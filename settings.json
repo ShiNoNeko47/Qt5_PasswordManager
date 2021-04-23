@@ -1,0 +1,8 @@
+{
+    "password":{
+        "length":15,
+        "upper":1,
+        "numbers":1,
+        "special":1
+    }
+}
