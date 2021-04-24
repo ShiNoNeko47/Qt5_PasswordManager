@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 import sqlite3
 from password import *
 import sys
+import pyperclip
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -63,9 +64,9 @@ class ShowPasswords(QWidget):
         self.layout = QGridLayout()
 
         self.table = QTableWidget()
-        self.table.setColumnCount(3)
+        self.table.setColumnCount(4)
         self.table.verticalHeader().setVisible(False)
-        self.table.setHorizontalHeaderLabels(['Website', 'Username', 'Password'])
+        self.table.setHorizontalHeaderLabels(['Website', 'Username', 'Password', ''])
 
         conn = sqlite3.connect('passwords.db')
         c = conn.cursor()
@@ -74,17 +75,30 @@ class ShowPasswords(QWidget):
         c.close()
         conn.close()
 
+        for i in range(3):
+            self.table.setColumnWidth(i, 190)
+        self.table.setColumnWidth(3, 30)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+        copy_btns = {}
         for row, i in zip(self.data, range(len(self.data))):
             self.table.insertRow(i)
             for data, j in zip(row, range(3)):
                 self.table.setItem(self.data.index(row), j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(data))))
-                self.table.setColumnWidth(j, 200)
+
+            copy_btns.update({i:copy_btn(i, self.data)})
+            self.table.setCellWidget(i, 3, copy_btns[i])
 
         self.setFixedWidth(640)
-        self.table.setFixedWidth(602)
+        self.table.setFixedWidth(604)
 
         self.layout.addWidget(self.table, 0, 0)
         self.setLayout(self.layout)
+
+class copy_btn(QPushButton):
+    def __init__(self, index, data):
+        super().__init__()
+        self.clicked.connect(lambda: pyperclip.copy(data[index][2]))
 
 def main():
 
