@@ -60,10 +60,12 @@ class ShowPasswords(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Passwords')
-        layout = QGridLayout()
+        self.layout = QGridLayout()
 
         self.table = QTableWidget()
         self.table.setColumnCount(3)
+        self.table.verticalHeader().setVisible(False)
+        self.table.setHorizontalHeaderLabels(['Website', 'Username', 'Password'])
 
         conn = sqlite3.connect('passwords.db')
         c = conn.cursor()
@@ -72,29 +74,27 @@ class ShowPasswords(QWidget):
         c.close()
         conn.close()
 
-        for row in self.data:
-            self.table.insertRow(self.data.index(row))
-            print(row)
-            for data in row:
-                print(data + str(self.data.index(row)) + str(row.index(data)))
-                self.table.setItem(self.data.index(row), row.index(data), QTableWidgetItem(data))
+        for row, i in zip(self.data, range(len(self.data))):
+            self.table.insertRow(i)
+            for data, j in zip(row, range(3)):
+                self.table.setItem(self.data.index(row), j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(data))))
+                self.table.setColumnWidth(j, 200)
 
-        layout.addWidget(self.table, 0, 0)
-        self.setLayout(layout)
+        self.setFixedWidth(640)
+        self.table.setFixedWidth(602)
+
+        self.layout.addWidget(self.table, 0, 0)
+        self.setLayout(self.layout)
 
 def main():
 
-    conn = sqlite3.connect('passwords.db')
-    c = conn.cursor()
-    c.execute('select * from passwords')
-    print(c.fetchall())
-    c.close()
-    conn.close()
+    argv = sys.argv
+    argv[0] = 'Qt5PasswordManager'
 
-    app = QApplication(sys.argv)
+    app = QApplication(argv)
     window = MainWindow()
     window.show()
-    app.exec_()
+    sys.exit(app.exec_())
 
 if __name__ == '__main__':
     main()
