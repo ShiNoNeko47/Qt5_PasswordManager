@@ -9,18 +9,35 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('PasswordManager')
+        self.setFixedHeight(150)
+        self.setFixedWidth(600)
         self.w = None
-        layout = QGridLayout()
+        access = False
+        self.layout = QGridLayout()
 
-        addPassword_btn = QPushButton('Add password')
-        addPassword_btn.clicked.connect(self.newpassword)
-        layout.addWidget(addPassword_btn)
+        self.key_input = QLineEdit()
+        self.key_input.setEchoMode(QLineEdit.Password)
+        self.key_input.textChanged.connect(self.check_key)
+        self.layout.addWidget(self.key_input)
 
-        showPasswords_btn = QPushButton('Show my passwords')
-        showPasswords_btn.clicked.connect(self.showpasswords)
-        layout.addWidget(showPasswords_btn)
+        self.addPassword_btn = QPushButton('Add password')
+        self.addPassword_btn.setEnabled(False)
+        self.addPassword_btn.clicked.connect(self.newpassword)
+        self.layout.addWidget(self.addPassword_btn)
 
-        self.setLayout(layout)
+        self.showPasswords_btn = QPushButton('Show my passwords')
+        self.showPasswords_btn.setEnabled(False)
+        self.showPasswords_btn.clicked.connect(self.showpasswords)
+        self.layout.addWidget(self.showPasswords_btn)
+
+        self.setLayout(self.layout)
+
+    def check_key(self):
+        self.addPassword_btn.setEnabled(False)
+        self.showPasswords_btn.setEnabled(False)
+        if self.key_input.text() == 'abc':
+            self.addPassword_btn.setEnabled(True)
+            self.showPasswords_btn.setEnabled(True)
 
     def newpassword(self):
         if self.w == None:
