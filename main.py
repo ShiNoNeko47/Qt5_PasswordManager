@@ -80,13 +80,13 @@ class ShowPasswords(QWidget):
         self.table.setColumnWidth(3, 30)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-        copy_btns = {}
+        copy_btns = []
         for row, i in zip(self.data, range(len(self.data))):
             self.table.insertRow(i)
             for data, j in zip(row, range(3)):
                 self.table.setItem(self.data.index(row), j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(data))))
 
-            copy_btns.update({i:copy_btn(i, self.data)})
+            copy_btns.append(copy_btn(i, self.data))
             self.table.setCellWidget(i, 3, copy_btns[i])
 
         self.setFixedWidth(640)
