@@ -5,6 +5,7 @@ import sqlite3
 from password import *
 import sys
 import pyperclip
+import os
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -74,6 +75,7 @@ class ManagePasswordsWindow(QWidget):
         self.commit_btn.clicked.connect(self.commitChanges)
         self.layout.addWidget(self.commit_btn, 2, 3)
 
+        self.setFixedWidth(640)
         self.setLayout(self.layout)
 
     def createTable(self):
@@ -90,7 +92,7 @@ class ManagePasswordsWindow(QWidget):
         self.data = c.fetchall()
         c.execute('select id from passwords')
         self.rowIds = c.fetchall()
-        print(self.rowIds)
+        #print(self.rowIds)
         c.close()
         conn.close()
 
@@ -127,7 +129,7 @@ class ManagePasswordsWindow(QWidget):
             i = n
             while (n,) in self.rowIds:
                 n += 1
-                print(n)
+                #print(n)
             self.rowIds.append((n,))
             self.sql.append('insert into passwords values ({}, \'{}\',\'{}\',\'{}\')'.format(n, self.newWebsite_le.text(), self.newUsername_le.text(), self.newPassword_le.text()))
             self.table.insertRow(i)
@@ -139,7 +141,7 @@ class ManagePasswordsWindow(QWidget):
             self.newUsername_le.setText('')
             self.newPassword_le.setText('')
 
-            print(self.sql)
+            #print(self.sql)
             self.createRemoveBtns()
 
     def commitChanges(self):
@@ -200,6 +202,7 @@ class copy_btn(QPushButton):
 class remove_btn(QPushButton):
     def __init__(self, rowId, table, remove_btns, sql):
         super().__init__()
+        self.setText('X')
         self.table = table
         self.remove_btns = remove_btns
         self.clicked.connect(self.remove_row)
@@ -211,12 +214,10 @@ class remove_btn(QPushButton):
         del self.remove_btns[self.remove_btns.index(self)]
         if self.rowId >= 0:
             self.sql.append('delete from passwords where id = {}'.format(self.rowId))
-        print(self.sql)
+        #print(self.sql)
 
 def main():
-
-    argv = sys.argv
-    argv[0] = 'Qt5PasswordManager'
+    os.chdir(sys.path[0])
 
     conn = sqlite3.connect('passwords.db')
     c = conn.cursor()
@@ -227,7 +228,7 @@ def main():
     c.close()
     conn.close()
 
-    app = QApplication(argv)
+    app = QApplication(['Qt5PasswordManager'])
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
