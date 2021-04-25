@@ -106,14 +106,17 @@ class ManagePasswordsWindow(QWidget):
 
         self.createRemoveBtns()
 
+        self.table.setFixedWidth(619)
+
         self.layout.addWidget(self.table, 1, 0, 1, 4)
 
     def createRemoveBtns(self):
         self.remove_btns = []
 
+        n = 0
         for i in range(self.table.rowCount()):
             try:
-                self.remove_btns.append(remove_btn(self.rowIds[i][0], self.table, self.remove_btns, self.sql))
+                self.remove_btns.append(remove_btn(self.rowIds[i + n][0], self.table, self.remove_btns, self.sql))
             except Exception:
                 self.remove_btns.append(remove_btn(-1, self.table, self.remove_btns, self.sql))
             self.table.setCellWidget(i, 3, self.remove_btns[i])
@@ -121,11 +124,16 @@ class ManagePasswordsWindow(QWidget):
     def addPassword(self):
         if all([self.newWebsite_le.text() != '', self.newUsername_le.text() != '', self.newPassword_le.text() != '']):
             n = self.table.rowCount()
+            i = n
+            while (n,) in self.rowIds:
+                n += 1
+                print(n)
+            self.rowIds.append((n,))
             self.sql.append('insert into passwords values ({}, \'{}\',\'{}\',\'{}\')'.format(n, self.newWebsite_le.text(), self.newUsername_le.text(), self.newPassword_le.text()))
-            self.table.insertRow(n)
-            self.table.setItem(n, 0, (QTableWidgetItem('* ' + self.newWebsite_le.text())))
-            self.table.setItem(n, 1, (QTableWidgetItem('* ' + self.newUsername_le.text())))
-            self.table.setItem(n, 2, (QTableWidgetItem('* ' + '*' * len(self.newPassword_le.text()))))
+            self.table.insertRow(i)
+            self.table.setItem(i, 0, (QTableWidgetItem('* ' + self.newWebsite_le.text())))
+            self.table.setItem(i, 1, (QTableWidgetItem('* ' + self.newUsername_le.text())))
+            self.table.setItem(i, 2, (QTableWidgetItem('* ' + '*' * len(self.newPassword_le.text()))))
 
             self.newWebsite_le.setText('')
             self.newUsername_le.setText('')
@@ -175,12 +183,12 @@ class ShowPasswords(QWidget):
         for row, i in zip(self.data, range(len(self.data))):
             self.table.insertRow(i)
             for data, j in zip(row, range(3)):
-                self.table.setItem(self.data.index(row), j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(data))))
+                self.table.setItem(i, j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(data))))
 
             copy_btns.append(copy_btn(i, self.data))
             self.table.setCellWidget(i, 3, copy_btns[i])
 
-        self.table.setFixedWidth(604)
+        self.table.setFixedWidth(619)
 
         self.layout.addWidget(self.table, 0, 0)
 
@@ -209,6 +217,15 @@ def main():
 
     argv = sys.argv
     argv[0] = 'Qt5PasswordManager'
+
+    conn = sqlite3.connect('passwords.db')
+    c = conn.cursor()
+    try:
+        c.execute('create table passwords (id integer, website varchar(50), username varchar(50), password varchar(50))')
+    except Exception:
+        pass
+    c.close()
+    conn.close()
 
     app = QApplication(argv)
     window = MainWindow()
