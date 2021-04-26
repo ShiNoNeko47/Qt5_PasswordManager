@@ -6,8 +6,12 @@ from password import *
 import sys
 import pyperclip
 import os
+import base64
 from Crypto.Hash import SHA256
-from Crypto.Protocol.KDF import PBKDF2
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.fernet import Fernet
 
 class SetupWindow(QWidget):
     def __init__(self):
@@ -44,7 +48,7 @@ class SetupWindow(QWidget):
 
         conn = sqlite3.connect('passwords.db')
         c = conn.cursor()
-        c.execute("insert into passwords values (-1, \'Master\', \'Key\', \'{}\')".format(SHA256.new(str.encode(self.key_setup_le.text())).hexdigest()))
+        c.execute("insert into passwords values (-1, \"Master\", \"Key\", \"{}\")".format(SHA256.new(str.encode(self.key_setup_le.text())).hexdigest()))
         conn.commit()
         c.close()
         conn.close()
@@ -59,9 +63,6 @@ class MainWindow(QWidget):
         self.setWindowTitle('PasswordManager')
         self.setFixedHeight(150)
         self.setFixedWidth(600)
-
-        self.w1 = ManagePasswordsWindow()
-        self.w2 = ShowPasswords()
 
         self.layout = QGridLayout()
 
@@ -88,18 +89,36 @@ class MainWindow(QWidget):
         if SHA256.new(str.encode(self.key_input.text())).hexdigest() == self.key_hashed:
             self.managePasswords_btn.setEnabled(True)
             self.displayPasswords_btn.setEnabled(True)
+            self.key = self.getKey()
+            print(self.key)
 
     def managepasswords(self):
+        self.w1 = ManagePasswordsWindow(self.key)
         self.w1.createTable()
         self.w1.show()
 
     def displaypasswords(self):
+        self.w2 = ShowPasswords(self.key)
         self.w2.createTable()
         self.w2.show()
 
+    def getKey(self):
+        password = self.key_input.text().encode()
+        salt = b'sw\xea\x01\x9d\x109\x0eF\xef/\n\xb0mWK'
+        kdf = PBKDF2HMAC(
+                algorithm = hashes.SHA256,
+                length = 32,
+                salt = salt,
+                iterations=10000,
+                backend = default_backend()
+                )
+        return base64.urlsafe_b64encode(kdf.derive(password))
+
 class ManagePasswordsWindow(QWidget):
-    def __init__(self):
+    def __init__(self, key):
         super().__init__()
+        self.f = Fernet(key)
+
         self.setWindowTitle('Manage Passwords')
         self.layout = QGridLayout()
 
@@ -150,7 +169,7 @@ class ManagePasswordsWindow(QWidget):
         for row, i in zip(self.data, range(len(self.data))):
             self.table.insertRow(i)
             for data, j in zip(row, range(3)):
-                self.table.setItem(i, j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(data))))
+                self.table.setItem(i, j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(self.f.decrypt(data.encode())))))
 
         self.createRemoveBtns()
 
@@ -177,7 +196,7 @@ class ManagePasswordsWindow(QWidget):
                 n += 1
                 #print(n)
             self.rowIds.append((n,))
-            self.sql.append('insert into passwords values ({}, \'{}\',\'{}\',\'{}\')'.format(n, self.newWebsite_le.text(), self.newUsername_le.text(), self.newPassword_le.text()))
+            self.sql.append('insert into passwords values ({}, \"{}\",\"{}\",\"{}\")'.format(n, self.newWebsite_le.text(), self.newUsername_le.text(), self.f.encrypt(self.newPassword_le.text().encode()).decode()))
             self.table.insertRow(i)
             self.table.setItem(i, 0, (QTableWidgetItem('* ' + self.newWebsite_le.text())))
             self.table.setItem(i, 1, (QTableWidgetItem('* ' + self.newUsername_le.text())))
@@ -194,6 +213,7 @@ class ManagePasswordsWindow(QWidget):
         conn = sqlite3.connect('passwords.db')
         c = conn.cursor()
         for statement in self.sql:
+            print(statement)
             c.execute(statement)
         conn.commit()
         c.close()
@@ -201,8 +221,10 @@ class ManagePasswordsWindow(QWidget):
         self.createTable()
 
 class ShowPasswords(QWidget):
-    def __init__(self):
+    def __init__(self, key):
         super().__init__()
+        self.f = Fernet(key)
+
         self.setWindowTitle('Passwords')
         self.layout = QGridLayout()
 
@@ -231,9 +253,9 @@ class ShowPasswords(QWidget):
         for row, i in zip(self.data, range(len(self.data))):
             self.table.insertRow(i)
             for data, j in zip(row, range(3)):
-                self.table.setItem(i, j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(data))))
+                self.table.setItem(i, j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(self.f.decrypt(data.encode())))))
 
-            copy_btns.append(copy_btn(i, self.data))
+            copy_btns.append(copy_btn(i, self.data, self.f))
             self.table.setCellWidget(i, 3, copy_btns[i])
 
         self.table.setFixedWidth(619)
@@ -241,9 +263,9 @@ class ShowPasswords(QWidget):
         self.layout.addWidget(self.table, 0, 0)
 
 class copy_btn(QPushButton):
-    def __init__(self, index, data):
+    def __init__(self, index, data, f):
         super().__init__()
-        self.clicked.connect(lambda: pyperclip.copy(data[index][2]))
+        self.clicked.connect(lambda: pyperclip.copy(f.decrypt(data[index][2].encode()).decode()))
 
 class remove_btn(QPushButton):
     def __init__(self, rowId, table, remove_btns, sql):
