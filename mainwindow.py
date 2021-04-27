@@ -16,8 +16,8 @@ class MainWindow(QWidget):
         self.setFixedHeight(150)
         self.setFixedWidth(600)
 
-        self.w1 = ManagePasswordsWindow()
         self.w2 = ShowPasswordsWindow()
+        self.w1 = ManagePasswordsWindow(self.w2)
 
         self.layout = QGridLayout()
 
@@ -51,6 +51,7 @@ class MainWindow(QWidget):
 
     def managepasswords(self):
         self.w1.setKey(self.key)
+        self.w2.setKey(self.key)
         self.w1.createTable()
         self.w1.show()
 

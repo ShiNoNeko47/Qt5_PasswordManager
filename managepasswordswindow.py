@@ -4,7 +4,7 @@ from cryptography.fernet import Fernet
 from removebtn import Remove_btn
 
 class ManagePasswordsWindow(QWidget):
-    def __init__(self):
+    def __init__(self, displayPasswordsWindow):
         super().__init__()
         self.setWindowTitle('Manage Passwords')
         self.layout = QGridLayout()
@@ -29,6 +29,8 @@ class ManagePasswordsWindow(QWidget):
 
         self.setFixedWidth(640)
         self.setLayout(self.layout)
+
+        self.displayPasswordsWindow = displayPasswordsWindow
 
     def setKey(self, key):
         self.f = Fernet(key)
@@ -83,7 +85,6 @@ class ManagePasswordsWindow(QWidget):
             i = n
             while (n,) in self.rowIds:
                 n += 1
-                #print(n)
             self.rowIds.append((n,))
             self.sql.append('insert into passwords values ({}, \"{}\",\"{}\",\"{}\")'.format(n, self.newWebsite_le.text(), self.newUsername_le.text(), self.f.encrypt(self.newPassword_le.text().encode()).decode()))
             self.table.insertRow(i)
@@ -108,4 +109,6 @@ class ManagePasswordsWindow(QWidget):
         c.close()
         conn.close()
         self.createTable()
+        self.displayPasswordsWindow.createTable()
+        Remove_btn.marked.clear()
 
