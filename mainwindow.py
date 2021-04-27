@@ -9,7 +9,7 @@ from managepasswordswindow import ManagePasswordsWindow
 from showpasswordswindow import ShowPasswordsWindow
 
 class MainWindow(QWidget):
-    def __init__(self, key_hashed):
+    def __init__(self, key_hashed, key = ''):
         super().__init__()
         self.key_hashed = key_hashed
         self.setWindowTitle('PasswordManager')
@@ -37,6 +37,8 @@ class MainWindow(QWidget):
         self.layout.addWidget(self.displayPasswords_btn)
 
         self.setLayout(self.layout)
+
+        self.key_input.setText(key)
 
     def check_key(self):
         self.managePasswords_btn.setEnabled(False)

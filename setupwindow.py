@@ -51,6 +51,6 @@ class SetupWindow(QWidget):
         c.close()
         conn.close()
 
-        self.window = MainWindow(SHA256.new(str.encode(self.key_setup_le.text())).hexdigest())
+        self.window = MainWindow(SHA256.new(str.encode(self.key_setup_le.text())).hexdigest(), self.key_setup_le.text())
         self.window.show()
 
