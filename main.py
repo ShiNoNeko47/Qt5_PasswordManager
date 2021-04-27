@@ -90,7 +90,7 @@ class MainWindow(QWidget):
             self.managePasswords_btn.setEnabled(True)
             self.displayPasswords_btn.setEnabled(True)
             self.key = self.getKey()
-            print(self.key)
+            #print(self.key)
 
     def managepasswords(self):
         self.w1 = ManagePasswordsWindow(self.key)
@@ -180,10 +180,9 @@ class ManagePasswordsWindow(QWidget):
     def createRemoveBtns(self):
         self.remove_btns = []
 
-        n = 0
         for i in range(self.table.rowCount()):
             try:
-                self.remove_btns.append(remove_btn(self.rowIds[i + n][0], self.table, self.remove_btns, self.sql))
+                self.remove_btns.append(remove_btn(self.rowIds[i][0], self.table, self.remove_btns, self.sql))
             except Exception:
                 self.remove_btns.append(remove_btn(-1, self.table, self.remove_btns, self.sql))
             self.table.setCellWidget(i, 3, self.remove_btns[i])
@@ -198,9 +197,9 @@ class ManagePasswordsWindow(QWidget):
             self.rowIds.append((n,))
             self.sql.append('insert into passwords values ({}, \"{}\",\"{}\",\"{}\")'.format(n, self.newWebsite_le.text(), self.newUsername_le.text(), self.f.encrypt(self.newPassword_le.text().encode()).decode()))
             self.table.insertRow(i)
-            self.table.setItem(i, 0, (QTableWidgetItem('* ' + self.newWebsite_le.text())))
-            self.table.setItem(i, 1, (QTableWidgetItem('* ' + self.newUsername_le.text())))
-            self.table.setItem(i, 2, (QTableWidgetItem('* ' + '*' * len(self.newPassword_le.text()))))
+            self.table.setItem(i, 0, (QTableWidgetItem('+ ' + self.newWebsite_le.text())))
+            self.table.setItem(i, 1, (QTableWidgetItem('+ ' + self.newUsername_le.text())))
+            self.table.setItem(i, 2, (QTableWidgetItem('+ ' + '*' * len(self.newPassword_le.text()))))
 
             self.newWebsite_le.setText('')
             self.newUsername_le.setText('')
@@ -213,7 +212,7 @@ class ManagePasswordsWindow(QWidget):
         conn = sqlite3.connect('passwords.db')
         c = conn.cursor()
         for statement in self.sql:
-            print(statement)
+            #print(statement)
             c.execute(statement)
         conn.commit()
         c.close()
@@ -268,20 +267,29 @@ class copy_btn(QPushButton):
         self.clicked.connect(lambda: pyperclip.copy(f.decrypt(data[index][2].encode()).decode()))
 
 class remove_btn(QPushButton):
+    marked = []
     def __init__(self, rowId, table, remove_btns, sql):
         super().__init__()
-        self.setText('X')
         self.table = table
         self.remove_btns = remove_btns
         self.clicked.connect(self.remove_row)
         self.rowId = rowId
         self.sql = sql
+        if self.rowId not in remove_btn.marked:
+            self.setText('X')
+        else:
+            self.setText('-')
 
     def remove_row(self):
-        self.table.removeRow(self.remove_btns.index(self))
-        del self.remove_btns[self.remove_btns.index(self)]
-        if self.rowId >= 0:
-            self.sql.append('delete from passwords where id = {}'.format(self.rowId))
+        if self.rowId not in remove_btn.marked:
+            if self.rowId >= 0:
+                self.sql.append('delete from passwords where id = {}'.format(self.rowId))
+                self.setText('-')
+                remove_btn.marked.append(self.rowId)
+        else:
+            del self.sql[self.sql.index('delete from passwords where id = {}'.format(self.rowId))]
+            self.setText('X')
+            del remove_btn.marked[remove_btn.marked.index(self.rowId)]
         #print(self.sql)
 
 def main():
