@@ -72,3 +72,9 @@ class MainWindow(QWidget):
                 )
         return base64.urlsafe_b64encode(kdf.derive(password))
 
+    def closeEvent(self, event):
+        if all([self.w1.isHidden(), self.w2.isHidden()]):
+            event.accept()
+        else:
+            event.ignore()
+
