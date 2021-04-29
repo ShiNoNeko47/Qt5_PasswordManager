@@ -4,8 +4,9 @@ from cryptography.fernet import Fernet
 from copybtn import Copy_btn
 
 class ShowPasswordsWindow(QWidget):
-    def __init__(self):
+    def __init__(self, btn):
         super().__init__()
+        self.btn = btn
         self.setWindowTitle('Passwords')
         self.layout = QGridLayout()
 
@@ -46,3 +47,5 @@ class ShowPasswordsWindow(QWidget):
 
         self.layout.addWidget(self.table, 0, 0)
 
+    def closeEvent(self, event):
+        self.btn.setDisabled(False)
