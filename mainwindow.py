@@ -16,9 +16,6 @@ class MainWindow(QWidget):
         self.setFixedHeight(150)
         self.setFixedWidth(600)
 
-        self.w2 = ShowPasswordsWindow()
-        self.w1 = ManagePasswordsWindow(self.w2)
-
         self.layout = QGridLayout()
 
         self.key_input = QLineEdit()
@@ -40,6 +37,9 @@ class MainWindow(QWidget):
 
         self.key_input.setText(key)
 
+        self.w2 = ShowPasswordsWindow(self.displayPasswords_btn)
+        self.w1 = ManagePasswordsWindow(self.w2, self.managePasswords_btn)
+
     def check_key(self):
         self.managePasswords_btn.setEnabled(False)
         self.displayPasswords_btn.setEnabled(False)
@@ -55,10 +55,14 @@ class MainWindow(QWidget):
         self.w1.createTable()
         self.w1.show()
 
+        self.managePasswords_btn.setDisabled(True)
+
     def displaypasswords(self):
         self.w2.setKey(self.key)
         self.w2.createTable()
         self.w2.show()
+
+        self.displayPasswords_btn.setDisabled(True)
 
     def getKey(self):
         password = self.key_input.text().encode()
