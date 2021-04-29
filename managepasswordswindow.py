@@ -148,4 +148,8 @@ class ManagePasswordsWindow(QWidget):
         Remove_btn.marked.clear()
     def closeEvent(self, event):
         self.btn.setDisabled(False)
+        self.newWebsite_le.setText('')
+        self.newUsername_le.setText('')
+        self.newPassword_le.setText('')
+        self.reNewPassword_le.setText('')
 
