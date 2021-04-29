@@ -4,8 +4,9 @@ from cryptography.fernet import Fernet
 from removebtn import Remove_btn
 
 class ManagePasswordsWindow(QWidget):
-    def __init__(self, displayPasswordsWindow):
+    def __init__(self, displayPasswordsWindow, btn):
         super().__init__()
+        self.btn = btn
         self.setWindowTitle('Manage Passwords')
         self.layout = QGridLayout()
 
@@ -89,13 +90,23 @@ class ManagePasswordsWindow(QWidget):
             self.table.setCellWidget(i, 3, self.remove_btns[i])
 
     def validInputCheck(self):
-        if all([self.newWebsite_le.text() != '',
-                self.newUsername_le.text() != '',
-                self.newPassword_le.text() != '',
-                self.newPassword_le.text() == self.reNewPassword_le.text()]):
+        check = [all([self.newWebsite_le.text() != '',
+            self.newUsername_le.text() != '',
+            self.newPassword_le.text() != '',
+            self.reNewPassword_le.text() != '']),
+            self.newPassword_le.text() == self.reNewPassword_le.text()]
+        if all(check):
             self.add_btn.setDisabled(False)
+            self.add_btn.setToolTip('')
             return True
         self.add_btn.setDisabled(True)
+        self.req_notMet = list(map(lambda x: x[1:], filter(lambda x: not check[int(x[0])], [
+            '0Don\'t leave empty fields!',
+            '1Passwords don\'t match!'])))
+        tooltip = ''
+        for i, j in zip(self.req_notMet, ['', '\n']):
+            tooltip = tooltip + j + i
+        self.add_btn.setToolTip(tooltip)
 
     def addPassword(self):
         if self.validInputCheck():
@@ -135,4 +146,6 @@ class ManagePasswordsWindow(QWidget):
         self.createTable()
         self.displayPasswordsWindow.createTable()
         Remove_btn.marked.clear()
+    def closeEvent(self, event):
+        self.btn.setDisabled(False)
 
