@@ -39,6 +39,7 @@ class ManagePasswordsWindow(QWidget):
         self.layout.addWidget(self.add_btn, 0, 3, 2, 1)
 
         self.save_btn = QPushButton('Save')
+        self.save_btn.setDisabled(True)
         self.save_btn.clicked.connect(self.commitChanges)
         self.layout.addWidget(self.save_btn, 3, 3)
 
@@ -74,10 +75,9 @@ class ManagePasswordsWindow(QWidget):
         self.table.setColumnWidth(4, 30)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-        for row, i in zip(self.data, range(len(self.data))):
+        for i in range(len(self.data)):
             self.table.insertRow(i)
-            for data, j in zip(row, range(3)):
-                self.table.setItem(i, j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(self.f.decrypt(data.encode())))))
+            self.update_row(i)
 
         self.createBtns()
 
@@ -85,16 +85,21 @@ class ManagePasswordsWindow(QWidget):
 
         self.layout.addWidget(self.table, 2, 0, 1, 4)
 
+    def update_row(self, i):
+        row = self.data[i]
+        for data, j in zip(row, range(3)):
+            self.table.setItem(i, j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(self.f.decrypt(data.encode())))))
+
     def createBtns(self):
         self.remove_btns = []
         self.edit_btns = []
 
         for i in range(self.table.rowCount()):
             try:
-                self.remove_btns.append(Remove_btn(self.rowIds[i][0], self.table, self.remove_btns, self.sql))
+                self.remove_btns.append(Remove_btn(self.rowIds[i][0], self.table, self.remove_btns, self.sql, self))
                 self.edit_btns.append(Edit_btn(self.rowIds[i][0], self.table, self.edit_btns, self.sql, self))
             except Exception:
-                self.remove_btns.append(Remove_btn(-1, self.table, self.remove_btns, self.sql))
+                self.remove_btns.append(Remove_btn(-1, self.table, self.remove_btns, self.sql, self))
                 self.edit_btns.append(Edit_btn(-1, self.table, self.edit_btns, self.sql, self))
             self.table.setCellWidget(i, 3, self.edit_btns[i])
             self.table.setCellWidget(i, 4, self.remove_btns[i])
@@ -130,6 +135,7 @@ class ManagePasswordsWindow(QWidget):
                 self.newUsername_le.text(),
                 self.f.encrypt(self.newPassword_le.text().encode()).decode()
             ))
+            self.save_btn.setDisabled(not self.sql)
 
             self.table.insertRow(i)
             self.table.setItem(i, 0, (QTableWidgetItem('+ ' + self.newWebsite_le.text())))
@@ -156,9 +162,12 @@ class ManagePasswordsWindow(QWidget):
         self.createTable()
         self.displayPasswordsWindow.createTable()
         Remove_btn.marked.clear()
+        self.save_btn.setDisabled(True)
+        Edit_btn.marked.clear()
 
     def closeEvent(self, event):
         self.btn.setDisabled(False)
+        Edit_btn.marked.clear()
         self.resetEntries()
 
     def resetEntries(self):
