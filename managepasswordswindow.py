@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import *
 import sqlite3
 from cryptography.fernet import Fernet
 from removebtn import Remove_btn
+from editbtn import Edit_btn
 
 class ManagePasswordsWindow(QWidget):
     def __init__(self, displayPasswordsWindow, btn):
@@ -12,18 +13,22 @@ class ManagePasswordsWindow(QWidget):
 
         self.newWebsite_le = QLineEdit()
         self.newWebsite_le.textChanged.connect(self.validInputCheck)
+        self.newWebsite_le.setPlaceholderText('Website:')
         self.layout.addWidget(self.newWebsite_le, 0, 0, 2, 1)
 
         self.newUsername_le = QLineEdit()
+        self.newUsername_le.setPlaceholderText('Username:')
         self.newUsername_le.textChanged.connect(self.validInputCheck)
         self.layout.addWidget(self.newUsername_le, 0, 1, 2, 1)
 
         self.newPassword_le = QLineEdit()
+        self.newPassword_le.setPlaceholderText('Password:')
         self.newPassword_le.setEchoMode(QLineEdit.Password)
         self.newPassword_le.textChanged.connect(self.validInputCheck)
         self.layout.addWidget(self.newPassword_le, 0, 2)
 
         self.reNewPassword_le = QLineEdit()
+        self.reNewPassword_le.setPlaceholderText('Confirm Password:')
         self.reNewPassword_le.setEchoMode(QLineEdit.Password)
         self.reNewPassword_le.textChanged.connect(self.validInputCheck)
         self.layout.addWidget(self.reNewPassword_le, 1, 2)
@@ -49,9 +54,9 @@ class ManagePasswordsWindow(QWidget):
         self.sql = []
 
         self.table = QTableWidget()
-        self.table.setColumnCount(4)
+        self.table.setColumnCount(5)
         self.table.verticalHeader().setVisible(False)
-        self.table.setHorizontalHeaderLabels(['Website', 'Username', 'Password', ''])
+        self.table.setHorizontalHeaderLabels(['Website', 'Username', 'Password', '', ''])
 
         conn = sqlite3.connect('passwords.db')
         c = conn.cursor()
@@ -64,8 +69,9 @@ class ManagePasswordsWindow(QWidget):
         conn.close()
 
         for i in range(3):
-            self.table.setColumnWidth(i, 190)
+            self.table.setColumnWidth(i, 180)
         self.table.setColumnWidth(3, 30)
+        self.table.setColumnWidth(4, 30)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         for row, i in zip(self.data, range(len(self.data))):
@@ -73,21 +79,25 @@ class ManagePasswordsWindow(QWidget):
             for data, j in zip(row, range(3)):
                 self.table.setItem(i, j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(self.f.decrypt(data.encode())))))
 
-        self.createRemoveBtns()
+        self.createBtns()
 
-        self.table.setFixedWidth(619)
+        self.table.setFixedWidth(620)
 
         self.layout.addWidget(self.table, 2, 0, 1, 4)
 
-    def createRemoveBtns(self):
+    def createBtns(self):
         self.remove_btns = []
+        self.edit_btns = []
 
         for i in range(self.table.rowCount()):
             try:
                 self.remove_btns.append(Remove_btn(self.rowIds[i][0], self.table, self.remove_btns, self.sql))
+                self.edit_btns.append(Edit_btn(self.rowIds[i][0], self.table, self.edit_btns, self.sql, self))
             except Exception:
                 self.remove_btns.append(Remove_btn(-1, self.table, self.remove_btns, self.sql))
-            self.table.setCellWidget(i, 3, self.remove_btns[i])
+                self.edit_btns.append(Edit_btn(-1, self.table, self.edit_btns, self.sql, self))
+            self.table.setCellWidget(i, 3, self.edit_btns[i])
+            self.table.setCellWidget(i, 4, self.remove_btns[i])
 
     def validInputCheck(self):
         check = [all([self.newWebsite_le.text() != '',
@@ -132,7 +142,7 @@ class ManagePasswordsWindow(QWidget):
             self.reNewPassword_le.setText('')
 
             #print(self.sql)
-            self.createRemoveBtns()
+            self.createBtns()
 
     def commitChanges(self):
         conn = sqlite3.connect('passwords.db')
@@ -146,8 +156,12 @@ class ManagePasswordsWindow(QWidget):
         self.createTable()
         self.displayPasswordsWindow.createTable()
         Remove_btn.marked.clear()
+
     def closeEvent(self, event):
         self.btn.setDisabled(False)
+        self.resetEntries()
+
+    def resetEntries(self):
         self.newWebsite_le.setText('')
         self.newUsername_le.setText('')
         self.newPassword_le.setText('')
