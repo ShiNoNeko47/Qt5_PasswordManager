@@ -13,7 +13,7 @@ class MainWindow(QWidget):
     def __init__(self, key_hashed, key = ''):
         super().__init__()
         self.settings = QSettings()
-        self.move(self.settings.value('pos_main', QPoint(50, 50)))
+        self.move(self.settings.value('pos', QPoint(50, 50)))
 
         self.key_hashed = key_hashed
         self.setWindowTitle('PasswordManager')
