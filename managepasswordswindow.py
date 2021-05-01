@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import *
 import sqlite3
 from cryptography.fernet import Fernet
 from removebtn import Remove_btn
-from editbtn import Edit_btn
 
 class ManagePasswordsWindow(QWidget):
     def __init__(self, displayPasswordsWindow, btn):
@@ -54,9 +53,9 @@ class ManagePasswordsWindow(QWidget):
         self.sql = []
 
         self.table = QTableWidget()
-        self.table.setColumnCount(5)
+        self.table.setColumnCount(4)
         self.table.verticalHeader().setVisible(False)
-        self.table.setHorizontalHeaderLabels(['Website', 'Username', 'Password', '', ''])
+        self.table.setHorizontalHeaderLabels(['Website', 'Username', 'Password', ''])
 
         conn = sqlite3.connect('passwords.db')
         c = conn.cursor()
@@ -69,9 +68,8 @@ class ManagePasswordsWindow(QWidget):
         conn.close()
 
         for i in range(3):
-            self.table.setColumnWidth(i, 180)
+            self.table.setColumnWidth(i, 190)
         self.table.setColumnWidth(3, 30)
-        self.table.setColumnWidth(4, 30)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         for row, i in zip(self.data, range(len(self.data))):
@@ -87,17 +85,13 @@ class ManagePasswordsWindow(QWidget):
 
     def createBtns(self):
         self.remove_btns = []
-        self.edit_btns = []
 
         for i in range(self.table.rowCount()):
             try:
                 self.remove_btns.append(Remove_btn(self.rowIds[i][0], self.table, self.remove_btns, self.sql))
-                self.edit_btns.append(Edit_btn(self.rowIds[i][0], self.table, self.edit_btns, self.sql, self))
             except Exception:
                 self.remove_btns.append(Remove_btn(-1, self.table, self.remove_btns, self.sql))
-                self.edit_btns.append(Edit_btn(-1, self.table, self.edit_btns, self.sql, self))
-            self.table.setCellWidget(i, 3, self.edit_btns[i])
-            self.table.setCellWidget(i, 4, self.remove_btns[i])
+            self.table.setCellWidget(i, 3, self.remove_btns[i])
 
     def validInputCheck(self):
         check = [all([self.newWebsite_le.text() != '',
