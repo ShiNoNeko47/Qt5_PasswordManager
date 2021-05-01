@@ -9,7 +9,7 @@ class ManagePasswordsWindow(QWidget):
     def __init__(self, displayPasswordsWindow, btn):
         super().__init__()
         self.settings = QSettings()
-        self.move(self.settings.value('pos1', QPoint(50, 50)))
+        self.move(20, 370)
 
         self.btn = btn
         self.setWindowTitle('Manage Passwords')
@@ -169,7 +169,6 @@ class ManagePasswordsWindow(QWidget):
     def closeEvent(self, event):
         self.btn.setDisabled(False)
         self.resetEntries()
-        self.settings.setValue('pos1', self.pos())
 
     def resetEntries(self):
         self.newWebsite_le.setText('')

@@ -1,6 +1,6 @@
 from Crypto.Hash import SHA256
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QSettings, QPoint
+from PyQt5.QtCore import QPoint
 import base64
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -12,8 +12,7 @@ from showpasswordswindow import ShowPasswordsWindow
 class MainWindow(QWidget):
     def __init__(self, key_hashed, key = ''):
         super().__init__()
-        self.settings = QSettings()
-        self.move(self.settings.value('pos', QPoint(50, 50)))
+        self.move(QPoint(350, 200))
 
         self.key_hashed = key_hashed
         self.setWindowTitle('PasswordManager')
@@ -82,7 +81,6 @@ class MainWindow(QWidget):
 
     def closeEvent(self, event):
         if all([self.w1.isHidden(), self.w2.isHidden()]):
-            self.settings.setValue('pos', self.pos())
             event.accept()
         else:
             event.ignore()
