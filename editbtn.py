@@ -19,7 +19,8 @@ class Edit_btn(QPushButton):
                 if btn != self:
                     btn.setDisabled(True)
         else:
-
+            Edit_btn.marked.clear()
+            self.setText('')
             for btn in self.edit_btns:
                 btn.setDisabled(False)
 
@@ -38,10 +39,4 @@ class Edit_btn(QPushButton):
                 self.sql.append('update passwords set password=\'{}\' where id={}'.format(self.w.f.encrypt(self.w.newPassword_le.text().encode()).decode(), self.rowId))
                 self.setText('-')
                 self.table.setItem(self.edit_btns.index(self), 2, (QTableWidgetItem('+ ' + '*' * len(self.w.newPassword_le.text()))))
-
             self.w.resetEntries()
-            if self.text() != '-':
-                del Edit_btn.marked[Edit_btn.marked.index(self.rowId)]
-                self.setText('')
-
-        self.w.save_btn.setDisabled(not self.sql)
