@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import QSettings, QPoint
 import sqlite3
 from cryptography.fernet import Fernet
 from copybtn import Copy_btn
@@ -6,6 +7,8 @@ from copybtn import Copy_btn
 class ShowPasswordsWindow(QWidget):
     def __init__(self, btn):
         super().__init__()
+        self.settings = QSettings()
+        self.move(self.settings.value('pos2', QPoint(50, 50)))
         self.btn = btn
         self.setWindowTitle('Passwords')
         self.layout = QGridLayout()
@@ -49,3 +52,4 @@ class ShowPasswordsWindow(QWidget):
 
     def closeEvent(self, event):
         self.btn.setDisabled(False)
+        self.settings.setValue('pos2', self.pos())
