@@ -9,6 +9,7 @@ class ShowPasswordsWindow(QWidget):
         super().__init__()
         self.settings = QSettings()
         self.move(self.settings.value('pos2', QPoint(50, 50)))
+
         self.btn = btn
         self.setWindowTitle('Passwords')
         self.layout = QGridLayout()
