@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import *
+from PyQt5.Qt import Qt
 import sqlite3
 from Crypto.Hash import SHA256
 from mainwindow import MainWindow
@@ -34,6 +35,10 @@ class SetupWindow(QWidget):
         self.layout.addWidget(self.ok_btn, 1, 1)
 
         self.setLayout(self.layout)
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Return:
+            self.ok_btn.click()
 
     def check(self):
         self.ok_btn.setEnabled(False)

@@ -1,6 +1,7 @@
 from Crypto.Hash import SHA256
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QPoint
+from PyQt5.Qt import Qt
 import base64
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -26,15 +27,15 @@ class MainWindow(QWidget):
         self.key_input.textChanged.connect(self.check_key)
         self.layout.addWidget(self.key_input)
 
-        self.managePasswords_btn = QPushButton('Manage passwords')
-        self.managePasswords_btn.setEnabled(False)
-        self.managePasswords_btn.clicked.connect(self.managepasswords)
-        self.layout.addWidget(self.managePasswords_btn)
-
         self.displayPasswords_btn = QPushButton('Display passwords')
         self.displayPasswords_btn.setEnabled(False)
         self.displayPasswords_btn.clicked.connect(self.displaypasswords)
         self.layout.addWidget(self.displayPasswords_btn)
+
+        self.managePasswords_btn = QPushButton('Manage passwords')
+        self.managePasswords_btn.setEnabled(False)
+        self.managePasswords_btn.clicked.connect(self.managepasswords)
+        self.layout.addWidget(self.managePasswords_btn)
 
         self.setLayout(self.layout)
 
@@ -42,6 +43,10 @@ class MainWindow(QWidget):
 
         self.w2 = ShowPasswordsWindow(self.displayPasswords_btn)
         self.w1 = ManagePasswordsWindow(self.w2, self.managePasswords_btn)
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Return:
+            self.displayPasswords_btn.click()
 
     def check_key(self):
         self.managePasswords_btn.setEnabled(False)
