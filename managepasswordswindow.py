@@ -4,6 +4,7 @@ from cryptography.fernet import Fernet
 from removebtn import Remove_btn
 from editbtn import Edit_btn
 from PyQt5.QtCore import QSettings, QPoint
+from messagebox import MessageBox
 
 class ManagePasswordsWindow(QWidget):
     def __init__(self, displayPasswordsWindow, btn):
@@ -52,6 +53,8 @@ class ManagePasswordsWindow(QWidget):
 
         self.displayPasswordsWindow = displayPasswordsWindow
 
+        self.messageBox = MessageBox(self)
+
     def setKey(self, key):
         self.f = Fernet(key)
 
@@ -84,6 +87,8 @@ class ManagePasswordsWindow(QWidget):
             for data, j in zip(row, range(3)):
                 self.table.setItem(i, j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(self.f.decrypt(data.encode())))))
 
+        self.number_or_ids = len(self.rowIds)
+
         self.createBtns()
 
         self.table.setFixedWidth(620)
@@ -102,7 +107,8 @@ class ManagePasswordsWindow(QWidget):
                 self.remove_btns.append(Remove_btn(-1, self.table, self.remove_btns, self.sql, self))
                 self.edit_btns.append(Edit_btn(-1, self.edit_btns, self))
                 print(-1)
-            self.table.setCellWidget(i, 3, self.edit_btns[i])
+            if i < self.number_or_ids:
+                self.table.setCellWidget(i, 3, self.edit_btns[i])
             self.table.setCellWidget(i, 4, self.remove_btns[i])
 
     def validInputCheck(self):
@@ -165,14 +171,21 @@ class ManagePasswordsWindow(QWidget):
         self.displayPasswordsWindow.createTable()
         Remove_btn.marked.clear()
         self.save_btn.setDisabled(True)
-
-    def closeEvent(self, event):
-        self.btn.setDisabled(False)
-        self.resetEntries()
+        self.sql.clear()
 
     def resetEntries(self):
         self.newWebsite_le.setText('')
         self.newUsername_le.setText('')
         self.newPassword_le.setText('')
         self.reNewPassword_le.setText('')
+
+    def closeEvent(self, event):
+        if not self.sql:
+            self.btn.setDisabled(False)
+            self.resetEntries()
+            event.accept()
+        else:
+            event.ignore()
+            self.messageBox.close()
+            self.messageBox.show()
 
