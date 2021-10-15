@@ -9,9 +9,6 @@ from messagebox import MessageBox
 class ManagePasswordsWindow(QWidget):
     def __init__(self, displayPasswordsWindow, btn):
         super().__init__()
-        self.settings = QSettings()
-        self.move(20, 370)
-
         self.btn = btn
         self.setWindowTitle('Manage Passwords')
         self.layout = QGridLayout()
@@ -68,9 +65,10 @@ class ManagePasswordsWindow(QWidget):
 
         conn = sqlite3.connect('passwords.db')
         c = conn.cursor()
-        c.execute('select website, username, password from passwords where (id <> -1)')
+        print(self.user)
+        c.execute('select website, username, password from {} where (id <> -1)'.format(self.user))
         self.data = c.fetchall()
-        c.execute('select id from passwords where (id <> -1)')
+        c.execute('select id from {} where (id <> -1)'.format(self.user))
         self.rowIds = c.fetchall()
         #print(self.rowIds)
         c.close()
@@ -137,7 +135,8 @@ class ManagePasswordsWindow(QWidget):
             while (n,) in self.rowIds:
                 n += 1
             self.rowIds.append((n,))
-            self.sql.append('insert into passwords values ({}, \"{}\",\"{}\",\"{}\")'.format(n,
+            self.sql.append('insert into {} values ({}, \"{}\",\"{}\",\"{}\")'.format(self.user,
+                n,
                 self.newWebsite_le.text(),
                 self.newUsername_le.text(),
                 self.f.encrypt(self.newPassword_le.text().encode()).decode()
