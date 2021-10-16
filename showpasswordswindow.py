@@ -28,7 +28,7 @@ class ShowPasswordsWindow(QWidget):
 
         conn = sqlite3.connect('passwords.db')
         c = conn.cursor()
-        c.execute('select website, username, password from {} where (id <> -1)'.format(self.user))
+        c.execute('select website, username, password from \"{}\" where (id <> -1)'.format(self.user))
         self.data = c.fetchall()
         c.close()
         conn.close()

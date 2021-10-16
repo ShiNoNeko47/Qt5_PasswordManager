@@ -70,7 +70,7 @@ class MainWindow(QWidget):
         try:
             conn = sqlite3.connect('passwords.db')
             c = conn.cursor()
-            c.execute('select password from {} where (id = -1)'.format(self.name_input.text()))
+            c.execute('select password from \"{}\" where (id = -1)'.format(self.name_input.text()))
             key_hashed = c.fetchone()[0]
             c.close()
             conn.close()

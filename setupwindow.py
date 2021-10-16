@@ -63,9 +63,9 @@ class SetupWindow(QWidget):
 
         conn = sqlite3.connect('passwords.db')
         c = conn.cursor()
-        c.execute('create table {} (id integer, website varchar(50), username varchar(50), password varchar(50))'.format(self.username_setup_le.text()))
-        c.execute("insert into {} values (-1, \"Master\", \"Key\", \"{}\")".format(self.username_setup_le.text(), SHA256.new(str.encode(self.key_setup_le.text())).hexdigest()))
-        c.execute('select password from {} where (id = -1)'.format(self.username_setup_le.text()))
+        c.execute('create table \"{}\" (id integer, website varchar(50), username varchar(50), password varchar(50))'.format(self.username_setup_le.text()))
+        c.execute("insert into \"{}\" values (-1, \"Master\", \"Key\", \"{}\")".format(self.username_setup_le.text(), SHA256.new(str.encode(self.key_setup_le.text())).hexdigest()))
+        c.execute('select password from \"{}\" where (id = -1)'.format(self.username_setup_le.text()))
         print(c.fetchall())
         conn.commit()
         c.close()

@@ -66,9 +66,9 @@ class ManagePasswordsWindow(QWidget):
         conn = sqlite3.connect('passwords.db')
         c = conn.cursor()
         print(self.user)
-        c.execute('select website, username, password from {} where (id <> -1)'.format(self.user))
+        c.execute('select website, username, password from \"{}\" where (id <> -1)'.format(self.user))
         self.data = c.fetchall()
-        c.execute('select id from {} where (id <> -1)'.format(self.user))
+        c.execute('select id from \"{}\" where (id <> -1)'.format(self.user))
         self.rowIds = c.fetchall()
         #print(self.rowIds)
         c.close()
@@ -135,7 +135,7 @@ class ManagePasswordsWindow(QWidget):
             while (n,) in self.rowIds:
                 n += 1
             self.rowIds.append((n,))
-            self.sql.append('insert into {} values ({}, \"{}\",\"{}\",\"{}\")'.format(self.user,
+            self.sql.append('insert into \"{}\" values ({}, \"{}\",\"{}\",\"{}\")'.format(self.user,
                 n,
                 self.newWebsite_le.text(),
                 self.newUsername_le.text(),
