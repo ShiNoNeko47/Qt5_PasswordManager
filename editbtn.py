@@ -18,7 +18,7 @@ class Edit_btn(QPushButton):
             self.setText('-')
             conn = sqlite3.connect('passwords.db')
             c = conn.cursor()
-            c.execute('select * from passwords where id={}'.format(self.rowId))
+            c.execute('select * from \"{}\" where id={}'.format(self.w.user, self.rowId))
             row = c.fetchone()
             c.close()
             conn.close()
