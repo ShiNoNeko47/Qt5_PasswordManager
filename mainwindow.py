@@ -1,4 +1,5 @@
-import sqlite3
+import json
+import mysql.connector
 from Crypto.Hash import SHA256
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QPoint
@@ -15,7 +16,8 @@ from setupwindow import SetupWindow
 class MainWindow(QWidget):
     def __init__(self, key = ''):
         super().__init__()
-        self.move(QPoint(350, 200))
+        self.configFile = open('config.json')
+        self.config = json.loads(self.configFile.read())
 
         self.key_hashed = 'a'
         self.setWindowTitle('PasswordManager')
@@ -52,8 +54,8 @@ class MainWindow(QWidget):
         self.key_input.setText(key)
 
         self.w3 = SetupWindow(self)
-        self.w2 = ShowPasswordsWindow(self.displayPasswords_btn)
-        self.w1 = ManagePasswordsWindow(self.w2, self.managePasswords_btn)
+        self.w2 = ShowPasswordsWindow(self.displayPasswords_btn, self.config)
+        self.w1 = ManagePasswordsWindow(self.w2, self.managePasswords_btn, self.config)
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Return:
@@ -68,9 +70,9 @@ class MainWindow(QWidget):
 
     def check_key(self):
         try:
-            conn = sqlite3.connect('passwords.db')
+            conn = mysql.connector.connect(**self.config)
             c = conn.cursor()
-            c.execute('select password from \"{}\" where (id = -1)'.format(self.name_input.text()))
+            c.execute('select password from {}_ where (id = -1)'.format(self.name_input.text()))
             key_hashed = c.fetchone()[0]
             c.close()
             conn.close()
@@ -81,8 +83,8 @@ class MainWindow(QWidget):
                 print(self.key)
                 return True
             return False
-        except:
-            pass
+        except Exception as x:
+            print(x)
 
     def managepasswords(self):
         if self.check_key():
@@ -122,6 +124,7 @@ class MainWindow(QWidget):
     def closeEvent(self, event):
         if all([self.w1.isHidden(), self.w2.isHidden()]):
             event.accept()
+            self.configFile.close()
         else:
             event.ignore()
 

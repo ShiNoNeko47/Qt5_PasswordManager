@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 from PyQt5.QtWidgets import *
-import sqlite3
 import sys
 import os
 from mainwindow import MainWindow

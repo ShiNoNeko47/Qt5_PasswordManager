@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import *
-import sqlite3
+import mysql.connector
 
 class Edit_btn(QPushButton):
     def __init__(self, rowId, edit_btns, window):
@@ -16,9 +16,9 @@ class Edit_btn(QPushButton):
             for btn in self.edit_btns:
                 btn.setText('+')
             self.setText('-')
-            conn = sqlite3.connect('passwords.db')
+            conn = mysql.connector.connect(**self.w.config)
             c = conn.cursor()
-            c.execute('select * from \"{}\" where id={}'.format(self.w.user, self.rowId))
+            c.execute('select * from {}_ where id={}'.format(self.w.user, self.rowId))
             row = c.fetchone()
             c.close()
             conn.close()

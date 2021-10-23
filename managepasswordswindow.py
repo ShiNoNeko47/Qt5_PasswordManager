@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import *
-import sqlite3
+import mysql.connector
 from cryptography.fernet import Fernet
 from removebtn import Remove_btn
 from editbtn import Edit_btn
@@ -7,9 +7,10 @@ from PyQt5.QtCore import QSettings, QPoint
 from messagebox import MessageBox
 
 class ManagePasswordsWindow(QWidget):
-    def __init__(self, displayPasswordsWindow, btn):
+    def __init__(self, displayPasswordsWindow, btn, config):
         super().__init__()
         self.btn = btn
+        self.config = config
         self.setWindowTitle('Manage Passwords')
         self.layout = QGridLayout()
 
@@ -63,12 +64,12 @@ class ManagePasswordsWindow(QWidget):
         self.table.verticalHeader().setVisible(False)
         self.table.setHorizontalHeaderLabels(['Website', 'Username', 'Password', '', ''])
 
-        conn = sqlite3.connect('passwords.db')
+        conn = mysql.connector.connect(**self.config)
         c = conn.cursor()
         print(self.user)
-        c.execute('select website, username, password from \"{}\" where (id <> -1)'.format(self.user))
+        c.execute('select website, username, password from {}_ where (id <> -1)'.format(self.user))
         self.data = c.fetchall()
-        c.execute('select id from \"{}\" where (id <> -1)'.format(self.user))
+        c.execute('select id from {}_ where (id <> -1)'.format(self.user))
         self.rowIds = c.fetchall()
         #print(self.rowIds)
         c.close()
@@ -135,7 +136,7 @@ class ManagePasswordsWindow(QWidget):
             while (n,) in self.rowIds:
                 n += 1
             self.rowIds.append((n,))
-            self.sql.append('insert into \"{}\" values ({}, \"{}\",\"{}\",\"{}\")'.format(self.user,
+            self.sql.append('insert into {}_ values ({}, \"{}\",\"{}\",\"{}\")'.format(self.user,
                 n,
                 self.newWebsite_le.text(),
                 self.newUsername_le.text(),
@@ -158,7 +159,7 @@ class ManagePasswordsWindow(QWidget):
             self.createBtns()
 
     def commitChanges(self):
-        conn = sqlite3.connect('passwords.db')
+        conn = mysql.connector.connect(**self.config)
         c = conn.cursor()
         for statement in self.sql:
             #print(statement)

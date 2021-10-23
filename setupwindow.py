@@ -1,14 +1,15 @@
 from PyQt5.QtWidgets import *
 from PyQt5.Qt import Qt
-import sqlite3
+import mysql.connector
 from Crypto.Hash import SHA256
 
 class SetupWindow(QWidget):
     def __init__(self, mainWindow):
         super().__init__()
         self.mainWindow = mainWindow
+        '''
         try:
-            conn = sqlite3.connect('passwords.db')
+            conn = mysql.connector.connect(**self.mainWindow.config)
             c = conn.cursor()
             c.execute("SELECT name FROM sqlite_master WHERE type='table'")
             self.userList = c.fetchall()[0]
@@ -18,6 +19,7 @@ class SetupWindow(QWidget):
             conn.close()
         except:
             self.userList = ()
+        '''
 
         self.layout = QGridLayout()
         self.setWindowTitle('New user')
@@ -61,11 +63,11 @@ class SetupWindow(QWidget):
     def ok(self):
         self.close()
 
-        conn = sqlite3.connect('passwords.db')
+        conn = mysql.connector.connect(**self.mainWindow.config)
         c = conn.cursor()
-        c.execute('create table \"{}\" (id integer, website varchar(50), username varchar(50), password varchar(50))'.format(self.username_setup_le.text()))
-        c.execute("insert into \"{}\" values (-1, \"Master\", \"Key\", \"{}\")".format(self.username_setup_le.text(), SHA256.new(str.encode(self.key_setup_le.text())).hexdigest()))
-        c.execute('select password from \"{}\" where (id = -1)'.format(self.username_setup_le.text()))
+        c.execute('create table {}_ (id integer, website varchar(50), username varchar(50), password varchar(150))'.format(self.username_setup_le.text()))
+        c.execute("insert into {}_ values (-1, \"Master\", \"Key\", \"{}\")".format(self.username_setup_le.text(), SHA256.new(str.encode(self.key_setup_le.text())).hexdigest()))
+        c.execute('select password from {}_ where (id = -1)'.format(self.username_setup_le.text()))
         print(c.fetchall())
         conn.commit()
         c.close()

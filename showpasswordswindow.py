@@ -1,14 +1,12 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QSettings, QPoint
-import sqlite3
+import mysql.connector
 from cryptography.fernet import Fernet
 from copybtn import Copy_btn
 
 class ShowPasswordsWindow(QWidget):
-    def __init__(self, btn):
+    def __init__(self, btn, config):
         super().__init__()
-        self.settings = QSettings()
-        self.move(QPoint(680, 480))
+        self.config = config
 
         self.btn = btn
         self.setWindowTitle('Passwords')
@@ -26,9 +24,9 @@ class ShowPasswordsWindow(QWidget):
         self.table.verticalHeader().setVisible(False)
         self.table.setHorizontalHeaderLabels(['Website', 'Username', 'Password', ''])
 
-        conn = sqlite3.connect('passwords.db')
+        conn = mysql.connector.connect(**self.config)
         c = conn.cursor()
-        c.execute('select website, username, password from \"{}\" where (id <> -1)'.format(self.user))
+        c.execute('select website, username, password from {}_ where (id <> -1)'.format(self.user))
         self.data = c.fetchall()
         c.close()
         conn.close()
@@ -53,4 +51,3 @@ class ShowPasswordsWindow(QWidget):
 
     def closeEvent(self, event):
         self.btn.setDisabled(False)
-        self.settings.setValue('pos2', self.pos())
