@@ -2,11 +2,11 @@ from PyQt5.QtWidgets import *
 import mysql.connector
 from cryptography.fernet import Fernet
 from copybtn import Copy_btn
+from config import Config
 
 class ShowPasswordsWindow(QWidget):
-    def __init__(self, btn, config):
+    def __init__(self, btn):
         super().__init__()
-        self.config = config
 
         self.btn = btn
         self.setWindowTitle('Passwords')
@@ -24,7 +24,7 @@ class ShowPasswordsWindow(QWidget):
         self.table.verticalHeader().setVisible(False)
         self.table.setHorizontalHeaderLabels(['Website', 'Username', 'Password', ''])
 
-        conn = mysql.connector.connect(**self.config)
+        conn = mysql.connector.connect(**Config.config())
         c = conn.cursor()
         c.execute('select website, username, password from {}_ where (id <> -1)'.format(self.user))
         self.data = c.fetchall()

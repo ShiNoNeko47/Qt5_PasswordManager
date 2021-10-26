@@ -2,7 +2,6 @@ import json
 import mysql.connector
 from Crypto.Hash import SHA256
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QPoint
 from PyQt5.Qt import Qt
 import base64
 from cryptography.hazmat.backends import default_backend
@@ -12,12 +11,12 @@ from cryptography.fernet import Fernet
 from managepasswordswindow import ManagePasswordsWindow
 from showpasswordswindow import ShowPasswordsWindow
 from setupwindow import SetupWindow
+from config import Config
+from settings import Settings
 
 class MainWindow(QWidget):
     def __init__(self, key = ''):
         super().__init__()
-        self.configFile = open('config.json')
-        self.config = json.loads(self.configFile.read())
 
         self.key_hashed = 'a'
         self.setWindowTitle('PasswordManager')
@@ -54,12 +53,14 @@ class MainWindow(QWidget):
         self.key_input.setText(key)
 
         self.w3 = SetupWindow(self)
-        self.w2 = ShowPasswordsWindow(self.displayPasswords_btn, self.config)
-        self.w1 = ManagePasswordsWindow(self.w2, self.managePasswords_btn, self.config)
+        self.w2 = ShowPasswordsWindow(self.displayPasswords_btn)
+        self.w1 = ManagePasswordsWindow(self.w2, self.managePasswords_btn)
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Return:
             self.displayPasswords_btn.click()
+        if e.key() == Qt.Key_Escape:
+            self.settings = Settings()
 
     def check_input(self):
         self.managePasswords_btn.setEnabled(False)
@@ -70,7 +71,7 @@ class MainWindow(QWidget):
 
     def check_key(self):
         try:
-            conn = mysql.connector.connect(**self.config)
+            conn = mysql.connector.connect(**Config.config())
             c = conn.cursor()
             c.execute('select password from {}_ where (id = -1)'.format(self.name_input.text()))
             key_hashed = c.fetchone()[0]
@@ -124,7 +125,6 @@ class MainWindow(QWidget):
     def closeEvent(self, event):
         if all([self.w1.isHidden(), self.w2.isHidden()]):
             event.accept()
-            self.configFile.close()
         else:
             event.ignore()
 

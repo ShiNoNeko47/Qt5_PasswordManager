@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 import mysql.connector
+from config import Config
 
 class Edit_btn(QPushButton):
     def __init__(self, rowId, edit_btns, window):
@@ -16,7 +17,7 @@ class Edit_btn(QPushButton):
             for btn in self.edit_btns:
                 btn.setText('+')
             self.setText('-')
-            conn = mysql.connector.connect(**self.w.config)
+            conn = mysql.connector.connect(**Config.config())
             c = conn.cursor()
             c.execute('select * from {}_ where id={}'.format(self.w.user, self.rowId))
             row = c.fetchone()

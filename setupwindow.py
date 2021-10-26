@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.Qt import Qt
 import mysql.connector
 from Crypto.Hash import SHA256
+from config import Config
 
 class SetupWindow(QWidget):
     def __init__(self, mainWindow):
@@ -63,7 +64,7 @@ class SetupWindow(QWidget):
     def ok(self):
         self.close()
 
-        conn = mysql.connector.connect(**self.mainWindow.config)
+        conn = mysql.connector.connect(**Config.config())
         c = conn.cursor()
         c.execute('create table {}_ (id integer, website varchar(50), username varchar(50), password varchar(150))'.format(self.username_setup_le.text()))
         c.execute("insert into {}_ values (-1, \"Master\", \"Key\", \"{}\")".format(self.username_setup_le.text(), SHA256.new(str.encode(self.key_setup_le.text())).hexdigest()))

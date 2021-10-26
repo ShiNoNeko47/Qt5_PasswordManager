@@ -5,12 +5,12 @@ from removebtn import Remove_btn
 from editbtn import Edit_btn
 from PyQt5.QtCore import QSettings, QPoint
 from messagebox import MessageBox
+from config import Config
 
 class ManagePasswordsWindow(QWidget):
-    def __init__(self, displayPasswordsWindow, btn, config):
+    def __init__(self, displayPasswordsWindow, btn):
         super().__init__()
         self.btn = btn
-        self.config = config
         self.setWindowTitle('Manage Passwords')
         self.layout = QGridLayout()
 
@@ -64,7 +64,7 @@ class ManagePasswordsWindow(QWidget):
         self.table.verticalHeader().setVisible(False)
         self.table.setHorizontalHeaderLabels(['Website', 'Username', 'Password', '', ''])
 
-        conn = mysql.connector.connect(**self.config)
+        conn = mysql.connector.connect(**Config.config())
         c = conn.cursor()
         print(self.user)
         c.execute('select website, username, password from {}_ where (id <> -1)'.format(self.user))
@@ -159,7 +159,7 @@ class ManagePasswordsWindow(QWidget):
             self.createBtns()
 
     def commitChanges(self):
-        conn = mysql.connector.connect(**self.config)
+        conn = mysql.connector.connect(**Config.config())
         c = conn.cursor()
         for statement in self.sql:
             #print(statement)
