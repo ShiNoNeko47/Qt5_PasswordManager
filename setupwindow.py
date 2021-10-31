@@ -3,6 +3,7 @@ from PyQt5.Qt import Qt
 import mysql.connector
 from Crypto.Hash import SHA256
 from config import Config
+from messagebox import MessageBox
 
 class SetupWindow(QWidget):
     def __init__(self, mainWindow):
@@ -52,18 +53,32 @@ class SetupWindow(QWidget):
         pass
 
     def ok(self):
-        self.close()
+        try:
+            conn = mysql.connector.connect(**Config.config())
+            c = conn.cursor()
+            c.execute('create table {}_ (id integer, website varchar(50), username varchar(50), password varchar(150))'.format(self.username_setup_le.text()))
+            c.execute("insert into {}_ values (-1, \"Master\", \"Key\", \"{}\")".format(self.username_setup_le.text(), SHA256.new(str.encode(self.key_setup_le.text())).hexdigest()))
+            c.execute('select password from {}_ where (id = -1)'.format(self.username_setup_le.text()))
+            print(c.fetchall())
+            conn.commit()
+            c.close()
+            conn.close()
 
-        conn = mysql.connector.connect(**Config.config())
-        c = conn.cursor()
-        c.execute('create table {}_ (id integer, website varchar(50), username varchar(50), password varchar(150))'.format(self.username_setup_le.text()))
-        c.execute("insert into {}_ values (-1, \"Master\", \"Key\", \"{}\")".format(self.username_setup_le.text(), SHA256.new(str.encode(self.key_setup_le.text())).hexdigest()))
-        c.execute('select password from {}_ where (id = -1)'.format(self.username_setup_le.text()))
-        print(c.fetchall())
-        conn.commit()
-        c.close()
-        conn.close()
+            self.close()
 
-        self.mainWindow.key_input.setText(self.key_setup_le.text())
-        self.mainWindow.name_input.setText(self.username_setup_le.text())
+            self.mainWindow.key_input.setText(self.key_setup_le.text())
+            self.mainWindow.name_input.setText(self.username_setup_le.text())
+        except Exception as x:
+            messagebox = MessageBox(self, 'ok', 'User already exists!')
+            messagebox.show()
+
+    def resetEntries(self):
+        self.username_setup_le.setText('')
+        self.key_setup_le.setText('')
+        self.key_reenter_le.setText('')
+
+    def closeEvent(self, event):
+        self.resetEntries()
+        self.messagebox.close()
+        event.accept()
 
