@@ -2,16 +2,16 @@ from PyQt5.QtWidgets import *
 from removebtn import Remove_btn
 
 class MessageBox(QWidget):
-    def __init__(self, managePasswordsWindow, mode = 'yes/no', title = 'Save changes?'):
+    def __init__(self, parentWindow, mode = 'yes/no', title = 'Save changes?'):
         super().__init__()
-        self.managePasswordsWindow = managePasswordsWindow
+        self.parentWindow = parentWindow
 
         self.setWindowTitle(title)
         self.layout = QGridLayout()
 
         self.label = QLabel()
         self.label.setText(title)
-        self.layout.addWidget(self.label, 0, 0, 1, 2)
+        self.layout.addWidget(self.label, 0, 0, 1, 3)
 
         self.ok_btn = QPushButton()
         self.ok_btn.setText('Ok')
@@ -26,10 +26,10 @@ class MessageBox(QWidget):
         self.no_btn.clicked.connect(self.not_save)
 
         if mode == 'yes/no':
-            self.layout.addWidget(self.yes_btn, 1, 1)
+            self.layout.addWidget(self.yes_btn, 1, 2)
             self.layout.addWidget(self.no_btn, 1, 0)
         elif mode == 'ok':
-            self.layout.addWidget(self.ok_btn, 1, 0)
+            self.layout.addWidget(self.ok_btn, 1, 1)
 
         self.setLayout(self.layout)
 
@@ -37,13 +37,13 @@ class MessageBox(QWidget):
         self.close()
 
     def save(self):
-        self.managePasswordsWindow.commitChanges()
+        self.parentWindow.commitChanges()
         self.close()
-        self.managePasswordsWindow.close()
+        self.parentWindow.close()
 
     def not_save(self):
-        self.managePasswordsWindow.sql.clear()
+        self.parentWindow.sql.clear()
         Remove_btn.marked.clear()
-        self.managePasswordsWindow.save_btn.setDisabled(True)
+        self.parentWindow.save_btn.setDisabled(True)
         self.close()
-        self.managePasswordsWindow.close()
+        self.parentWindow.close()
