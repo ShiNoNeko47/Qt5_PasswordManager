@@ -16,22 +16,22 @@ class ManagePasswordsWindow(QWidget):
 
         self.newWebsite_le = QLineEdit()
         self.newWebsite_le.textChanged.connect(self.validInputCheck)
-        self.newWebsite_le.setPlaceholderText('Website:')
+        self.newWebsite_le.setPlaceholderText('Website')
         self.layout.addWidget(self.newWebsite_le, 0, 0, 2, 1)
 
         self.newUsername_le = QLineEdit()
-        self.newUsername_le.setPlaceholderText('Username:')
+        self.newUsername_le.setPlaceholderText('Username')
         self.newUsername_le.textChanged.connect(self.validInputCheck)
         self.layout.addWidget(self.newUsername_le, 0, 1, 2, 1)
 
         self.newPassword_le = QLineEdit()
-        self.newPassword_le.setPlaceholderText('Password:')
+        self.newPassword_le.setPlaceholderText('Password')
         self.newPassword_le.setEchoMode(QLineEdit.Password)
         self.newPassword_le.textChanged.connect(self.validInputCheck)
         self.layout.addWidget(self.newPassword_le, 0, 2)
 
         self.reNewPassword_le = QLineEdit()
-        self.reNewPassword_le.setPlaceholderText('Confirm Password:')
+        self.reNewPassword_le.setPlaceholderText('Confirm Password')
         self.reNewPassword_le.setEchoMode(QLineEdit.Password)
         self.reNewPassword_le.textChanged.connect(self.validInputCheck)
         self.layout.addWidget(self.reNewPassword_le, 1, 2)

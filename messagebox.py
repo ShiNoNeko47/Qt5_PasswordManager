@@ -1,15 +1,16 @@
 from PyQt5.QtWidgets import *
+from removebtn import Remove_btn
 
 class MessageBox(QWidget):
     def __init__(self, managePasswordsWindow):
         super().__init__()
         self.managePasswordsWindow = managePasswordsWindow
 
-        self.setWindowTitle('Commit changes?')
+        self.setWindowTitle('Save changes?')
         self.layout = QGridLayout()
 
         self.label = QLabel()
-        self.label.setText('Commit changes?')
+        self.label.setText('Save changes?')
         self.layout.addWidget(self.label, 0, 0, 1, 2)
 
         self.yes_btn = QPushButton()
@@ -31,5 +32,7 @@ class MessageBox(QWidget):
 
     def not_save(self):
         self.managePasswordsWindow.sql.clear()
+        Remove_btn.marked.clear()
+        self.managePasswordsWindow.save_btn.setDisabled(True)
         self.close()
         self.managePasswordsWindow.close()

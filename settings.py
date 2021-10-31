@@ -1,3 +1,4 @@
+from PyQt5.Qt import Qt
 from PyQt5.QtWidgets import *
 from config import Config
 import ipaddress
@@ -13,6 +14,7 @@ class Settings(QWidget):
         self.host_le = QLineEdit()
         self.host_le.setText(self.config['host'])
         self.host_le.textChanged.connect(self.check_ip)
+        self.host_le.setPlaceholderText('Host')
         self.layout.addWidget(self.host_le, 0, 1)
 
         self.ok_btn = QPushButton('Ok')
@@ -39,3 +41,6 @@ class Settings(QWidget):
         except Exception as x:
             print(x)
 
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Return:
+            self.ok_btn.click()

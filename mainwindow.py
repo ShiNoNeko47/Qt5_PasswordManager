@@ -1,3 +1,4 @@
+import sys
 import json
 import mysql.connector
 from Crypto.Hash import SHA256
@@ -27,11 +28,13 @@ class MainWindow(QWidget):
 
         self.name_input = QLineEdit()
         self.name_input.textChanged.connect(self.check_input)
+        self.name_input.setPlaceholderText('Username')
         self.layout.addWidget(self.name_input, 0, 0, 1, 3)
 
         self.key_input = QLineEdit()
         self.key_input.setEchoMode(QLineEdit.Password)
         self.key_input.textChanged.connect(self.check_input)
+        self.key_input.setPlaceholderText('Master key')
         self.layout.addWidget(self.key_input, 1, 0, 1, 3)
 
         self.displayPasswords_btn = QPushButton('Display passwords')
@@ -81,7 +84,6 @@ class MainWindow(QWidget):
             print(SHA256.new(str.encode(self.key_input.text())).hexdigest())
             if SHA256.new(str.encode(self.key_input.text())).hexdigest() == key_hashed:
                 self.key = self.getKey()
-                print(self.key)
                 return True
             return False
         except Exception as x:
@@ -125,6 +127,7 @@ class MainWindow(QWidget):
     def closeEvent(self, event):
         if all([self.w1.isHidden(), self.w2.isHidden()]):
             event.accept()
+            sys.exit()
         else:
             event.ignore()
 

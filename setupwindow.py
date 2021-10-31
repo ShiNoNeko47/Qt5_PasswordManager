@@ -7,21 +7,8 @@ from config import Config
 class SetupWindow(QWidget):
     def __init__(self, mainWindow):
         super().__init__()
-        self.mainWindow = mainWindow
-        '''
-        try:
-            conn = mysql.connector.connect(**self.mainWindow.config)
-            c = conn.cursor()
-            c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-            self.userList = c.fetchall()[0]
-            #c.execute('drop table passwords;')
-            #conn.commit()
-            c.close()
-            conn.close()
-        except:
-            self.userList = ()
-        '''
 
+        self.mainWindow = mainWindow
         self.layout = QGridLayout()
         self.setWindowTitle('New user')
         self.setFixedHeight(150)
@@ -29,16 +16,19 @@ class SetupWindow(QWidget):
 
         self.username_setup_le = QLineEdit()
         self.username_setup_le.textChanged.connect(self.checkName)
+        self.username_setup_le.setPlaceholderText('New username')
         self.layout.addWidget(self.username_setup_le, 0, 0)
 
         self.key_setup_le = QLineEdit()
         self.key_setup_le.setEchoMode(QLineEdit.Password)
         self.key_setup_le.textChanged.connect(self.checkPassword)
+        self.key_setup_le.setPlaceholderText('Master key')
         self.layout.addWidget(self.key_setup_le, 1, 0)
 
         self.key_reenter_le = QLineEdit()
         self.key_reenter_le.setEchoMode(QLineEdit.Password)
         self.key_reenter_le.textChanged.connect(self.checkPassword)
+        self.key_reenter_le.setPlaceholderText('Confirm master key')
         self.layout.addWidget(self.key_reenter_le, 2, 0)
 
         self.ok_btn = QPushButton('Ok')
