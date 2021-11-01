@@ -14,6 +14,7 @@ from showpasswordswindow import ShowPasswordsWindow
 from setupwindow import SetupWindow
 from config import Config
 from settings import Settings
+from messagebox import MessageBox
 
 class MainWindow(QWidget):
     def __init__(self, key = ''):
@@ -86,8 +87,9 @@ class MainWindow(QWidget):
                 self.key = self.getKey()
                 return True
             return False
-        except Exception as x:
-            print(x)
+        except mysql.connector.Error as x:
+            self.messagebox = MessageBox(self, 'ok', x.msg)
+            self.messagebox.show()
 
     def managepasswords(self):
         if self.check_key():
