@@ -63,9 +63,12 @@ class SetupWindow(QWidget):
 
             self.mainWindow.key_input.setText(self.key_setup_le.text())
             self.mainWindow.name_input.setText(self.username_setup_le.text())
-        except Exception as x:
-            print(x)
-            self.messagebox = MessageBox(self, 'ok', 'User already exists!')
+        except mysql.connector.Error as x:
+            if x.errno == mysql.connector.errorcode.ER_TABLE_EXISTS_ERROR:
+                self.messagebox = MessageBox(self, 'ok', 'User already exists!')
+            else:
+                self.messagebox = MessageBox(self, 'ok', x.msg)
+
             self.messagebox.show()
 
     def resetEntries(self):
