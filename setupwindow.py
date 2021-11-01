@@ -16,7 +16,6 @@ class SetupWindow(QWidget):
         self.setFixedWidth(600)
 
         self.username_setup_le = QLineEdit()
-        self.username_setup_le.textChanged.connect(self.checkName)
         self.username_setup_le.setPlaceholderText('New username')
         self.layout.addWidget(self.username_setup_le, 0, 0)
 
@@ -48,10 +47,6 @@ class SetupWindow(QWidget):
         if all([self.key_setup_le.text() == self.key_reenter_le.text(), len(self.key_setup_le.text()) > 3]):
             self.ok_btn.setEnabled(True)
 
-    def checkName(self):
-        #self.ok_btn.setEnabled(False)
-        pass
-
     def ok(self):
         try:
             conn = mysql.connector.connect(**Config.config())
@@ -69,8 +64,9 @@ class SetupWindow(QWidget):
             self.mainWindow.key_input.setText(self.key_setup_le.text())
             self.mainWindow.name_input.setText(self.username_setup_le.text())
         except Exception as x:
-            messagebox = MessageBox(self, 'ok', 'User already exists!')
-            messagebox.show()
+            print(x)
+            self.messagebox = MessageBox(self, 'ok', 'User already exists!')
+            self.messagebox.show()
 
     def resetEntries(self):
         self.username_setup_le.setText('')
@@ -78,7 +74,10 @@ class SetupWindow(QWidget):
         self.key_reenter_le.setText('')
 
     def closeEvent(self, event):
+        try:
+            self.messagebox.close()
+        except:
+            pass
         self.resetEntries()
-        self.messagebox.close()
         event.accept()
 
