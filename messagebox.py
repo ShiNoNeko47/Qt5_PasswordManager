@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 from removebtn import Remove_btn
+from PyQt5.Qt import Qt
 
 class MessageBox(QWidget):
     def __init__(self, parentWindow, mode = 'yes/no', title = 'Save changes?'):
@@ -28,10 +29,16 @@ class MessageBox(QWidget):
         if mode == 'yes/no':
             self.layout.addWidget(self.yes_btn, 1, 2)
             self.layout.addWidget(self.no_btn, 1, 0)
+            self.default = self.yes_btn
         elif mode == 'ok':
             self.layout.addWidget(self.ok_btn, 1, 1)
+            self.default = self.ok_btn
 
         self.setLayout(self.layout)
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Return:
+            self.default.click()
 
     def ok(self):
         self.close()
