@@ -1,3 +1,5 @@
 __pycache__
 passwords.db
 *.swp
+config.py
+config.json
