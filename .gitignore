@@ -1,4 +1,4 @@
 __pycache__
 passwords.db
 *.swp
-config.py
+change_config.py
