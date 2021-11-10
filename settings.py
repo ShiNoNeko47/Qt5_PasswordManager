@@ -25,12 +25,9 @@ class Settings(QWidget):
         self.show()
 
     def check_ip(self):
-        try:
-            if ipaddress.ip_address(self.host_le.text()).is_global:
-                self.ok_btn.setEnabled(True)
-            else:
-                self.ok_btn.setEnabled(False)
-        except ValueError:
+        if self.host_le.text() != '':
+            self.ok_btn.setEnabled(True)
+        else:
             self.ok_btn.setEnabled(False)
 
     def config_update(self):
