@@ -4,7 +4,7 @@ class Remove_btn(QPushButton):
     marked = []
     def __init__(self, rowId, table, remove_btns, sql, window):
         super().__init__()
-        print(Remove_btn.marked)
+        #print(Remove_btn.marked)
         self.table = table
         self.remove_btns = remove_btns
         self.clicked.connect(self.remove_row)
