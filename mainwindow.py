@@ -77,25 +77,27 @@ class MainWindow(QWidget):
         try:
             conn = mysql.connector.connect(**Config.config())
             c = conn.cursor()
-            c.execute('select password from {}_ where (id = -1)'.format(self.name_input.text()))
-            key_hashed = c.fetchone()[0]
+            c.execute("select MasterKey, ID from Users where (Username = \'{}\')".format(self.name_input.text()))
+            data = c.fetchone()
+            key_hashed = data[0]
+            self.user_id = data[1]
             c.close()
             conn.close()
-            print(key_hashed)
-            print(SHA256.new(str.encode(self.key_input.text())).hexdigest())
-            if SHA256.new(str.encode(self.key_input.text())).hexdigest() == key_hashed:
+            #print(key_hashed)
+            #print(SHA256.new(self.key_input.text().encode()).hexdigest())
+            if SHA256.new(self.key_input.text().encode()).hexdigest() == key_hashed.decode():
                 self.key = self.getKey()
                 return True
             return False
         except mysql.connector.Error as x:
-            self.messagebox = MessageBox(self, 'ok', x.msg)
+            self.messagebox = MessageBox(self, x.msg)
             self.messagebox.show()
 
     def managepasswords(self):
         if self.check_key():
-            self.w1.user = self.name_input.text()
+            self.w1.user = self.user_id
             self.w1.setKey(self.key)
-            self.w2.user = self.name_input.text()
+            self.w2.user = self.user_id
             self.w2.setKey(self.key)
             self.w1.createTable()
             self.w1.show()
@@ -104,7 +106,7 @@ class MainWindow(QWidget):
 
     def displaypasswords(self):
         if self.check_key():
-            self.w2.user = self.name_input.text()
+            self.w2.user = self.user_id
             self.w2.setKey(self.key)
             self.w2.createTable()
             self.w2.show()

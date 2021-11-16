@@ -15,7 +15,8 @@ class Settings(QWidget):
         self.host_le.setText(self.config['host'])
         self.host_le.textChanged.connect(self.check_ip)
         self.host_le.setPlaceholderText('Host')
-        self.layout.addWidget(self.host_le, 0, 1)
+        self.layout.addWidget(self.host_le, 0, 0, 1, 3)
+        self.setMinimumWidth(320)
 
         self.ok_btn = QPushButton('Ok')
         self.ok_btn.clicked.connect(self.config_update)

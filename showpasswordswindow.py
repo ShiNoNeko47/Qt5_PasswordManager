@@ -26,7 +26,8 @@ class ShowPasswordsWindow(QWidget):
 
         conn = mysql.connector.connect(**Config.config())
         c = conn.cursor()
-        c.execute('select website, username, password from {}_ where (id <> -1)'.format(self.user))
+        #print(self.user)
+        c.execute("select Website, Username, Password from Passwords where (UserID = \'{}\' and Deleted = 0)".format(self.user))
         self.data = c.fetchall()
         c.close()
         conn.close()
@@ -40,7 +41,7 @@ class ShowPasswordsWindow(QWidget):
         for row, i in zip(self.data, range(len(self.data))):
             self.table.insertRow(i)
             for data, j in zip(row, range(3)):
-                self.table.setItem(i, j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(self.f.decrypt(data.encode())))))
+                self.table.setItem(i, j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(self.f.decrypt(data)))))
 
             copy_btns.append(Copy_btn(i, self.data, self.f))
             self.table.setCellWidget(i, 3, copy_btns[i])

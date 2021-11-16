@@ -3,7 +3,7 @@ from removebtn import Remove_btn
 from PyQt5.Qt import Qt
 
 class MessageBox(QWidget):
-    def __init__(self, parentWindow, mode = 'yes/no', title = 'Save changes?'):
+    def __init__(self, parentWindow, title):
         super().__init__()
         self.parentWindow = parentWindow
 
@@ -26,11 +26,11 @@ class MessageBox(QWidget):
         self.no_btn.setText('No')
         self.no_btn.clicked.connect(self.not_save)
 
-        if mode == 'yes/no':
+        if title[-1] == '?':
             self.layout.addWidget(self.yes_btn, 1, 2)
             self.layout.addWidget(self.no_btn, 1, 0)
             self.default = self.yes_btn
-        elif mode == 'ok':
+        else:
             self.layout.addWidget(self.ok_btn, 1, 1)
             self.default = self.ok_btn
 
