@@ -52,15 +52,21 @@ class SetupWindow(QWidget):
             conn = mysql.connector.connect(**Config.config())
             c = conn.cursor()
             c.execute("select Users.Username from Users")
-            if self.username_setup_le.text() in c.fetchall()[0]:
-                self.messagebox = MessageBox(self, 'User already exists!')
-                self.messagebox.show()
+            users = c.fetchone()
+            validUser = False
+            if users:
+                if self.username_setup_le.text() in users:
+                    self.messagebox = MessageBox(self, 'User already exists!')
+                    self.messagebox.show()
+                else:
+                    validUser = True
 
             else:
+                validUser = True
+
+            if validUser:
                 c.execute("insert into Users (Users.Username, MasterKey) values (\'{}\', \'{}\')".format(self.username_setup_le.text(), SHA256.new(self.key_setup_le.text().encode()).hexdigest()))
                 conn.commit()
-                c.close()
-                conn.close()
 
                 self.mainWindow.key_input.setText(self.key_setup_le.text())
                 self.mainWindow.name_input.setText(self.username_setup_le.text())
