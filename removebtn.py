@@ -18,10 +18,9 @@ class Remove_btn(QPushButton):
 
     def remove_row(self):
         if self.rowId not in Remove_btn.marked:
-            if self.rowId >= 0:
-                self.sql.append('update Passwords set Deleted = 1 where (ID = {})'.format(self.rowId))
-                self.setText('-')
-                Remove_btn.marked.append(self.rowId)
+            self.sql.append('update Passwords set Deleted = 1 where (ID = {})'.format(self.rowId))
+            self.setText('-')
+            Remove_btn.marked.append(self.rowId)
         else:
             del self.sql[self.sql.index('update Passwords set Deleted = 1 where (ID = {})'.format(self.rowId))]
             self.setText('X')
