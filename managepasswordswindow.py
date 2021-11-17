@@ -108,7 +108,7 @@ class ManagePasswordsWindow(QWidget):
                 #print(-1)
             if i < self.number_or_ids:
                 self.table.setCellWidget(i, 3, self.edit_btns[i])
-            self.table.setCellWidget(i, 4, self.remove_btns[i])
+                self.table.setCellWidget(i, 4, self.remove_btns[i])
 
     def validInputCheck(self):
         check = [all([self.newWebsite_le.text() != '',
