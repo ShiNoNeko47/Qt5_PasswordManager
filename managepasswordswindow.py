@@ -99,15 +99,11 @@ class ManagePasswordsWindow(QWidget):
         self.edit_btns = []
 
         for i in range(self.table.rowCount()):
-            try:
-                self.remove_btns.append(Remove_btn(self.rowIds[i][0], self.table, self.remove_btns, self.sql, self))
-                self.edit_btns.append(Edit_btn(self.rowIds[i][0], self.edit_btns, self))
-            except Exception:
-                self.remove_btns.append(Remove_btn(-1, self.table, self.remove_btns, self.sql, self))
-                self.edit_btns.append(Edit_btn(-1, self.edit_btns, self))
-                #print(-1)
             if i < self.number_or_ids:
+                self.edit_btns.append(Edit_btn(self.rowIds[i][0], self.edit_btns, self))
                 self.table.setCellWidget(i, 3, self.edit_btns[i])
+
+                self.remove_btns.append(Remove_btn(self.rowIds[i][0], self.table, self.remove_btns, self.sql, self))
                 self.table.setCellWidget(i, 4, self.remove_btns[i])
 
     def validInputCheck(self):
