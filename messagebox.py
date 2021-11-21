@@ -1,6 +1,10 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import (QWidget,
+                             QLabel,
+                             QPushButton,
+                             QGridLayout)
 from removebtn import Remove_btn
 from PyQt5.Qt import Qt
+
 
 class MessageBox(QWidget):
     def __init__(self, parentWindow, title):
@@ -33,7 +37,6 @@ class MessageBox(QWidget):
         else:
             self.layout.addWidget(self.ok_btn, 1, 1)
             self.default = self.ok_btn
-
         self.setLayout(self.layout)
 
     def keyPressEvent(self, e):

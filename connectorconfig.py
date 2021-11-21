@@ -3,6 +3,7 @@
 import json
 from cryptography.fernet import Fernet
 
+
 class Config:
     key = b'LdGzkYcr8D4rOuKAyf_9spqqDGC-2Qf8duZM6x30ElQ='
     f = Fernet(key)
@@ -16,6 +17,7 @@ class Config:
     def config_update(config):
         with open('config.json', 'wb') as file:
             file.write(Config.f.encrypt(json.dumps(config).encode()))
+
 
 def main():
     config = Config.config()
@@ -31,9 +33,10 @@ def main():
 
         if newParameter != '':
             config[parameter] = newParameter
-    #print(config)
+    # print(config)
 
     Config.config_update(config)
+
 
 if __name__ == '__main__':
     main()

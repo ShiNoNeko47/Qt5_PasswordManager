@@ -1,14 +1,15 @@
 import sys
-import json
 import mysql.connector
 from Crypto.Hash import SHA256
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import (QWidget,
+                             QGridLayout,
+                             QLineEdit,
+                             QPushButton)
 from PyQt5.Qt import Qt
 import base64
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.fernet import Fernet
 from managepasswordswindow import ManagePasswordsWindow
 from showpasswordswindow import ShowPasswordsWindow
 from setupwindow import SetupWindow
@@ -16,8 +17,9 @@ from connectorconfig import Config
 from settings import Settings
 from messagebox import MessageBox
 
+
 class MainWindow(QWidget):
-    def __init__(self, key = ''):
+    def __init__(self, key=''):
         super().__init__()
 
         self.key_hashed = 'a'
@@ -63,13 +65,14 @@ class MainWindow(QWidget):
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Return:
             self.displayPasswords_btn.click()
+
         if e.key() == Qt.Key_Escape:
             self.settings = Settings()
 
     def check_input(self):
         self.managePasswords_btn.setEnabled(False)
         self.displayPasswords_btn.setEnabled(False)
-        if len(self.key_input.text()) >= 4 and len(self.name_input.text())>0:
+        if len(self.key_input.text()) >= 4 and len(self.name_input.text()) > 0:
             self.managePasswords_btn.setEnabled(True)
             self.displayPasswords_btn.setEnabled(True)
 
@@ -77,15 +80,21 @@ class MainWindow(QWidget):
         try:
             conn = mysql.connector.connect(**Config.config())
             c = conn.cursor()
-            c.execute("select MasterKey, ID from Users where (User = \'{}\')".format(self.name_input.text()))
+            c.execute("""elect MasterKey, ID
+                         from Users
+                         where
+                         (User = \'{}\')"""
+                      .format(self.name_input.text()))
+
             data = c.fetchone()
             key_hashed = data[0]
             self.user_id = data[1]
             c.close()
             conn.close()
-            #print(key_hashed)
-            #print(SHA256.new(self.key_input.text().encode()).hexdigest())
-            if SHA256.new(self.key_input.text().encode()).hexdigest() == key_hashed.decode():
+            key_input_hashed = SHA256.new(self.key_input.text().encode())
+            # print(key_hashed)
+            # print(SHA256.new(self.key_input.text().encode()).hexdigest())
+            if key_input_hashed.hexdigest() == key_hashed.decode():
                 self.key = self.get_key()
                 return True
             return False
@@ -120,12 +129,11 @@ class MainWindow(QWidget):
         password = self.key_input.text().encode()
         salt = b'sw\xea\x01\x9d\x109\x0eF\xef/\n\xb0mWK'
         kdf = PBKDF2HMAC(
-                algorithm = hashes.SHA256,
-                length = 32,
-                salt = salt,
+                algorithm=hashes.SHA256,
+                length=32,
+                salt=salt,
                 iterations=10000,
-                backend = default_backend()
-                )
+                backend=default_backend())
         return base64.urlsafe_b64encode(kdf.derive(password))
 
     def closeEvent(self, event):
@@ -134,4 +142,3 @@ class MainWindow(QWidget):
             sys.exit()
         else:
             event.ignore()
-

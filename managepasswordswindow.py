@@ -1,11 +1,17 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import (QWidget,
+                             QGridLayout,
+                             QLineEdit,
+                             QPushButton,
+                             QTableWidget,
+                             QTableWidgetItem,
+                             QAbstractItemView)
 import mysql.connector
 from cryptography.fernet import Fernet
 from removebtn import Remove_btn
 from editbtn import Edit_btn
-from PyQt5.QtCore import QSettings, QPoint
 from messagebox import MessageBox
 from connectorconfig import Config
+
 
 class ManagePasswordsWindow(QWidget):
     def __init__(self, displayPasswordsWindow, btn):
@@ -62,16 +68,27 @@ class ManagePasswordsWindow(QWidget):
         self.table = QTableWidget()
         self.table.setColumnCount(5)
         self.table.verticalHeader().setVisible(False)
-        self.table.setHorizontalHeaderLabels(['Website', 'Username', 'Password', '', ''])
-
+        self.table.setHorizontalHeaderLabels(['Website',
+                                              'Username',
+                                              'Password',
+                                              '',
+                                              ''])
         conn = mysql.connector.connect(**Config.config())
         c = conn.cursor()
-        #print(self.user)
-        c.execute("select Website, Username, Password from Passwords where (UserID = \'{}\' and Deleted = 0)".format(self.user))
+        # print(self.user)
+        c.execute("""select Website, Username, Password
+                     from Passwords
+                     where
+                     (UserID = \'{}\' and Deleted = 0)"""
+                  .format(self.user))
         self.data = c.fetchall()
-        c.execute("select ID from Passwords where (UserID = \'{}\' and Deleted = 0)".format(self.user))
+        c.execute("""select ID
+                     from Passwords
+                     where
+                     (UserID = \'{}\' and Deleted = 0)"""
+                  .format(self.user))
         self.rowIds = c.fetchall()
-        #print(self.rowIds)
+        # print(self.rowIds)
         c.close()
         conn.close()
 
@@ -83,9 +100,14 @@ class ManagePasswordsWindow(QWidget):
 
         for row, i in zip(self.data, range(len(self.data))):
             self.table.insertRow(i)
-            for data, j in zip(row, range(3)):
-                self.table.setItem(i, j, (QTableWidgetItem(data) if j != 2 else QTableWidgetItem('*'*len(self.f.decrypt(data)))))
-
+            for data, j in zip(row, range(2)):
+                self.table.setItem(i,
+                                   j,
+                                   (QTableWidgetItem(data)))
+            self.table.setItem(i,
+                               2,
+                               (QTableWidgetItem('*'
+                                                 * len(self.f.decrypt(data)))))
         self.number_or_ids = len(self.rowIds)
 
         self.create_btns()
@@ -100,26 +122,38 @@ class ManagePasswordsWindow(QWidget):
 
         for i in range(self.table.rowCount()):
             if i < self.number_or_ids:
-                self.edit_btns.append(Edit_btn(self.rowIds[i][0], self.edit_btns, self))
-                self.table.setCellWidget(i, 3, self.edit_btns[i])
-
-                self.remove_btns.append(Remove_btn(self.rowIds[i][0], self.table, self.remove_btns, self.sql, self))
-                self.table.setCellWidget(i, 4, self.remove_btns[i])
+                self.edit_btns.append(Edit_btn(self.rowIds[i][0],
+                                               self.edit_btns,
+                                               self))
+                self.table.setCellWidget(i,
+                                         3,
+                                         self.edit_btns[i])
+                self.remove_btns.append(Remove_btn(self.rowIds[i][0],
+                                                   self.table,
+                                                   self.remove_btns,
+                                                   self.sql,
+                                                   self))
+                self.table.setCellWidget(i,
+                                         4,
+                                         self.remove_btns[i])
 
     def valid_input_check(self):
         check = [all([self.newWebsite_le.text() != '',
-            self.newUsername_le.text() != '',
-            self.newPassword_le.text() != '',
-            self.reNewPassword_le.text() != '']),
-            self.newPassword_le.text() == self.reNewPassword_le.text()]
+                      self.newUsername_le.text() != '',
+                      self.newPassword_le.text() != '',
+                      self.reNewPassword_le.text() != '']),
+                 self.newPassword_le.text() == self.reNewPassword_le.text()]
+
         if all(check):
             self.add_btn.setDisabled(False)
             self.add_btn.setToolTip('')
             return True
+
         self.add_btn.setDisabled(True)
-        self.req_notMet = list(map(lambda x: x[1:], filter(lambda x: not check[int(x[0])], [
-            '0Don\'t leave empty fields!',
-            '1Passwords don\'t match!'])))
+        self.req_notMet = list(map(lambda x: x[1:],
+                                   filter(lambda x: not check[int(x[0])],
+                                   ['0Don\'t leave empty fields!',
+                                    '1Passwords don\'t match!'])))
         tooltip = ''
         for i, j in zip(self.req_notMet, ['', '\n']):
             tooltip = tooltip + j + i
@@ -132,32 +166,48 @@ class ManagePasswordsWindow(QWidget):
             while (n,) in self.rowIds:
                 n += 1
             self.rowIds.append((n,))
-            self.sql.append("insert into Passwords (UserID, Website, Username, Password) values ({}, \'{}\',\'{}\',\'{}\')".format(self.user,
-                self.newWebsite_le.text(),
-                self.newUsername_le.text(),
-                self.f.encrypt(self.newPassword_le.text().encode()).decode()
-            ))
+            self.sql.append("""insert into Passwords
+                               (UserID, Website, Username, Password)
+                               values
+                               ({}, \'{}\',\'{}\',\'{}\')"""
+                            .format(self.user,
+                                    self.newWebsite_le.text(),
+                                    self.newUsername_le.text(),
+                                    self.f.encrypt(self.newPassword_le.text()
+                                                   .encode()).decode()))
 
             self.save_btn.setDisabled(not self.sql)
 
             self.table.insertRow(i)
-            self.table.setItem(i, 0, (QTableWidgetItem('+ ' + self.newWebsite_le.text())))
-            self.table.setItem(i, 1, (QTableWidgetItem('+ ' + self.newUsername_le.text())))
-            self.table.setItem(i, 2, (QTableWidgetItem('+ ' + '*' * len(self.newPassword_le.text()))))
+
+            website = self.newWebsite_le.text()
+            self.table.setItem(i,
+                               0,
+                               (QTableWidgetItem('+ ' + website)))
+
+            username = self.newUsername_le.text()
+            self.table.setItem(i,
+                               1,
+                               (QTableWidgetItem('+ ' + username)))
+
+            password = '*' * len(self.newPassword_le.text())
+            self.table.setItem(i,
+                               2,
+                               (QTableWidgetItem('+ ' + password)))
 
             self.newWebsite_le.setText('')
             self.newUsername_le.setText('')
             self.newPassword_le.setText('')
             self.reNewPassword_le.setText('')
 
-            #print(self.sql)
+            # print(self.sql)
             self.create_btns()
 
     def commit_changes(self):
         conn = mysql.connector.connect(**Config.config())
         c = conn.cursor()
         for statement in self.sql:
-            #print(statement)
+            # print(statement)
             c.execute(statement)
         conn.commit()
         c.close()
@@ -185,4 +235,3 @@ class ManagePasswordsWindow(QWidget):
             event.ignore()
             self.messageBox.close()
             self.messageBox.show()
-

@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QPushButton
 import mysql.connector
 from connectorconfig import Config
+
 
 class Edit_btn(QPushButton):
     def __init__(self, rowId, edit_btns, window):
@@ -16,10 +17,16 @@ class Edit_btn(QPushButton):
         if self.text() == '+':
             for btn in self.edit_btns:
                 btn.setText('+')
+
             self.setText('-')
             conn = mysql.connector.connect(**Config.config())
             c = conn.cursor()
-            c.execute("select Website, Username, Password from Passwords where (ID = \'{}\' and Deleted = 0)".format(self.rowId))
+            c.execute("""select Website, Username, Password
+                         from Passwords
+                         where
+                         (ID = \'{}\' and Deleted = 0)"""
+                      .format(self.rowId))
+
             row = c.fetchone()
             c.close()
             conn.close()
@@ -28,6 +35,7 @@ class Edit_btn(QPushButton):
             self.w.newUsername_le.setText(row[1])
             self.w.newPassword_le.setText(self.f.decrypt(row[2]).decode())
             self.w.reNewPassword_le.setText(self.f.decrypt(row[2]).decode())
+
         else:
             self.setText('+')
             self.w.resetEntries()

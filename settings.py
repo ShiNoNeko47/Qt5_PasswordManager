@@ -1,7 +1,10 @@
+from PyQt5.QtWidgets import (QWidget,
+                             QPushButton,
+                             QLineEdit,
+                             QGridLayout)
 from PyQt5.Qt import Qt
-from PyQt5.QtWidgets import *
 from connectorconfig import Config
-import ipaddress
+
 
 class Settings(QWidget):
     def __init__(self):
@@ -36,8 +39,8 @@ class Settings(QWidget):
             self.config['host'] = self.host_le.text()
             Config.config_update(self.config)
             self.close()
-        except Exception as x:
-            print(x)
+        except Exception as e:
+            print(e)
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Return:

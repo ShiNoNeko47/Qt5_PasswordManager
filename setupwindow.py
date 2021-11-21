@@ -1,9 +1,13 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import (QWidget,
+                             QLineEdit,
+                             QPushButton,
+                             QGridLayout)
 from PyQt5.Qt import Qt
 import mysql.connector
 from Crypto.Hash import SHA256
 from connectorconfig import Config
 from messagebox import MessageBox
+
 
 class SetupWindow(QWidget):
     def __init__(self, mainWindow):
@@ -45,17 +49,20 @@ class SetupWindow(QWidget):
     def check_password(self):
         self.ok_btn.setEnabled(False)
         if all([self.key_setup_le.text() == self.key_reenter_le.text(),
-            len(self.key_setup_le.text()) > 3]):
+                len(self.key_setup_le.text()) > 3]):
             self.ok_btn.setEnabled(True)
 
     def ok(self):
         try:
             conn = mysql.connector.connect(**Config.config())
             c = conn.cursor()
-
-            c.execute("insert into Users (User, MasterKey) values (\'{}\', \'{}\')".format(
-                self.username_setup_le.text(),
-                SHA256.new(self.key_setup_le.text().encode()).hexdigest()))
+            c.execute("""insert into Users
+                         (User, MasterKey)
+                         values
+                         (\'{}\', \'{}\')"""
+                      .format(self.username_setup_le.text(),
+                              SHA256.new(self.key_setup_le.text().encode())
+                              .hexdigest()))
             conn.commit()
 
             self.mainWindow.key_input.setText(self.key_setup_le.text())
@@ -79,10 +86,7 @@ class SetupWindow(QWidget):
         self.key_reenter_le.setText('')
 
     def closeEvent(self, event):
-        try:
+        if self.messagebox.isVisible():
             self.messagebox.close()
-        except:
-            pass
         self.reset_entries()
         event.accept()
-
