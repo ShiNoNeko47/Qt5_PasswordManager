@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import *
 import mysql.connector
 from cryptography.fernet import Fernet
 from copybtn import Copy_btn
-from config import Config
+from connectorconfig import Config
 
 class ShowPasswordsWindow(QWidget):
     def __init__(self, btn):
@@ -15,10 +15,10 @@ class ShowPasswordsWindow(QWidget):
         self.setFixedWidth(640)
         self.setLayout(self.layout)
 
-    def setKey(self, key):
+    def set_key(self, key):
         self.f = Fernet(key)
 
-    def createTable(self):
+    def create_table(self):
         self.table = QTableWidget()
         self.table.setColumnCount(4)
         self.table.verticalHeader().setVisible(False)

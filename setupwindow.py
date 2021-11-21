@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.Qt import Qt
 import mysql.connector
 from Crypto.Hash import SHA256
-from config import Config
+from connectorconfig import Config
 from messagebox import MessageBox
 
 class SetupWindow(QWidget):
@@ -21,13 +21,13 @@ class SetupWindow(QWidget):
 
         self.key_setup_le = QLineEdit()
         self.key_setup_le.setEchoMode(QLineEdit.Password)
-        self.key_setup_le.textChanged.connect(self.checkPassword)
+        self.key_setup_le.textChanged.connect(self.check_password)
         self.key_setup_le.setPlaceholderText('Master key')
         self.layout.addWidget(self.key_setup_le, 1, 0)
 
         self.key_reenter_le = QLineEdit()
         self.key_reenter_le.setEchoMode(QLineEdit.Password)
-        self.key_reenter_le.textChanged.connect(self.checkPassword)
+        self.key_reenter_le.textChanged.connect(self.check_password)
         self.key_reenter_le.setPlaceholderText('Confirm master key')
         self.layout.addWidget(self.key_reenter_le, 2, 0)
 
@@ -42,7 +42,7 @@ class SetupWindow(QWidget):
         if e.key() == Qt.Key_Return:
             self.ok_btn.click()
 
-    def checkPassword(self):
+    def check_password(self):
         self.ok_btn.setEnabled(False)
         if all([self.key_setup_le.text() == self.key_reenter_le.text(),
             len(self.key_setup_le.text()) > 3]):
@@ -53,7 +53,7 @@ class SetupWindow(QWidget):
             conn = mysql.connector.connect(**Config.config())
             c = conn.cursor()
 
-            c.execute("insert into Users (Users.Username, MasterKey) values (\'{}\', \'{}\')".format(
+            c.execute("insert into Users (User, MasterKey) values (\'{}\', \'{}\')".format(
                 self.username_setup_le.text(),
                 SHA256.new(self.key_setup_le.text().encode()).hexdigest()))
             conn.commit()
@@ -73,7 +73,7 @@ class SetupWindow(QWidget):
         c.close()
         conn.close()
 
-    def resetEntries(self):
+    def reset_entries(self):
         self.username_setup_le.setText('')
         self.key_setup_le.setText('')
         self.key_reenter_le.setText('')
@@ -83,6 +83,6 @@ class SetupWindow(QWidget):
             self.messagebox.close()
         except:
             pass
-        self.resetEntries()
+        self.reset_entries()
         event.accept()
 

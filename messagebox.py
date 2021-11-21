@@ -44,7 +44,7 @@ class MessageBox(QWidget):
         self.close()
 
     def save(self):
-        self.parentWindow.commitChanges()
+        self.parentWindow.commit_changes()
         self.close()
         self.parentWindow.close()
 

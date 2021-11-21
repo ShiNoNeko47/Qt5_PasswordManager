@@ -1,6 +1,6 @@
 from PyQt5.Qt import Qt
 from PyQt5.QtWidgets import *
-from config import Config
+from connectorconfig import Config
 import ipaddress
 
 class Settings(QWidget):

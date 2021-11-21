@@ -12,7 +12,7 @@ from cryptography.fernet import Fernet
 from managepasswordswindow import ManagePasswordsWindow
 from showpasswordswindow import ShowPasswordsWindow
 from setupwindow import SetupWindow
-from config import Config
+from connectorconfig import Config
 from settings import Settings
 from messagebox import MessageBox
 
@@ -40,16 +40,16 @@ class MainWindow(QWidget):
 
         self.displayPasswords_btn = QPushButton('Display passwords')
         self.displayPasswords_btn.setEnabled(False)
-        self.displayPasswords_btn.clicked.connect(self.displaypasswords)
+        self.displayPasswords_btn.clicked.connect(self.display_passwords)
         self.layout.addWidget(self.displayPasswords_btn, 2, 0, 1, 3)
 
         self.managePasswords_btn = QPushButton('Manage passwords')
         self.managePasswords_btn.setEnabled(False)
-        self.managePasswords_btn.clicked.connect(self.managepasswords)
+        self.managePasswords_btn.clicked.connect(self.manage_passwords)
         self.layout.addWidget(self.managePasswords_btn, 3, 0, 1, 3)
 
         self.newUser_btn = QPushButton('New user')
-        self.newUser_btn.clicked.connect(self.newuser)
+        self.newUser_btn.clicked.connect(self.new_user)
         self.layout.addWidget(self.newUser_btn, 4, 1)
 
         self.setLayout(self.layout)
@@ -77,7 +77,7 @@ class MainWindow(QWidget):
         try:
             conn = mysql.connector.connect(**Config.config())
             c = conn.cursor()
-            c.execute("select MasterKey, ID from Users where (Username = \'{}\')".format(self.name_input.text()))
+            c.execute("select MasterKey, ID from Users where (User = \'{}\')".format(self.name_input.text()))
             data = c.fetchone()
             key_hashed = data[0]
             self.user_id = data[1]
@@ -86,37 +86,37 @@ class MainWindow(QWidget):
             #print(key_hashed)
             #print(SHA256.new(self.key_input.text().encode()).hexdigest())
             if SHA256.new(self.key_input.text().encode()).hexdigest() == key_hashed.decode():
-                self.key = self.getKey()
+                self.key = self.get_key()
                 return True
             return False
         except mysql.connector.Error as x:
             self.messagebox = MessageBox(self, x.msg)
             self.messagebox.show()
 
-    def managepasswords(self):
+    def manage_passwords(self):
         if self.check_key():
             self.w1.user = self.user_id
-            self.w1.setKey(self.key)
+            self.w1.set_key(self.key)
             self.w2.user = self.user_id
-            self.w2.setKey(self.key)
-            self.w1.createTable()
+            self.w2.set_key(self.key)
+            self.w1.create_table()
             self.w1.show()
 
             self.managePasswords_btn.setDisabled(True)
 
-    def displaypasswords(self):
+    def display_passwords(self):
         if self.check_key():
             self.w2.user = self.user_id
-            self.w2.setKey(self.key)
-            self.w2.createTable()
+            self.w2.set_key(self.key)
+            self.w2.create_table()
             self.w2.show()
 
             self.displayPasswords_btn.setDisabled(True)
 
-    def newuser(self):
+    def new_user(self):
         self.w3.show()
 
-    def getKey(self):
+    def get_key(self):
         password = self.key_input.text().encode()
         salt = b'sw\xea\x01\x9d\x109\x0eF\xef/\n\xb0mWK'
         kdf = PBKDF2HMAC(
