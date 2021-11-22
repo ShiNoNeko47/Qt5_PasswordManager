@@ -55,6 +55,7 @@ class ShowPasswordsWindow(QWidget):
                 self.table.setItem(i,
                                    j,
                                    (QTableWidgetItem(data)))
+            data = row[2]
             self.table.setItem(i,
                                2,
                                (QTableWidgetItem('*'
