@@ -80,7 +80,7 @@ class MainWindow(QWidget):
         try:
             conn = mysql.connector.connect(**Config.config())
             c = conn.cursor()
-            c.execute("""elect MasterKey, ID
+            c.execute("""select MasterKey, ID
                          from Users
                          where
                          (User = \'{}\')"""
