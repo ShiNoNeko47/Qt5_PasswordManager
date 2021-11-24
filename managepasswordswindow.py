@@ -57,7 +57,8 @@ class ManagePasswordsWindow(QWidget):
 
         self.displayPasswordsWindow = displayPasswordsWindow
 
-        self.messageBox = MessageBox(self, 'Save changes?')
+        self.messageBox = MessageBox(self,
+                                     'Save changes?')
 
     def set_key(self, key):
         self.f = Fernet(key)
@@ -104,11 +105,10 @@ class ManagePasswordsWindow(QWidget):
                 self.table.setItem(i,
                                    j,
                                    (QTableWidgetItem(data)))
-            data = row[2]
+            data = '*' * len(self.f.decrypt(row[2]))
             self.table.setItem(i,
                                2,
-                               (QTableWidgetItem('*'
-                                                 * len(self.f.decrypt(data)))))
+                               (QTableWidgetItem(data)))
         self.number_or_ids = len(self.rowIds)
 
         self.create_btns()
