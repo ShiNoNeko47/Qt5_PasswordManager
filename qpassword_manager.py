@@ -6,7 +6,7 @@ from mainwindow import MainWindow
 
 
 def main():
-    app = QApplication(['Qt5PasswordManager'])
+    app = QApplication(['qpassword_manager'])
 
     window = MainWindow()
     window.show()

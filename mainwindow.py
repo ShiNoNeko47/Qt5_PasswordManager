@@ -23,7 +23,7 @@ class MainWindow(QWidget):
         super().__init__()
 
         self.key_hashed = 'a'
-        self.setWindowTitle('PasswordManager')
+        self.setWindowTitle('qpassword_manager')
         self.setFixedHeight(250)
         self.setFixedWidth(600)
 
