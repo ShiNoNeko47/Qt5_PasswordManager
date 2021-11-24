@@ -41,6 +41,7 @@ class SetupWindow(QWidget):
         self.layout.addWidget(self.ok_btn, 2, 1)
 
         self.setLayout(self.layout)
+        self.messagebox = MessageBox(self, 'message')
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Return:
