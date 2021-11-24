@@ -55,11 +55,10 @@ class ShowPasswordsWindow(QWidget):
                 self.table.setItem(i,
                                    j,
                                    (QTableWidgetItem(data)))
-            data = row[2]
+            data = '*' * len(self.f.decrypt(row[2]))
             self.table.setItem(i,
                                2,
-                               (QTableWidgetItem('*'
-                                                 * len(self.f.decrypt(data)))))
+                               (QTableWidgetItem(data)))
             copy_btns.append(Copy_btn(i, self.data, self.f))
             self.table.setCellWidget(i, 3, copy_btns[i])
 
