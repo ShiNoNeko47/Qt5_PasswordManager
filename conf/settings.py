@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (QWidget,
                              QLineEdit,
                              QGridLayout)
 from PyQt5.Qt import Qt
-from connectorconfig import Config
+from conf.connectorconfig import Config
 
 
 class Settings(QWidget):

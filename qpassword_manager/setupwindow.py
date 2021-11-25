@@ -5,8 +5,8 @@ from PyQt5.QtWidgets import (QWidget,
 from PyQt5.Qt import Qt
 import mysql.connector
 from Crypto.Hash import SHA256
-from connectorconfig import Config
-from messagebox import MessageBox
+from qpassword_manager.messagebox import MessageBox
+from conf.connectorconfig import Config
 
 
 class SetupWindow(QWidget):

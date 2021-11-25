@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QPushButton
 import mysql.connector
-from connectorconfig import Config
+from conf.connectorconfig import Config
 
 
 class Edit_btn(QPushButton):

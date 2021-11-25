@@ -9,13 +9,13 @@ class Config:
     f = Fernet(key)
 
     def config():
-        with open('config.json', 'rb') as file:
+        with open('conf/config.json', 'rb') as file:
             configEnc = file.read()
         config = json.loads(Config.f.decrypt(configEnc).decode())
         return(config)
 
     def config_update(config):
-        with open('config.json', 'wb') as file:
+        with open('conf/config.json', 'wb') as file:
             file.write(Config.f.encrypt(json.dumps(config).encode()))
 
 

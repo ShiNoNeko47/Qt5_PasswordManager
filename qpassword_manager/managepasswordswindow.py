@@ -7,10 +7,10 @@ from PyQt5.QtWidgets import (QWidget,
                              QAbstractItemView)
 import mysql.connector
 from cryptography.fernet import Fernet
-from removebtn import Remove_btn
-from editbtn import Edit_btn
-from messagebox import MessageBox
-from connectorconfig import Config
+from qpassword_manager.messagebox import MessageBox
+from qpassword_manager.btns.removebtn import Remove_btn
+from qpassword_manager.btns.editbtn import Edit_btn
+from conf.connectorconfig import Config
 
 
 class ManagePasswordsWindow(QWidget):

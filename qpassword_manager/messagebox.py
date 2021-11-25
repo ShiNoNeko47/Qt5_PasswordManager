@@ -2,8 +2,8 @@ from PyQt5.QtWidgets import (QWidget,
                              QLabel,
                              QPushButton,
                              QGridLayout)
-from removebtn import Remove_btn
 from PyQt5.Qt import Qt
+from qpassword_manager.btns.removebtn import Remove_btn
 
 
 class MessageBox(QWidget):

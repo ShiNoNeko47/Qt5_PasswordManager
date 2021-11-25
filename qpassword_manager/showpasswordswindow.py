@@ -5,8 +5,8 @@ from PyQt5.QtWidgets import (QWidget,
                              QAbstractItemView)
 import mysql.connector
 from cryptography.fernet import Fernet
-from copybtn import Copy_btn
-from connectorconfig import Config
+from qpassword_manager.btns.copybtn import Copy_btn
+from conf.connectorconfig import Config
 
 
 class ShowPasswordsWindow(QWidget):

@@ -2,7 +2,7 @@
 
 from PyQt5.QtWidgets import QApplication
 import sys
-from mainwindow import MainWindow
+from qpassword_manager.mainwindow import MainWindow
 
 
 def main():

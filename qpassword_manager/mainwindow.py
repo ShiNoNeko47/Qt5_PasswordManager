@@ -10,12 +10,12 @@ import base64
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from managepasswordswindow import ManagePasswordsWindow
-from showpasswordswindow import ShowPasswordsWindow
-from setupwindow import SetupWindow
-from connectorconfig import Config
-from settings import Settings
-from messagebox import MessageBox
+from qpassword_manager.managepasswordswindow import ManagePasswordsWindow
+from qpassword_manager.showpasswordswindow import ShowPasswordsWindow
+from qpassword_manager.setupwindow import SetupWindow
+from qpassword_manager.messagebox import MessageBox
+from conf.connectorconfig import Config
+from conf.settings import Settings
 
 
 class MainWindow(QWidget):
