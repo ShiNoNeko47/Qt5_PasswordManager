@@ -38,4 +38,4 @@ class Edit_btn(QPushButton):
 
         else:
             self.setText('+')
-            self.w.resetEntries()
+            self.w.reset_entries()
