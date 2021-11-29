@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (QWidget,
                              QPushButton,
                              QGridLayout)
 from PyQt5.Qt import Qt
-import mysql.connector
+import requests
 from Crypto.Hash import SHA256
 from qpassword_manager.messagebox import MessageBox
 from conf.connectorconfig import Config
@@ -54,6 +54,7 @@ class SetupWindow(QWidget):
             self.ok_btn.setEnabled(True)
 
     def ok(self):
+        '''
         try:
             conn = mysql.connector.connect(**Config.config())
             c = conn.cursor()
@@ -62,8 +63,7 @@ class SetupWindow(QWidget):
                          values
                          (\'{}\', \'{}\')"""
                       .format(self.username_setup_le.text(),
-                              SHA256.new(self.key_setup_le.text().encode())
-                              .hexdigest()))
+                              ))
             conn.commit()
 
             self.mainWindow.key_input.setText(self.key_setup_le.text())
@@ -80,6 +80,24 @@ class SetupWindow(QWidget):
 
         c.close()
         conn.close()
+        '''
+        MasterKey = SHA256.new(self.key_setup_le.text().encode()).hexdigest()
+        self.r = requests.post(Config.config()['host'],
+                               {'action': 'new_user',
+                                'user': self.username_setup_le.text(),
+                                'master_key': MasterKey})
+        msg = self.r.text
+        print(msg)
+        if msg:
+            if msg.startswith('Duplicate entry'):
+                msg = 'User exists.'
+            self.messagebox = MessageBox(self, msg)
+            self.messagebox.show()
+
+        else:
+            self.mainWindow.key_input.setText(self.key_setup_le.text())
+            self.mainWindow.name_input.setText(self.username_setup_le.text())
+            self.close()
 
     def reset_entries(self):
         self.username_setup_le.setText('')
