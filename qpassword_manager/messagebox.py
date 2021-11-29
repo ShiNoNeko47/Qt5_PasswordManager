@@ -24,11 +24,11 @@ class MessageBox(QWidget):
 
         self.yes_btn = QPushButton()
         self.yes_btn.setText('Yes')
-        self.yes_btn.clicked.connect(self.save)
+        self.yes_btn.clicked.connect(self.yes)
 
         self.no_btn = QPushButton()
         self.no_btn.setText('No')
-        self.no_btn.clicked.connect(self.not_save)
+        self.no_btn.clicked.connect(self.no)
 
         if title[-1] == '?':
             self.layout.addWidget(self.yes_btn, 1, 2)
@@ -46,12 +46,12 @@ class MessageBox(QWidget):
     def ok(self):
         self.close()
 
-    def save(self):
+    def yes(self):
         self.parentWindow.commit_changes()
         self.close()
         self.parentWindow.close()
 
-    def not_save(self):
+    def no(self):
         self.parentWindow.sql.clear()
         Remove_btn.marked.clear()
         self.parentWindow.save_btn.setDisabled(True)
