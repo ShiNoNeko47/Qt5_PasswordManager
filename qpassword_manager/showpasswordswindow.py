@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (QWidget,
                              QTableWidget,
                              QTableWidgetItem,
                              QAbstractItemView)
-import mysql.connector
+import requests
 from cryptography.fernet import Fernet
 from qpassword_manager.btns.copybtn import Copy_btn
 from conf.connectorconfig import Config
@@ -31,6 +31,12 @@ class ShowPasswordsWindow(QWidget):
                                               'Username',
                                               'Password',
                                               ''])
+        self.r = requests.post(Config.config()['host'],
+                               {'action': 'create_table'},
+                               auth=self.auth)
+        print(self.r.json())
+        self.data = self.r.json()
+        '''
         conn = mysql.connector.connect(**Config.config())
         c = conn.cursor()
         # print(self.user)
@@ -42,7 +48,7 @@ class ShowPasswordsWindow(QWidget):
         self.data = c.fetchall()
         c.close()
         conn.close()
-
+        '''
         for i in range(3):
             self.table.setColumnWidth(i, 190)
         self.table.setColumnWidth(3, 30)
@@ -51,11 +57,11 @@ class ShowPasswordsWindow(QWidget):
         copy_btns = []
         for row, i in zip(self.data, range(len(self.data))):
             self.table.insertRow(i)
-            for data, j in zip(row, range(2)):
+            for j in range(2):
                 self.table.setItem(i,
                                    j,
-                                   (QTableWidgetItem(data)))
-            data = '*' * len(self.f.decrypt(row[2]))
+                                   (QTableWidgetItem(row[str(j)])))
+            data = '*' * len(self.f.decrypt(row['2'].encode()))
             self.table.setItem(i,
                                2,
                                (QTableWidgetItem(data)))
