@@ -1,5 +1,5 @@
 import sys
-import mysql.connector
+import requests
 from Crypto.Hash import SHA256
 from PyQt5.QtWidgets import (QWidget,
                              QGridLayout,
@@ -78,36 +78,32 @@ class MainWindow(QWidget):
 
     def check_key(self):
         try:
-            conn = mysql.connector.connect(**Config.config())
-            c = conn.cursor()
-            c.execute("""select MasterKey, ID
-                         from Users
-                         where
-                         (User = \'{}\')"""
-                      .format(self.name_input.text()))
-
-            data = c.fetchone()
-            key_hashed = data[0]
-            self.user_id = data[1]
-            c.close()
-            conn.close()
-            key_input_hashed = SHA256.new(self.key_input.text().encode())
-            # print(key_hashed)
-            # print(SHA256.new(self.key_input.text().encode()).hexdigest())
-            if key_input_hashed.hexdigest() == key_hashed.decode():
+            self.key_input_hashed = SHA256.new(self.key_input.text().encode())
+            self.r = requests.post(Config.config()['host'],
+                                   {'action': 'get_id'},
+                                   auth=(self.name_input.text(),
+                                         self.key_input_hashed.hexdigest()))
+            print(self.name_input.text(), self.key_input_hashed.hexdigest())
+            print(self.r.text)
+            if self.r.text:
                 self.key = self.get_key()
                 return True
+            raise Exception('Wrong username or password!')
             return False
-        except mysql.connector.Error as x:
-            self.messagebox = MessageBox(self, x.msg)
+        except Exception as x:
+            self.messagebox = MessageBox(self, x.args[0])
             self.messagebox.show()
 
     def manage_passwords(self):
         if self.check_key():
-            self.w1.user = self.user_id
+            self.w1.auth = (self.name_input.text(),
+                            self.key_input_hashed.hexdigest())
             self.w1.set_key(self.key)
-            self.w2.user = self.user_id
+
+            self.w2.auth = (self.name_input.text(),
+                            self.key_input_hashed.hexdigest())
             self.w2.set_key(self.key)
+
             self.w1.create_table()
             self.w1.show()
 
@@ -115,7 +111,8 @@ class MainWindow(QWidget):
 
     def display_passwords(self):
         if self.check_key():
-            self.w2.user = self.user_id
+            self.w2.auth = (self.name_input.text(),
+                            self.key_input_hashed.hexdigest())
             self.w2.set_key(self.key)
             self.w2.create_table()
             self.w2.show()
