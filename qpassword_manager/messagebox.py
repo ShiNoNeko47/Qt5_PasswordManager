@@ -52,7 +52,7 @@ class MessageBox(QWidget):
         self.parentWindow.close()
 
     def no(self):
-        self.parentWindow.sql.clear()
+        self.parentWindow.actions.clear()
         Remove_btn.marked.clear()
         self.parentWindow.save_btn.setDisabled(True)
         self.close()
