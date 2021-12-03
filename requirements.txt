@@ -1,5 +1,5 @@
 cryptography==35.0.0
-mysql-connector-python==8.0.27
 pycryptodome==3.11.0
 pyperclip==1.8.2
 PyQt5==5.15.6
+requests==2.26.0
