@@ -117,13 +117,9 @@ class ManagePasswordsWindow(QWidget):
             for j in range(2):
                 data = row[str(j)]
                 print(data)
-                self.table.setItem(i,
-                                   j,
-                                   (QTableWidgetItem(data)))
+                self.table.setItem(i, j, (QTableWidgetItem(data)))
             data = '*' * len(self.f.decrypt(row['2'].encode()))
-            self.table.setItem(i,
-                               2,
-                               (QTableWidgetItem(data)))
+            self.table.setItem(i, 2, (QTableWidgetItem(data)))
         self.create_btns()
 
         self.table.setFixedWidth(620)
@@ -138,17 +134,13 @@ class ManagePasswordsWindow(QWidget):
             self.edit_btns.append(Edit_btn(self.rowIds[i],
                                            self.edit_btns,
                                            self))
-            self.table.setCellWidget(i,
-                                     3,
-                                     self.edit_btns[i])
+            self.table.setCellWidget(i, 3, self.edit_btns[i])
             self.remove_btns.append(Remove_btn(self.rowIds[i],
                                                self.table,
                                                self.remove_btns,
                                                self.actions,
                                                self))
-            self.table.setCellWidget(i,
-                                     4,
-                                     self.remove_btns[i])
+            self.table.setCellWidget(i, 4, self.remove_btns[i])
 
     def valid_input_check(self):
         check = [all([self.newWebsite_le.text() != '',
@@ -174,11 +166,6 @@ class ManagePasswordsWindow(QWidget):
 
     def add_password(self):
         if self.valid_input_check():
-            n = self.table.rowCount()
-            i = n
-            while (n,) in self.rowIds:
-                n += 1
-            self.rowIds.append((n,))
             self.actions.append([self.newWebsite_le.text(),
                                  self.newUsername_le.text(),
                                  self.f.encrypt(self.newPassword_le.text()
@@ -187,22 +174,17 @@ class ManagePasswordsWindow(QWidget):
 
             self.save_btn.setDisabled(not self.actions)
 
-            self.table.insertRow(i)
+            n = self.table.rowCount()
+            self.table.insertRow(n)
 
             website = self.newWebsite_le.text()
-            self.table.setItem(i,
-                               0,
-                               (QTableWidgetItem('+ ' + website)))
+            self.table.setItem(n, 0, (QTableWidgetItem('+ ' + website)))
 
             username = self.newUsername_le.text()
-            self.table.setItem(i,
-                               1,
-                               (QTableWidgetItem('+ ' + username)))
+            self.table.setItem(n, 1, (QTableWidgetItem('+ ' + username)))
 
             password = '*' * len(self.newPassword_le.text())
-            self.table.setItem(i,
-                               2,
-                               (QTableWidgetItem('+ ' + password)))
+            self.table.setItem(n, 2, (QTableWidgetItem('+ ' + password)))
 
             self.newWebsite_le.setText('')
             self.newUsername_le.setText('')
