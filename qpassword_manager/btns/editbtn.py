@@ -19,19 +19,6 @@ class Edit_btn(QPushButton):
                 btn.setText('+')
 
             self.setText('-')
-            '''
-            conn = mysql.connector.connect(**Config.config())
-            c = conn.cursor()
-            c.execute("""select Website, Username, Password
-                         from Passwords
-                         where
-                         (ID = \'{}\' and Deleted = 0)"""
-                      .format(self.rowId))
-
-            row = c.fetchone()
-            c.close()
-            conn.close()
-            '''
             self.r = requests.post(Config.config()['host'],
                                    {'action': 'get_row',
                                     'id': self.rowId},
