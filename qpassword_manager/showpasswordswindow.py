@@ -36,19 +36,7 @@ class ShowPasswordsWindow(QWidget):
                                auth=self.auth)
         print(self.r.json())
         self.data = self.r.json()
-        '''
-        conn = mysql.connector.connect(**Config.config())
-        c = conn.cursor()
-        # print(self.user)
-        c.execute("""select Website, Username, Password
-                     from Passwords
-                     where
-                     (UserID = \'{}\' and Deleted = 0)"""
-                  .format(self.user))
-        self.data = c.fetchall()
-        c.close()
-        conn.close()
-        '''
+
         for i in range(3):
             self.table.setColumnWidth(i, 190)
         self.table.setColumnWidth(3, 30)
