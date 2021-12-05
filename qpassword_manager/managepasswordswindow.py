@@ -57,8 +57,17 @@ class ManagePasswordsWindow(QWidget):
 
         self.displayPasswordsWindow = displayPasswordsWindow
 
-        self.messageBox = MessageBox(self,
-                                     'Save changes?')
+        self.messagebox = MessageBox(self, 'Save changes?')
+
+    def messagebox_handler(self, choice):
+        if choice == 1:
+            self.commit_changes()
+            self.close()
+        else:
+            self.actions.clear()
+            Remove_btn.marked.clear()
+            self.save_btn.setDisabled(True)
+            self.close()
 
     def set_key(self, key):
         self.f = Fernet(key)
@@ -85,26 +94,6 @@ class ManagePasswordsWindow(QWidget):
                                auth=self.auth)
         print(self.r.json())
         self.rowIds = self.r.json()
-        '''
-        conn = mysql.connector.connect(**Config.config())
-        c = conn.cursor()
-        # print(self.user)
-        c.execute("""select Website, Username, Password
-                     from Passwords
-                     where
-                     (UserID = \'{}\' and Deleted = 0)"""
-                  .format(self.user))
-        self.data = c.fetchall()
-        c.execute("""select ID
-                     from Passwords
-                     where
-                     (UserID = \'{}\' and Deleted = 0)"""
-                  .format(self.user))
-        self.rowIds = c.fetchall()
-        # print(self.rowIds)
-        c.close()
-        conn.close()
-        '''
 
         for i in range(3):
             self.table.setColumnWidth(i, 180)
@@ -194,16 +183,6 @@ class ManagePasswordsWindow(QWidget):
             self.create_btns()
 
     def commit_changes(self):
-        '''
-        conn = mysql.connector.connect(**Config.config())
-        c = conn.cursor()
-        for statement in self.sql:
-            # print(statement)
-            c.execute(statement)
-        conn.commit()
-        c.close()
-        conn.close()
-        '''
         for action in self.actions:
             if action.pop() == 'add':
                 self.r = requests.post(Config.config()['host'],
@@ -239,5 +218,5 @@ class ManagePasswordsWindow(QWidget):
             event.accept()
         else:
             event.ignore()
-            self.messageBox.close()
-            self.messageBox.show()
+            self.messagebox.close()
+            self.messagebox.show()

@@ -54,33 +54,6 @@ class SetupWindow(QWidget):
             self.ok_btn.setEnabled(True)
 
     def ok(self):
-        '''
-        try:
-            conn = mysql.connector.connect(**Config.config())
-            c = conn.cursor()
-            c.execute("""insert into Users
-                         (User, MasterKey)
-                         values
-                         (\'{}\', \'{}\')"""
-                      .format(self.username_setup_le.text(),
-                              ))
-            conn.commit()
-
-            self.mainWindow.key_input.setText(self.key_setup_le.text())
-            self.mainWindow.name_input.setText(self.username_setup_le.text())
-            self.close()
-
-        except mysql.connector.Error as x:
-            if x.errno == 1062:
-                self.messagebox = MessageBox(self, 'User already exists!')
-                self.messagebox.show()
-            else:
-                self.messagebox = MessageBox(self, x.msg)
-                self.messagebox.show()
-
-        c.close()
-        conn.close()
-        '''
         MasterKey = SHA256.new(self.key_setup_le.text().encode()).hexdigest()
         self.r = requests.post(Config.config()['host'],
                                {'action': 'new_user',
@@ -90,13 +63,20 @@ class SetupWindow(QWidget):
         print(msg)
         if msg:
             if msg.startswith('Duplicate entry'):
-                msg = 'User exists.'
+                msg = 'User exists. Login?'
+
             self.messagebox = MessageBox(self, msg)
             self.messagebox.show()
 
         else:
             self.mainWindow.key_input.setText(self.key_setup_le.text())
             self.mainWindow.name_input.setText(self.username_setup_le.text())
+            self.close()
+
+    def messagebox_handler(self, choice):
+        if choice == 1:
+            self.mainWindow.name_input.setText(self.username_setup_le.text())
+            self.mainWindow.key_input.setText('')
             self.close()
 
     def reset_entries(self):

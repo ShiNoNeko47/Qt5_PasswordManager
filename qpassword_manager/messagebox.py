@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import (QWidget,
                              QPushButton,
                              QGridLayout)
 from PyQt5.Qt import Qt
-from qpassword_manager.btns.removebtn import Remove_btn
 
 
 class MessageBox(QWidget):
@@ -47,13 +46,9 @@ class MessageBox(QWidget):
         self.close()
 
     def yes(self):
-        self.parentWindow.commit_changes()
+        self.parentWindow.messagebox_handler(1)
         self.close()
-        self.parentWindow.close()
 
     def no(self):
-        self.parentWindow.actions.clear()
-        Remove_btn.marked.clear()
-        self.parentWindow.save_btn.setDisabled(True)
+        self.parentWindow.messagebox_handler(0)
         self.close()
-        self.parentWindow.close()
