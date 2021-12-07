@@ -1,7 +1,4 @@
-from PyQt5.QtWidgets import (QWidget,
-                             QLineEdit,
-                             QPushButton,
-                             QGridLayout)
+from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QGridLayout
 from PyQt5.Qt import Qt
 import requests
 from Crypto.Hash import SHA256
@@ -15,33 +12,33 @@ class SetupWindow(QWidget):
 
         self.mainWindow = mainWindow
         self.layout = QGridLayout()
-        self.setWindowTitle('New user')
+        self.setWindowTitle("New user")
         self.setFixedHeight(150)
         self.setFixedWidth(600)
 
         self.username_setup_le = QLineEdit()
-        self.username_setup_le.setPlaceholderText('New username')
+        self.username_setup_le.setPlaceholderText("New username")
         self.layout.addWidget(self.username_setup_le, 0, 0)
 
         self.key_setup_le = QLineEdit()
         self.key_setup_le.setEchoMode(QLineEdit.Password)
         self.key_setup_le.textChanged.connect(self.check_password)
-        self.key_setup_le.setPlaceholderText('Master key')
+        self.key_setup_le.setPlaceholderText("Master key")
         self.layout.addWidget(self.key_setup_le, 1, 0)
 
         self.key_reenter_le = QLineEdit()
         self.key_reenter_le.setEchoMode(QLineEdit.Password)
         self.key_reenter_le.textChanged.connect(self.check_password)
-        self.key_reenter_le.setPlaceholderText('Confirm master key')
+        self.key_reenter_le.setPlaceholderText("Confirm master key")
         self.layout.addWidget(self.key_reenter_le, 2, 0)
 
-        self.ok_btn = QPushButton('Ok')
+        self.ok_btn = QPushButton("Ok")
         self.ok_btn.setEnabled(False)
         self.ok_btn.clicked.connect(self.ok)
         self.layout.addWidget(self.ok_btn, 2, 1)
 
         self.setLayout(self.layout)
-        self.messagebox = MessageBox(self, 'message')
+        self.messagebox = MessageBox(self, "message")
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Return:
@@ -49,21 +46,29 @@ class SetupWindow(QWidget):
 
     def check_password(self):
         self.ok_btn.setEnabled(False)
-        if all([self.key_setup_le.text() == self.key_reenter_le.text(),
-                len(self.key_setup_le.text()) > 3]):
+        if all(
+            [
+                self.key_setup_le.text() == self.key_reenter_le.text(),
+                len(self.key_setup_le.text()) > 3,
+            ]
+        ):
             self.ok_btn.setEnabled(True)
 
     def ok(self):
         MasterKey = SHA256.new(self.key_setup_le.text().encode()).hexdigest()
-        self.r = requests.post(Config.config()['host'],
-                               {'action': 'new_user',
-                                'user': self.username_setup_le.text(),
-                                'master_key': MasterKey})
+        self.r = requests.post(
+            Config.config()["host"],
+            {
+                "action": "new_user",
+                "user": self.username_setup_le.text(),
+                "master_key": MasterKey,
+            },
+        )
         msg = self.r.text
         print(msg)
         if msg:
-            if msg.startswith('Duplicate entry'):
-                msg = 'User exists. Login?'
+            if msg.startswith("Duplicate entry"):
+                msg = "User exists. Login?"
 
             self.messagebox = MessageBox(self, msg)
             self.messagebox.show()
@@ -76,13 +81,13 @@ class SetupWindow(QWidget):
     def messagebox_handler(self, choice):
         if choice == 1:
             self.mainWindow.name_input.setText(self.username_setup_le.text())
-            self.mainWindow.key_input.setText('')
+            self.mainWindow.key_input.setText("")
             self.close()
 
     def reset_entries(self):
-        self.username_setup_le.setText('')
-        self.key_setup_le.setText('')
-        self.key_reenter_le.setText('')
+        self.username_setup_le.setText("")
+        self.key_setup_le.setText("")
+        self.key_reenter_le.setText("")
 
     def closeEvent(self, event):
         if self.messagebox.isVisible():

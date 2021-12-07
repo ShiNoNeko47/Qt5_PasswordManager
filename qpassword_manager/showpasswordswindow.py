@@ -1,8 +1,10 @@
-from PyQt5.QtWidgets import (QWidget,
-                             QGridLayout,
-                             QTableWidget,
-                             QTableWidgetItem,
-                             QAbstractItemView)
+from PyQt5.QtWidgets import (
+    QWidget,
+    QGridLayout,
+    QTableWidget,
+    QTableWidgetItem,
+    QAbstractItemView,
+)
 import requests
 from cryptography.fernet import Fernet
 from qpassword_manager.btns.copybtn import Copy_btn
@@ -14,7 +16,7 @@ class ShowPasswordsWindow(QWidget):
         super().__init__()
 
         self.btn = btn
-        self.setWindowTitle('Passwords')
+        self.setWindowTitle("Passwords")
         self.layout = QGridLayout()
 
         self.setFixedWidth(640)
@@ -27,13 +29,12 @@ class ShowPasswordsWindow(QWidget):
         self.table = QTableWidget()
         self.table.setColumnCount(4)
         self.table.verticalHeader().setVisible(False)
-        self.table.setHorizontalHeaderLabels(['Website',
-                                              'Username',
-                                              'Password',
-                                              ''])
-        self.r = requests.post(Config.config()['host'],
-                               {'action': 'create_table'},
-                               auth=self.auth)
+        self.table.setHorizontalHeaderLabels(
+            ["Website", "Username", "Password", ""]
+        )
+        self.r = requests.post(
+            Config.config()["host"], {"action": "create_table"}, auth=self.auth
+        )
         print(self.r.json())
         self.data = self.r.json()
 
@@ -46,13 +47,9 @@ class ShowPasswordsWindow(QWidget):
         for row, i in zip(self.data, range(len(self.data))):
             self.table.insertRow(i)
             for j in range(2):
-                self.table.setItem(i,
-                                   j,
-                                   (QTableWidgetItem(row[str(j)])))
-            data = '*' * len(self.f.decrypt(row['2'].encode()))
-            self.table.setItem(i,
-                               2,
-                               (QTableWidgetItem(data)))
+                self.table.setItem(i, j, (QTableWidgetItem(row[str(j)])))
+            data = "*" * len(self.f.decrypt(row["2"].encode()))
+            self.table.setItem(i, 2, (QTableWidgetItem(data)))
             copy_btns.append(Copy_btn(i, self.data, self.f))
             self.table.setCellWidget(i, 3, copy_btns[i])
 

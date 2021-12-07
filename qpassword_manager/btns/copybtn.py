@@ -5,6 +5,6 @@ from PyQt5.QtWidgets import QPushButton
 class Copy_btn(QPushButton):
     def __init__(self, index, data, f):
         super().__init__()
-        self.decrypted = f.decrypt(data[index]['2'].encode()).decode()
+        self.decrypted = f.decrypt(data[index]["2"].encode()).decode()
         self.clicked.connect(lambda: pyperclip.copy(self.decrypted))
-        self.setText('📋')
+        self.setText("📋")

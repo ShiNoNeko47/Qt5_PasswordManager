@@ -11,26 +11,27 @@ class Edit_btn(QPushButton):
         self.w = window
         self.clicked.connect(self.edit_row)
         self.f = self.w.f
-        self.setText('+')
+        self.setText("+")
 
     def edit_row(self):
-        if self.text() == '+':
+        if self.text() == "+":
             for btn in self.edit_btns:
-                btn.setText('+')
+                btn.setText("+")
 
-            self.setText('-')
-            self.r = requests.post(Config.config()['host'],
-                                   {'action': 'get_row',
-                                    'id': self.rowId},
-                                   auth=(self.w.auth))
+            self.setText("-")
+            self.r = requests.post(
+                Config.config()["host"],
+                {"action": "get_row", "id": self.rowId},
+                auth=(self.w.auth),
+            )
             row = self.r.json()
             print(self.rowId)
-            self.w.newWebsite_le.setText(row['0'])
-            self.w.newUsername_le.setText(row['1'])
-            password = self.f.decrypt(row['2'].encode()).decode()
+            self.w.newWebsite_le.setText(row["0"])
+            self.w.newUsername_le.setText(row["1"])
+            password = self.f.decrypt(row["2"].encode()).decode()
             self.w.newPassword_le.setText(password)
             self.w.reNewPassword_le.setText(password)
 
         else:
-            self.setText('+')
+            self.setText("+")
             self.w.reset_entries()

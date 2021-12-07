@@ -6,7 +6,7 @@ from qpassword_manager.mainwindow import MainWindow
 
 
 def main():
-    app = QApplication(['qpassword_manager'])
+    app = QApplication(["qpassword_manager"])
 
     window = MainWindow()
     window.show()
@@ -14,5 +14,5 @@ def main():
     sys.exit(app.exec_())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
