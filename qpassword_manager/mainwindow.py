@@ -8,11 +8,11 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from qpassword_manager.managepasswordswindow import ManagePasswordsWindow
-from qpassword_manager.showpasswordswindow import ShowPasswordsWindow
+from qpassword_manager.displaypasswordswindow import DisplayPasswordsWindow
 from qpassword_manager.setupwindow import SetupWindow
 from qpassword_manager.messagebox import MessageBox
-from conf.connectorconfig import Config
-from conf.settings import Settings
+from qpassword_manager.conf.connectorconfig import Config
+from qpassword_manager.conf.settings import Settings
 
 
 class MainWindow(QWidget):
@@ -55,9 +55,11 @@ class MainWindow(QWidget):
 
         self.key_input.setText(key)
 
-        self.w3 = SetupWindow(self)
-        self.w2 = ShowPasswordsWindow(self.displayPasswords_btn)
-        self.w1 = ManagePasswordsWindow(self.w2, self.managePasswords_btn)
+        self.w_display = DisplayPasswordsWindow(self.displayPasswords_btn)
+        self.w_manage = ManagePasswordsWindow(
+            self.w_display, self.managePasswords_btn
+        )
+        self.w_setup = SetupWindow(self)
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Return:
@@ -92,42 +94,42 @@ class MainWindow(QWidget):
             raise Exception("Wrong username or password!")
             return False
         except Exception as x:
-            self.messagebox = MessageBox(self, x.args[0])
+            self.messagebox = MessageBox(self, str(x))
             self.messagebox.show()
 
     def manage_passwords(self):
         if self.check_key():
-            self.w1.auth = (
+            self.w_manage.auth = (
                 self.name_input.text(),
                 self.key_input_hashed.hexdigest(),
             )
-            self.w1.set_key(self.key)
+            self.w_manage.set_key(self.key)
 
-            self.w2.auth = (
+            self.w_display.auth = (
                 self.name_input.text(),
                 self.key_input_hashed.hexdigest(),
             )
-            self.w2.set_key(self.key)
+            self.w_display.set_key(self.key)
 
-            self.w1.create_table()
-            self.w1.show()
+            self.w_manage.create_table()
+            self.w_manage.show()
 
             self.managePasswords_btn.setDisabled(True)
 
     def display_passwords(self):
         if self.check_key():
-            self.w2.auth = (
+            self.w_display.auth = (
                 self.name_input.text(),
                 self.key_input_hashed.hexdigest(),
             )
-            self.w2.set_key(self.key)
-            self.w2.create_table()
-            self.w2.show()
+            self.w_display.set_key(self.key)
+            self.w_display.create_table()
+            self.w_display.show()
 
             self.displayPasswords_btn.setDisabled(True)
 
     def new_user(self):
-        self.w3.show()
+        self.w_setup.show()
 
     def get_key(self):
         password = self.key_input.text().encode()
@@ -142,7 +144,7 @@ class MainWindow(QWidget):
         return base64.urlsafe_b64encode(kdf.derive(password))
 
     def closeEvent(self, event):
-        if all([self.w1.isHidden(), self.w2.isHidden()]):
+        if all([self.w_manage.isHidden(), self.w_display.isHidden()]):
             event.accept()
             sys.exit()
         else:
