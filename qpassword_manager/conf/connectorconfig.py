@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import os
 import json
 from cryptography.fernet import Fernet
 
@@ -9,13 +10,17 @@ class Config:
     f = Fernet(key)
 
     def config():
-        with open("qpassword_manager/conf/config.json", "rb") as file:
+        with open(
+            os.path.join(os.path.dirname(__file__), "config.json"), "rb"
+        ) as file:
             configEnc = file.read()
         config = json.loads(Config.f.decrypt(configEnc).decode())
         return config
 
     def config_update(config):
-        with open("qpassword_manager/conf/config.json", "wb") as file:
+        with open(
+            os.path.join(os.path.dirname(__file__), "config.json"), "wb"
+        ) as file:
             file.write(Config.f.encrypt(json.dumps(config).encode()))
 
 
