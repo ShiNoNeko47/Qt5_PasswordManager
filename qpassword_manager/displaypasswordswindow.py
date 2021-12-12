@@ -8,10 +8,10 @@ from PyQt5.QtWidgets import (
 import requests
 from cryptography.fernet import Fernet
 from qpassword_manager.btns.copybtn import Copy_btn
-from conf.connectorconfig import Config
+from qpassword_manager.conf.connectorconfig import Config
 
 
-class ShowPasswordsWindow(QWidget):
+class DisplayPasswordsWindow(QWidget):
     def __init__(self, btn):
         super().__init__()
 
