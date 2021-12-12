@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QPushButton, QLineEdit, QGridLayout
 from PyQt5.Qt import Qt
-from conf.connectorconfig import Config
+from qpassword_manager.conf.connectorconfig import Config
 
 
 class Settings(QWidget):

@@ -12,7 +12,7 @@ from cryptography.fernet import Fernet
 from qpassword_manager.messagebox import MessageBox
 from qpassword_manager.btns.removebtn import Remove_btn
 from qpassword_manager.btns.editbtn import Edit_btn
-from conf.connectorconfig import Config
+from qpassword_manager.conf.connectorconfig import Config
 
 
 class ManagePasswordsWindow(QWidget):

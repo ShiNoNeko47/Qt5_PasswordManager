@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QPushButton
 import requests
-from conf.connectorconfig import Config
+from qpassword_manager.conf.connectorconfig import Config
 
 
 class Edit_btn(QPushButton):

@@ -3,7 +3,7 @@ from PyQt5.Qt import Qt
 import requests
 from Crypto.Hash import SHA256
 from qpassword_manager.messagebox import MessageBox
-from conf.connectorconfig import Config
+from qpassword_manager.conf.connectorconfig import Config
 
 
 class SetupWindow(QWidget):
