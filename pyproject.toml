@@ -1,15 +1,6 @@
-[tool.poetry]
-name = "qpassword_manager"
-version = "0.3.0"
-description = ""
-authors = ["ShiNoNeko47 <nikola.brezovec.32123@gmail.com>"]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=42.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [tool.black]
 line-length = 80
