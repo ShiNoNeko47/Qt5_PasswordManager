@@ -1,3 +1,4 @@
+import logging
 from PyQt5.QtWidgets import (
     QWidget,
     QGridLayout,
@@ -8,7 +9,6 @@ from PyQt5.QtWidgets import (
     QAbstractItemView,
 )
 import requests
-import logging
 from cryptography.fernet import Fernet
 from qpassword_manager.messagebox import MessageBox
 from qpassword_manager.btns.removebtn import Remove_btn
@@ -55,12 +55,16 @@ class ManagePasswordsWindow(QWidget):
         self.save_btn.clicked.connect(self.commit_changes)
         self.layout.addWidget(self.save_btn, 3, 3)
 
+        self.table = QTableWidget()
+        self.layout.addWidget(self.table, 2, 0, 1, 4)
+
         self.setLayout(self.layout)
         self.setFixedWidth(640)
 
         self.displayPasswordsWindow = displayPasswordsWindow
 
         self.messagebox = MessageBox(self, "Save changes?")
+        self.row_ids = []
 
     def messagebox_handler(self, choice):
         if choice == 1:
@@ -78,23 +82,20 @@ class ManagePasswordsWindow(QWidget):
     def create_table(self):
         self.actions = []
 
-        self.table = QTableWidget()
         self.table.setColumnCount(5)
         self.table.verticalHeader().setVisible(False)
         self.table.setHorizontalHeaderLabels(
             ["Website", "Username", "Password", "", ""]
         )
-        self.r = requests.post(
+        data = requests.post(
             Config.config()["host"], {"action": "create_table"}, auth=self.auth
-        )
-        logging.debug(self.r.json())
-        self.data = self.r.json()
+        ).json()
+        logging.debug(data)
 
-        self.r = requests.post(
+        self.row_ids = requests.post(
             Config.config()["host"], {"action": "get_pass_ids"}, auth=self.auth
-        )
-        logging.debug(self.r.json())
-        self.rowIds = self.r.json()
+        ).json()
+        logging.debug(self.row_ids)
 
         for i in range(3):
             self.table.setColumnWidth(i, 180)
@@ -102,32 +103,30 @@ class ManagePasswordsWindow(QWidget):
         self.table.setColumnWidth(4, 30)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-        for row, i in zip(self.data, range(len(self.data))):
+        for row, i in zip(data, range(len(data))):
             self.table.insertRow(i)
             for j in range(2):
-                data = row[str(j)]
-                logging.debug(data)
-                self.table.setItem(i, j, (QTableWidgetItem(data)))
+                item = row[str(j)]
+                logging.debug(item)
+                self.table.setItem(i, j, (QTableWidgetItem(item)))
             data = "*" * len(self.f.decrypt(row["2"].encode()))
             self.table.setItem(i, 2, (QTableWidgetItem(data)))
         self.create_btns()
 
         self.table.setFixedWidth(620)
 
-        self.layout.addWidget(self.table, 2, 0, 1, 4)
-
     def create_btns(self):
         self.remove_btns = []
         self.edit_btns = []
 
-        for i in range(len(self.rowIds)):
+        for i in range(len(self.row_ids)):
             self.edit_btns.append(
-                Edit_btn(self.rowIds[i], self.edit_btns, self)
+                Edit_btn(self.row_ids[i], self.edit_btns, self)
             )
             self.table.setCellWidget(i, 3, self.edit_btns[i])
             self.remove_btns.append(
                 Remove_btn(
-                    self.rowIds[i],
+                    self.row_ids[i],
                     self.table,
                     self.remove_btns,
                     self.actions,
@@ -206,7 +205,7 @@ class ManagePasswordsWindow(QWidget):
     def commit_changes(self):
         for action in self.actions:
             if action.pop() == "add":
-                self.r = requests.post(
+                r = requests.post(
                     Config.config()["host"],
                     {
                         "action": "add",
@@ -217,12 +216,12 @@ class ManagePasswordsWindow(QWidget):
                     auth=self.auth,
                 )
             else:
-                self.r = requests.post(
+                r = requests.post(
                     Config.config()["host"],
                     {"action": "delete", "id": action},
                     auth=self.auth,
                 )
-            logging.debug(self.r.text)
+            logging.debug(r.text)
 
         Remove_btn.marked.clear()
         self.actions.clear()
