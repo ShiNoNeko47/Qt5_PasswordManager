@@ -9,7 +9,7 @@ class Config:
     key = b"LdGzkYcr8D4rOuKAyf_9spqqDGC-2Qf8duZM6x30ElQ="
     f = Fernet(key)
 
-    def config():
+    def config(self):
         with open(
             os.path.join(os.path.dirname(__file__), "config.json"), "rb"
         ) as file:
@@ -17,7 +17,7 @@ class Config:
         config = json.loads(Config.f.decrypt(configEnc).decode())
         return config
 
-    def config_update(config):
+    def config_update(self, config):
         with open(
             os.path.join(os.path.dirname(__file__), "config.json"), "wb"
         ) as file:
