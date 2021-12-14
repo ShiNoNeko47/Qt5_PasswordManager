@@ -1,3 +1,4 @@
+import logging
 from PyQt5.QtWidgets import QPushButton
 
 
@@ -6,7 +7,7 @@ class Remove_btn(QPushButton):
 
     def __init__(self, rowId, table, remove_btns, actions, window):
         super().__init__()
-        # print(Remove_btn.marked)
+        # logging.debug(Remove_btn.marked)
         self.table = table
         self.remove_btns = remove_btns
         self.clicked.connect(self.remove_row)

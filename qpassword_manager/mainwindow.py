@@ -1,5 +1,6 @@
 import sys
 import requests
+import logging
 from Crypto.Hash import SHA256
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLineEdit, QPushButton
 from PyQt5.Qt import Qt
@@ -86,8 +87,9 @@ class MainWindow(QWidget):
                     self.key_input_hashed.hexdigest(),
                 ),
             )
-            print(self.name_input.text(), self.key_input_hashed.hexdigest())
-            print(self.r.text)
+            logging.debug(self.name_input.text())
+            logging.debug(self.key_input_hashed.hexdigest())
+            logging.debug(self.r.text)
             if self.r.text:
                 self.key = self.get_key()
                 return True

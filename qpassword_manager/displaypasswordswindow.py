@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (
     QAbstractItemView,
 )
 import requests
+import logging
 from cryptography.fernet import Fernet
 from qpassword_manager.btns.copybtn import Copy_btn
 from qpassword_manager.conf.connectorconfig import Config
@@ -35,7 +36,7 @@ class DisplayPasswordsWindow(QWidget):
         self.r = requests.post(
             Config.config()["host"], {"action": "create_table"}, auth=self.auth
         )
-        print(self.r.json())
+        logging.debug(self.r.json())
         self.data = self.r.json()
 
         for i in range(3):

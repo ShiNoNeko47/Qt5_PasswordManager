@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
     QAbstractItemView,
 )
 import requests
+import logging
 from cryptography.fernet import Fernet
 from qpassword_manager.messagebox import MessageBox
 from qpassword_manager.btns.removebtn import Remove_btn
@@ -86,13 +87,13 @@ class ManagePasswordsWindow(QWidget):
         self.r = requests.post(
             Config.config()["host"], {"action": "create_table"}, auth=self.auth
         )
-        print(self.r.json())
+        logging.debug(self.r.json())
         self.data = self.r.json()
 
         self.r = requests.post(
             Config.config()["host"], {"action": "get_pass_ids"}, auth=self.auth
         )
-        print(self.r.json())
+        logging.debug(self.r.json())
         self.rowIds = self.r.json()
 
         for i in range(3):
@@ -105,7 +106,7 @@ class ManagePasswordsWindow(QWidget):
             self.table.insertRow(i)
             for j in range(2):
                 data = row[str(j)]
-                print(data)
+                logging.debug(data)
                 self.table.setItem(i, j, (QTableWidgetItem(data)))
             data = "*" * len(self.f.decrypt(row["2"].encode()))
             self.table.setItem(i, 2, (QTableWidgetItem(data)))
@@ -221,7 +222,7 @@ class ManagePasswordsWindow(QWidget):
                     {"action": "delete", "id": action},
                     auth=self.auth,
                 )
-            print(self.r.text)
+            logging.debug(self.r.text)
 
         Remove_btn.marked.clear()
         self.actions.clear()

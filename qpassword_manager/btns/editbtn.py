@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QPushButton
 import requests
+import logging
 from qpassword_manager.conf.connectorconfig import Config
 
 
@@ -25,7 +26,7 @@ class Edit_btn(QPushButton):
                 auth=(self.w.auth),
             )
             row = self.r.json()
-            print(self.rowId)
+            logging.debug(self.rowId)
             self.w.newWebsite_le.setText(row["0"])
             self.w.newUsername_le.setText(row["1"])
             password = self.f.decrypt(row["2"].encode()).decode()
