@@ -60,3 +60,4 @@ class DisplayPasswordsWindow(QWidget):
 
     def closeEvent(self, event):
         self.btn.setDisabled(False)
+        logging.debug(event)
