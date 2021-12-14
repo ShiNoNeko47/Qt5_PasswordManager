@@ -1,7 +1,7 @@
+import logging
 from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QGridLayout
 from PyQt5.Qt import Qt
 import requests
-import logging
 from Crypto.Hash import SHA256
 from qpassword_manager.messagebox import MessageBox
 from qpassword_manager.conf.connectorconfig import Config
