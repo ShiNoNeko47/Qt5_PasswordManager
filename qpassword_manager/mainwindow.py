@@ -1,10 +1,10 @@
 import sys
-import requests
 import logging
+import base64
+import requests
 from Crypto.Hash import SHA256
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLineEdit, QPushButton
 from PyQt5.Qt import Qt
-import base64
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -38,15 +38,15 @@ class MainWindow(QWidget):
         self.key_input.setPlaceholderText("Master key")
         self.layout.addWidget(self.key_input, 1, 0, 1, 3)
 
-        self.displayPasswords_btn = QPushButton("Display passwords")
-        self.displayPasswords_btn.setEnabled(False)
-        self.displayPasswords_btn.clicked.connect(self.display_passwords)
-        self.layout.addWidget(self.displayPasswords_btn, 2, 0, 1, 3)
+        self.display_passwords_btn = QPushButton("Display passwords")
+        self.display_passwords_btn.setEnabled(False)
+        self.display_passwords_btn.clicked.connect(self.display_passwords)
+        self.layout.addWidget(self.display_passwords_btn, 2, 0, 1, 3)
 
-        self.managePasswords_btn = QPushButton("Manage passwords")
-        self.managePasswords_btn.setEnabled(False)
-        self.managePasswords_btn.clicked.connect(self.manage_passwords)
-        self.layout.addWidget(self.managePasswords_btn, 3, 0, 1, 3)
+        self.manage_passwords_btn = QPushButton("Manage passwords")
+        self.manage_passwords_btn.setEnabled(False)
+        self.manage_passwords_btn.clicked.connect(self.manage_passwords)
+        self.layout.addWidget(self.manage_passwords_btn, 3, 0, 1, 3)
 
         self.newUser_btn = QPushButton("New user")
         self.newUser_btn.clicked.connect(self.new_user)
@@ -56,25 +56,25 @@ class MainWindow(QWidget):
 
         self.key_input.setText(key)
 
-        self.w_display = DisplayPasswordsWindow(self.displayPasswords_btn)
+        self.w_display = DisplayPasswordsWindow(self.display_passwords_btn)
         self.w_manage = ManagePasswordsWindow(
-            self.w_display, self.managePasswords_btn
+            self.w_display, self.manage_passwords_btn
         )
         self.w_setup = SetupWindow(self)
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Return:
-            self.displayPasswords_btn.click()
+            self.display_passwords_btn.click()
 
         if e.key() == Qt.Key_Escape:
             self.settings = Settings()
 
     def check_input(self):
-        self.managePasswords_btn.setEnabled(False)
-        self.displayPasswords_btn.setEnabled(False)
+        self.manage_passwords_btn.setEnabled(False)
+        self.display_passwords_btn.setEnabled(False)
         if len(self.key_input.text()) >= 4 and len(self.name_input.text()) > 0:
-            self.managePasswords_btn.setEnabled(True)
-            self.displayPasswords_btn.setEnabled(True)
+            self.manage_passwords_btn.setEnabled(True)
+            self.display_passwords_btn.setEnabled(True)
 
     def check_key(self):
         try:
@@ -116,7 +116,7 @@ class MainWindow(QWidget):
             self.w_manage.create_table()
             self.w_manage.show()
 
-            self.managePasswords_btn.setDisabled(True)
+            self.manage_passwords_btn.setDisabled(True)
 
     def display_passwords(self):
         if self.check_key():
@@ -128,7 +128,7 @@ class MainWindow(QWidget):
             self.w_display.create_table()
             self.w_display.show()
 
-            self.displayPasswords_btn.setDisabled(True)
+            self.display_passwords_btn.setDisabled(True)
 
     def new_user(self):
         self.w_setup.show()
