@@ -1,15 +1,15 @@
 #!/usr/bin/python
 
-from PyQt5.QtWidgets import QApplication
 import sys
 import getopt
 import logging
+from PyQt5.QtWidgets import QApplication
 from qpassword_manager.mainwindow import MainWindow
 
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "l:", ["log="])
+        opts, _ = getopt.getopt(sys.argv[1:], "l:", ["log="])
 
         for option, argument in opts:
             if option in ("-h", "--help"):
