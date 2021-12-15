@@ -57,15 +57,14 @@ class SetupWindow(QWidget):
 
     def ok(self):
         MasterKey = SHA256.new(self.key_setup_le.text().encode()).hexdigest()
-        self.r = requests.post(
+        msg = requests.post(
             Config.config()["host"],
             {
                 "action": "new_user",
                 "user": self.username_setup_le.text(),
                 "master_key": MasterKey,
             },
-        )
-        msg = self.r.text
+        ).text
         logging.debug(msg)
         if msg:
             if msg.startswith("Duplicate entry"):
