@@ -19,6 +19,7 @@ from qpassword_manager.conf.connectorconfig import Config
 class ManagePasswordsWindow(QWidget):
     def __init__(self, displayPasswordsWindow, btn):
         super().__init__()
+        self.f = None
         self.btn = btn
         self.setWindowTitle("Manage Passwords")
         self.layout = QGridLayout()
@@ -82,6 +83,8 @@ class ManagePasswordsWindow(QWidget):
     def create_table(self):
         self.actions = []
 
+        self.table.clear()
+        self.table.setRowCount(0)
         self.table.setColumnCount(5)
         self.table.verticalHeader().setVisible(False)
         self.table.setHorizontalHeaderLabels(
@@ -116,24 +119,22 @@ class ManagePasswordsWindow(QWidget):
         self.table.setFixedWidth(620)
 
     def create_btns(self):
-        self.remove_btns = []
-        self.edit_btns = []
+        remove_btns = []
+        edit_btns = []
 
         for i in range(len(self.row_ids)):
-            self.edit_btns.append(
-                Edit_btn(self.row_ids[i], self.edit_btns, self)
-            )
-            self.table.setCellWidget(i, 3, self.edit_btns[i])
-            self.remove_btns.append(
+            edit_btns.append(Edit_btn(self.row_ids[i], edit_btns, self))
+            self.table.setCellWidget(i, 3, edit_btns[i])
+            remove_btns.append(
                 Remove_btn(
                     self.row_ids[i],
                     self.table,
-                    self.remove_btns,
+                    remove_btns,
                     self.actions,
                     self,
                 )
             )
-            self.table.setCellWidget(i, 4, self.remove_btns[i])
+            self.table.setCellWidget(i, 4, remove_btns[i])
 
     def valid_input_check(self):
         check = [
@@ -150,23 +151,9 @@ class ManagePasswordsWindow(QWidget):
 
         if all(check):
             self.add_btn.setDisabled(False)
-            self.add_btn.setToolTip("")
             return True
 
         self.add_btn.setDisabled(True)
-        self.req_notMet = list(
-            map(
-                lambda x: x[1:],
-                filter(
-                    lambda x: not check[int(x[0])],
-                    ["0Don't leave empty fields!", "1Passwords don't match!"],
-                ),
-            )
-        )
-        tooltip = ""
-        for i, j in zip(self.req_notMet, ["", "\n"]):
-            tooltip = tooltip + j + i
-        self.add_btn.setToolTip(tooltip)
 
     def add_password(self):
         if self.valid_input_check():
