@@ -16,9 +16,14 @@ class DisplayPasswordsWindow(QWidget):
     def __init__(self, btn):
         super().__init__()
 
+        self.f = None
         self.btn = btn
+
         self.setWindowTitle("Passwords")
         self.layout = QGridLayout()
+
+        self.table = QTableWidget()
+        self.layout.addWidget(self.table, 0, 0)
 
         self.setFixedWidth(640)
         self.setLayout(self.layout)
@@ -27,17 +32,17 @@ class DisplayPasswordsWindow(QWidget):
         self.f = Fernet(key)
 
     def create_table(self):
-        self.table = QTableWidget()
+        self.table.clear()
         self.table.setColumnCount(4)
+        self.table.setRowCount(0)
         self.table.verticalHeader().setVisible(False)
         self.table.setHorizontalHeaderLabels(
             ["Website", "Username", "Password", ""]
         )
-        self.r = requests.post(
+        data = requests.post(
             Config.config()["host"], {"action": "create_table"}, auth=self.auth
-        )
-        logging.debug(self.r.json())
-        self.data = self.r.json()
+        ).json()
+        logging.debug(data)
 
         for i in range(3):
             self.table.setColumnWidth(i, 190)
@@ -45,18 +50,16 @@ class DisplayPasswordsWindow(QWidget):
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         copy_btns = []
-        for row, i in zip(self.data, range(len(self.data))):
+        for row, i in zip(data, range(len(data))):
             self.table.insertRow(i)
             for j in range(2):
                 self.table.setItem(i, j, (QTableWidgetItem(row[str(j)])))
-            data = "*" * len(self.f.decrypt(row["2"].encode()))
-            self.table.setItem(i, 2, (QTableWidgetItem(data)))
-            copy_btns.append(Copy_btn(i, self.data, self.f))
+            row = "*" * len(self.f.decrypt(row["2"].encode()))
+            self.table.setItem(i, 2, (QTableWidgetItem(row)))
+            copy_btns.append(Copy_btn(i, data, self.f))
             self.table.setCellWidget(i, 3, copy_btns[i])
 
         self.table.setFixedWidth(619)
-
-        self.layout.addWidget(self.table, 0, 0)
 
     def closeEvent(self, event):
         self.btn.setDisabled(False)
