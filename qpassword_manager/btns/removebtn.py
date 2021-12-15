@@ -9,8 +9,11 @@ class Remove_btn(QPushButton):
         self.table = table
         self.remove_btns = remove_btns
         self.clicked.connect(self.remove_row)
+
         self.rowId = rowId
+        self.action = [self.rowId, "delete"]
         self.actions = actions
+
         self.w = window
         if self.rowId not in Remove_btn.marked:
             self.setText("X")
@@ -19,7 +22,6 @@ class Remove_btn(QPushButton):
 
     def remove_row(self):
         if self.rowId not in Remove_btn.marked:
-            self.action = [self.rowId, "delete"]
             self.actions.append(self.action)
             self.setText("-")
             Remove_btn.marked.append(self.rowId)
