@@ -23,7 +23,6 @@ class Settings(QWidget):
         self.layout.addWidget(self.ok_btn, 1, 1)
 
         self.setLayout(self.layout)
-        self.show()
 
     def check_ip(self):
         if self.host_le.text() != "":
@@ -32,12 +31,9 @@ class Settings(QWidget):
             self.ok_btn.setEnabled(False)
 
     def config_update(self):
-        try:
-            self.config["host"] = self.host_le.text()
-            Config.config_update(self.config)
-            self.close()
-        except Exception as e:
-            print(e)
+        self.config["host"] = self.host_le.text()
+        Config.config_update(self.config)
+        self.close()
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Return:
