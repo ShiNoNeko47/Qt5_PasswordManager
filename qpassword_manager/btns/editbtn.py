@@ -20,12 +20,11 @@ class Edit_btn(QPushButton):
                 btn.setText("+")
 
             self.setText("-")
-            self.r = requests.post(
+            row = requests.post(
                 Config.config()["host"],
                 {"action": "get_row", "id": self.rowId},
                 auth=(self.w.auth),
-            )
-            row = self.r.json()
+            ).json()
             logging.debug(self.rowId)
             self.w.newWebsite_le.setText(row["0"])
             self.w.newUsername_le.setText(row["1"])
