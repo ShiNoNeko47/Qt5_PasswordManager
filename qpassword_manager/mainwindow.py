@@ -17,10 +17,10 @@ from qpassword_manager.conf.settings import Settings
 
 
 class MainWindow(QWidget):
-    def __init__(self, key=""):
+    def __init__(self):
         super().__init__()
+        self.key_input_hashed = None
 
-        self.key_hashed = "a"
         self.setWindowTitle("qpassword_manager")
         self.setFixedHeight(250)
         self.setFixedWidth(600)
@@ -54,20 +54,21 @@ class MainWindow(QWidget):
 
         self.setLayout(self.layout)
 
-        self.key_input.setText(key)
-
         self.w_display = DisplayPasswordsWindow(self.display_passwords_btn)
         self.w_manage = ManagePasswordsWindow(
             self.w_display, self.manage_passwords_btn
         )
         self.w_setup = SetupWindow(self)
 
+        self.settings = Settings()
+        self.messagebox = MessageBox(self, "Wrong username or password!")
+
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Return:
             self.display_passwords_btn.click()
 
         if e.key() == Qt.Key_Escape:
-            self.settings = Settings()
+            self.settings.show()
 
     def check_input(self):
         self.manage_passwords_btn.setEnabled(False)
@@ -77,27 +78,22 @@ class MainWindow(QWidget):
             self.display_passwords_btn.setEnabled(True)
 
     def check_key(self):
-        try:
-            self.key_input_hashed = SHA256.new(self.key_input.text().encode())
-            self.r = requests.post(
-                Config.config()["host"],
-                {"action": "get_id"},
-                auth=(
-                    self.name_input.text(),
-                    self.key_input_hashed.hexdigest(),
-                ),
-            )
-            logging.debug(self.name_input.text())
-            logging.debug(self.key_input_hashed.hexdigest())
-            logging.debug(self.r.text)
-            if self.r.text:
-                self.key = self.get_key()
-                return True
-            raise Exception("Wrong username or password!")
-            return False
-        except Exception as x:
-            self.messagebox = MessageBox(self, str(x))
-            self.messagebox.show()
+        self.key_input_hashed = SHA256.new(self.key_input.text().encode())
+        user_id = requests.post(
+            Config.config()["host"],
+            {"action": "get_id"},
+            auth=(
+                self.name_input.text(),
+                self.key_input_hashed.hexdigest(),
+            ),
+        ).text
+        logging.debug(self.name_input.text())
+        logging.debug(self.key_input_hashed.hexdigest())
+        logging.debug(user_id)
+        if user_id:
+            return True
+
+        self.messagebox.show()
 
     def manage_passwords(self):
         if self.check_key():
@@ -105,13 +101,13 @@ class MainWindow(QWidget):
                 self.name_input.text(),
                 self.key_input_hashed.hexdigest(),
             )
-            self.w_manage.set_key(self.key)
+            self.w_manage.set_key(self.get_key())
 
             self.w_display.auth = (
                 self.name_input.text(),
                 self.key_input_hashed.hexdigest(),
             )
-            self.w_display.set_key(self.key)
+            self.w_display.set_key(self.get_key())
 
             self.w_manage.create_table()
             self.w_manage.show()
@@ -124,7 +120,7 @@ class MainWindow(QWidget):
                 self.name_input.text(),
                 self.key_input_hashed.hexdigest(),
             )
-            self.w_display.set_key(self.key)
+            self.w_display.set_key(self.get_key())
             self.w_display.create_table()
             self.w_display.show()
 
