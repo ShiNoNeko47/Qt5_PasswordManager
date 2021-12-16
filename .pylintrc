@@ -1,2 +1,5 @@
 [MASTER]
 extension-pkg-whitelist=PyQt5
+
+[MESSAGES CONTROL]
+disable=too-many-instance-attributes

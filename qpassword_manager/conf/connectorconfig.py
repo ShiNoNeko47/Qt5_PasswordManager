@@ -14,8 +14,8 @@ class Config:
         with open(
             os.path.join(os.path.dirname(__file__), "config.json"), "rb"
         ) as file:
-            configEnc = file.read()
-        config = json.loads(Config.f.decrypt(configEnc).decode())
+            config_enc = file.read()
+        config = json.loads(Config.f.decrypt(config_enc).decode())
         return config
 
     @staticmethod
@@ -31,15 +31,15 @@ def main():
     for parameter in config:
         print(type(config[parameter]))
         if parameter != "connection_timeout":
-            newParameter = input(parameter + ": ")
+            parameter_new = input(parameter + ": ")
         else:
             try:
-                newParameter = int(input(parameter + ": "))
+                parameter_new = int(input(parameter + ": "))
             except ValueError:
-                newParameter = ""
+                parameter_new = ""
 
-        if newParameter != "":
-            config[parameter] = newParameter
+        if parameter_new != "":
+            config[parameter] = parameter_new
     # print(config)
 
     Config.config_update(config)

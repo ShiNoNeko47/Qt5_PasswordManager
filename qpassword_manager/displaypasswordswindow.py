@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (
     QAbstractItemView,
 )
 from cryptography.fernet import Fernet
-from qpassword_manager.btns.copybtn import Copy_btn
+from qpassword_manager.btns.copybtn import CopyBtn
 from qpassword_manager.conf.connectorconfig import Config
 
 
@@ -16,7 +16,7 @@ class DisplayPasswordsWindow(QWidget):
     def __init__(self, btn):
         super().__init__()
 
-        self.f = None
+        self.fernet = None
         self.btn = btn
 
         self.setWindowTitle("Passwords")
@@ -29,7 +29,7 @@ class DisplayPasswordsWindow(QWidget):
         self.setLayout(self.layout)
 
     def set_key(self, key):
-        self.f = Fernet(key)
+        self.fernet = Fernet(key)
 
     def create_table(self):
         self.table.clear()
@@ -50,17 +50,17 @@ class DisplayPasswordsWindow(QWidget):
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         copy_btns = []
-        for row, i in zip(data, range(len(data))):
+        for i, row in enumerate(data):
             self.table.insertRow(i)
             for j in range(2):
                 self.table.setItem(i, j, (QTableWidgetItem(row[str(j)])))
-            row = "*" * len(self.f.decrypt(row["2"].encode()))
+            row = "*" * len(self.fernet.decrypt(row["2"].encode()))
             self.table.setItem(i, 2, (QTableWidgetItem(row)))
-            copy_btns.append(Copy_btn(i, data, self.f))
+            copy_btns.append(CopyBtn(i, data, self.fernet))
             self.table.setCellWidget(i, 3, copy_btns[i])
 
         self.table.setFixedWidth(619)
 
-    def closeEvent(self, event):
+    def closeEvent(self, event):  # pylint: disable=invalid-name
         self.btn.setDisabled(False)
         logging.debug(event)

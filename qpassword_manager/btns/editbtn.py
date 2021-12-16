@@ -1,17 +1,17 @@
-from PyQt5.QtWidgets import QPushButton
-import requests
 import logging
+import requests
+from PyQt5.QtWidgets import QPushButton
 from qpassword_manager.conf.connectorconfig import Config
 
 
-class Edit_btn(QPushButton):
-    def __init__(self, rowId, edit_btns, window):
+class EditBtn(QPushButton):
+    def __init__(self, row_id, edit_btns, window):
         super().__init__()
-        self.rowId = rowId
+        self.row_id = row_id
         self.edit_btns = edit_btns
-        self.w = window
+        self.window = window
         self.clicked.connect(self.edit_row)
-        self.f = self.w.f
+        self.fernet = self.window.fernet
         self.setText("+")
 
     def edit_row(self):
@@ -22,16 +22,16 @@ class Edit_btn(QPushButton):
             self.setText("-")
             row = requests.post(
                 Config.config()["host"],
-                {"action": "get_row", "id": self.rowId},
-                auth=(self.w.auth),
+                {"action": "get_row", "id": self.row_id},
+                auth=(self.window.auth),
             ).json()
-            logging.debug(self.rowId)
-            self.w.newWebsite_le.setText(row["0"])
-            self.w.newUsername_le.setText(row["1"])
-            password = self.f.decrypt(row["2"].encode()).decode()
-            self.w.newPassword_le.setText(password)
-            self.w.reNewPassword_le.setText(password)
+            logging.debug(self.row_id)
+            self.window.new_website_le.setText(row["0"])
+            self.window.new_username_le.setText(row["1"])
+            password = self.fernet.decrypt(row["2"].encode()).decode()
+            self.window.new_password_le.setText(password)
+            self.window.re_new_password_le.setText(password)
 
         else:
             self.setText("+")
-            self.w.reset_entries()
+            self.window.reset_entries()

@@ -48,9 +48,9 @@ class MainWindow(QWidget):
         self.manage_passwords_btn.clicked.connect(self.manage_passwords)
         self.layout.addWidget(self.manage_passwords_btn, 3, 0, 1, 3)
 
-        self.newUser_btn = QPushButton("New user")
-        self.newUser_btn.clicked.connect(self.new_user)
-        self.layout.addWidget(self.newUser_btn, 4, 1)
+        self.new_user_btn = QPushButton("New user")
+        self.new_user_btn.clicked.connect(self.new_user)
+        self.layout.addWidget(self.new_user_btn, 4, 1)
 
         self.setLayout(self.layout)
 
@@ -63,11 +63,11 @@ class MainWindow(QWidget):
         self.settings = Settings()
         self.messagebox = MessageBox(self, "Wrong username or password!")
 
-    def keyPressEvent(self, e):
-        if e.key() == Qt.Key_Return:
+    def keyPressEvent(self, event):  # pylint: disable=invalid-name
+        if event.key() == Qt.Key_Return:
             self.display_passwords_btn.click()
 
-        if e.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key_Escape:
             self.settings.show()
 
     def check_input(self):
@@ -94,6 +94,7 @@ class MainWindow(QWidget):
             return True
 
         self.messagebox.show()
+        return False
 
     def manage_passwords(self):
         if self.check_key():
@@ -141,7 +142,7 @@ class MainWindow(QWidget):
         )
         return base64.urlsafe_b64encode(kdf.derive(password))
 
-    def closeEvent(self, event):
+    def closeEvent(self, event):  # pylint: disable=invalid-name
         if all([self.w_manage.isHidden(), self.w_display.isHidden()]):
             event.accept()
             sys.exit()

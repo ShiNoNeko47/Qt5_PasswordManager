@@ -3,9 +3,9 @@ from PyQt5.Qt import Qt
 
 
 class MessageBox(QWidget):
-    def __init__(self, parentWindow, title):
+    def __init__(self, window_parent, title):
         super().__init__()
-        self.parentWindow = parentWindow
+        self.window_parent = window_parent
 
         self.setWindowTitle(title)
         self.layout = QGridLayout()
@@ -16,15 +16,15 @@ class MessageBox(QWidget):
 
         self.ok_btn = QPushButton()
         self.ok_btn.setText("Ok")
-        self.ok_btn.clicked.connect(self.ok)
+        self.ok_btn.clicked.connect(self.choice_ok)
 
         self.yes_btn = QPushButton()
         self.yes_btn.setText("Yes")
-        self.yes_btn.clicked.connect(self.yes)
+        self.yes_btn.clicked.connect(self.choice_yes)
 
         self.no_btn = QPushButton()
         self.no_btn.setText("No")
-        self.no_btn.clicked.connect(self.no)
+        self.no_btn.clicked.connect(self.choice_no)
 
         if title[-1] == "?":
             self.layout.addWidget(self.yes_btn, 1, 2)
@@ -35,17 +35,17 @@ class MessageBox(QWidget):
             self.default = self.ok_btn
         self.setLayout(self.layout)
 
-    def keyPressEvent(self, e):
-        if e.key() == Qt.Key_Return:
+    def keyPressEvent(self, event):  # pylint: disable=invalid-name
+        if event.key() == Qt.Key_Return:
             self.default.click()
 
-    def ok(self):
+    def choice_ok(self):
         self.close()
 
-    def yes(self):
-        self.parentWindow.messagebox_handler(1)
+    def choice_yes(self):
+        self.window_parent.messagebox_handler(1)
         self.close()
 
-    def no(self):
-        self.parentWindow.messagebox_handler(0)
+    def choice_no(self):
+        self.window_parent.messagebox_handler(0)
         self.close()

@@ -8,10 +8,10 @@ from qpassword_manager.conf.connectorconfig import Config
 
 
 class SetupWindow(QWidget):
-    def __init__(self, mainWindow):
+    def __init__(self, window_main):
         super().__init__()
 
-        self.mainWindow = mainWindow
+        self.window_main = window_main
         self.layout = QGridLayout()
         self.setWindowTitle("New user")
         self.setFixedHeight(150)
@@ -35,14 +35,14 @@ class SetupWindow(QWidget):
 
         self.ok_btn = QPushButton("Ok")
         self.ok_btn.setEnabled(False)
-        self.ok_btn.clicked.connect(self.ok)
+        self.ok_btn.clicked.connect(self.add_user)
         self.layout.addWidget(self.ok_btn, 2, 1)
 
         self.setLayout(self.layout)
         self.messagebox = MessageBox(self, "message")
 
-    def keyPressEvent(self, e):
-        if e.key() == Qt.Key_Return:
+    def keyPressEvent(self, event):  # pylint: disable=invalid-name
+        if event.key() == Qt.Key_Return:
             self.ok_btn.click()
 
     def check_password(self):
@@ -55,14 +55,14 @@ class SetupWindow(QWidget):
         ):
             self.ok_btn.setEnabled(True)
 
-    def ok(self):
-        MasterKey = SHA256.new(self.key_setup_le.text().encode()).hexdigest()
+    def add_user(self):
+        master_key = SHA256.new(self.key_setup_le.text().encode()).hexdigest()
         msg = requests.post(
             Config.config()["host"],
             {
                 "action": "new_user",
                 "user": self.username_setup_le.text(),
-                "master_key": MasterKey,
+                "master_key": master_key,
             },
         ).text
         logging.debug(msg)
@@ -74,14 +74,14 @@ class SetupWindow(QWidget):
             self.messagebox.show()
 
         else:
-            self.mainWindow.key_input.setText(self.key_setup_le.text())
-            self.mainWindow.name_input.setText(self.username_setup_le.text())
+            self.window_main.key_input.setText(self.key_setup_le.text())
+            self.window_main.name_input.setText(self.username_setup_le.text())
             self.close()
 
     def messagebox_handler(self, choice):
         if choice == 1:
-            self.mainWindow.name_input.setText(self.username_setup_le.text())
-            self.mainWindow.key_input.setText("")
+            self.window_main.name_input.setText(self.username_setup_le.text())
+            self.window_main.key_input.setText("")
             self.close()
 
     def reset_entries(self):
@@ -89,7 +89,7 @@ class SetupWindow(QWidget):
         self.key_setup_le.setText("")
         self.key_reenter_le.setText("")
 
-    def closeEvent(self, event):
+    def closeEvent(self, event):  # pylint: disable=invalid-name
         if self.messagebox.isVisible():
             self.messagebox.close()
         self.reset_entries()

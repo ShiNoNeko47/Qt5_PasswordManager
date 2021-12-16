@@ -11,40 +11,40 @@ from PyQt5.QtWidgets import (
 import requests
 from cryptography.fernet import Fernet
 from qpassword_manager.messagebox import MessageBox
-from qpassword_manager.btns.removebtn import Remove_btn
-from qpassword_manager.btns.editbtn import Edit_btn
+from qpassword_manager.btns.removebtn import RemoveBtn
+from qpassword_manager.btns.editbtn import EditBtn
 from qpassword_manager.conf.connectorconfig import Config
 
 
 class ManagePasswordsWindow(QWidget):
-    def __init__(self, displayPasswordsWindow, btn):
+    def __init__(self, window_display_passwords, btn):
         super().__init__()
-        self.f = None
+        self.fernet = None
         self.btn = btn
         self.setWindowTitle("Manage Passwords")
         self.layout = QGridLayout()
 
-        self.newWebsite_le = QLineEdit()
-        self.newWebsite_le.textChanged.connect(self.valid_input_check)
-        self.newWebsite_le.setPlaceholderText("Website")
-        self.layout.addWidget(self.newWebsite_le, 0, 0, 2, 1)
+        self.new_website_le = QLineEdit()
+        self.new_website_le.textChanged.connect(self.valid_input_check)
+        self.new_website_le.setPlaceholderText("Website")
+        self.layout.addWidget(self.new_website_le, 0, 0, 2, 1)
 
-        self.newUsername_le = QLineEdit()
-        self.newUsername_le.setPlaceholderText("Username")
-        self.newUsername_le.textChanged.connect(self.valid_input_check)
-        self.layout.addWidget(self.newUsername_le, 0, 1, 2, 1)
+        self.new_username_le = QLineEdit()
+        self.new_username_le.setPlaceholderText("Username")
+        self.new_username_le.textChanged.connect(self.valid_input_check)
+        self.layout.addWidget(self.new_username_le, 0, 1, 2, 1)
 
-        self.newPassword_le = QLineEdit()
-        self.newPassword_le.setPlaceholderText("Password")
-        self.newPassword_le.setEchoMode(QLineEdit.Password)
-        self.newPassword_le.textChanged.connect(self.valid_input_check)
-        self.layout.addWidget(self.newPassword_le, 0, 2)
+        self.new_password_le = QLineEdit()
+        self.new_password_le.setPlaceholderText("Password")
+        self.new_password_le.setEchoMode(QLineEdit.Password)
+        self.new_password_le.textChanged.connect(self.valid_input_check)
+        self.layout.addWidget(self.new_password_le, 0, 2)
 
-        self.reNewPassword_le = QLineEdit()
-        self.reNewPassword_le.setPlaceholderText("Confirm Password")
-        self.reNewPassword_le.setEchoMode(QLineEdit.Password)
-        self.reNewPassword_le.textChanged.connect(self.valid_input_check)
-        self.layout.addWidget(self.reNewPassword_le, 1, 2)
+        self.re_new_password_le = QLineEdit()
+        self.re_new_password_le.setPlaceholderText("Confirm Password")
+        self.re_new_password_le.setEchoMode(QLineEdit.Password)
+        self.re_new_password_le.textChanged.connect(self.valid_input_check)
+        self.layout.addWidget(self.re_new_password_le, 1, 2)
 
         self.add_btn = QPushButton("Add")
         self.add_btn.clicked.connect(self.add_password)
@@ -62,7 +62,7 @@ class ManagePasswordsWindow(QWidget):
         self.setLayout(self.layout)
         self.setFixedWidth(640)
 
-        self.displayPasswordsWindow = displayPasswordsWindow
+        self.window_display_passwords = window_display_passwords
 
         self.messagebox = MessageBox(self, "Save changes?")
         self.row_ids = []
@@ -73,12 +73,12 @@ class ManagePasswordsWindow(QWidget):
             self.close()
         else:
             self.actions.clear()
-            Remove_btn.marked.clear()
+            RemoveBtn.marked.clear()
             self.save_btn.setDisabled(True)
             self.close()
 
     def set_key(self, key):
-        self.f = Fernet(key)
+        self.fernet = Fernet(key)
 
     def create_table(self):
         self.actions = []
@@ -106,13 +106,13 @@ class ManagePasswordsWindow(QWidget):
         self.table.setColumnWidth(4, 30)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-        for row, i in zip(data, range(len(data))):
+        for i, row in enumerate(data):
             self.table.insertRow(i)
             for j in range(2):
                 item = row[str(j)]
                 logging.debug(item)
                 self.table.setItem(i, j, (QTableWidgetItem(item)))
-            data = "*" * len(self.f.decrypt(row["2"].encode()))
+            data = "*" * len(self.fernet.decrypt(row["2"].encode()))
             self.table.setItem(i, 2, (QTableWidgetItem(data)))
         self.create_btns()
 
@@ -122,15 +122,13 @@ class ManagePasswordsWindow(QWidget):
         remove_btns = []
         edit_btns = []
 
-        for i in range(len(self.row_ids)):
-            edit_btns.append(Edit_btn(self.row_ids[i], edit_btns, self))
+        for i, row_id in enumerate(self.row_ids):
+            edit_btns.append(EditBtn(row_id, edit_btns, self))
             self.table.setCellWidget(i, 3, edit_btns[i])
             remove_btns.append(
-                Remove_btn(
-                    self.row_ids[i],
-                    self.table,
+                RemoveBtn(
+                    row_id,
                     remove_btns,
-                    self.actions,
                     self,
                 )
             )
@@ -140,13 +138,13 @@ class ManagePasswordsWindow(QWidget):
         check = [
             all(
                 [
-                    self.newWebsite_le.text() != "",
-                    self.newUsername_le.text() != "",
-                    self.newPassword_le.text() != "",
-                    self.reNewPassword_le.text() != "",
+                    self.new_website_le.text() != "",
+                    self.new_username_le.text() != "",
+                    self.new_password_le.text() != "",
+                    self.re_new_password_le.text() != "",
                 ]
             ),
-            self.newPassword_le.text() == self.reNewPassword_le.text(),
+            self.new_password_le.text() == self.re_new_password_le.text(),
         ]
 
         if all(check):
@@ -154,15 +152,16 @@ class ManagePasswordsWindow(QWidget):
             return True
 
         self.add_btn.setDisabled(True)
+        return False
 
     def add_password(self):
         if self.valid_input_check():
             self.actions.append(
                 [
-                    self.newWebsite_le.text(),
-                    self.newUsername_le.text(),
-                    self.f.encrypt(
-                        self.newPassword_le.text().encode()
+                    self.new_website_le.text(),
+                    self.new_username_le.text(),
+                    self.fernet.encrypt(
+                        self.new_password_le.text().encode()
                     ).decode(),
                     "add",
                 ]
@@ -170,29 +169,33 @@ class ManagePasswordsWindow(QWidget):
 
             self.save_btn.setDisabled(not self.actions)
 
-            n = self.table.rowCount()
-            self.table.insertRow(n)
+            row_count = self.table.rowCount()
+            self.table.insertRow(row_count)
 
-            website = self.newWebsite_le.text()
-            self.table.setItem(n, 0, (QTableWidgetItem("+ " + website)))
+            website = self.new_website_le.text()
+            self.table.setItem(row_count, 0, (QTableWidgetItem("+ " + website)))
 
-            username = self.newUsername_le.text()
-            self.table.setItem(n, 1, (QTableWidgetItem("+ " + username)))
+            username = self.new_username_le.text()
+            self.table.setItem(
+                row_count, 1, (QTableWidgetItem("+ " + username))
+            )
 
-            password = "*" * len(self.newPassword_le.text())
-            self.table.setItem(n, 2, (QTableWidgetItem("+ " + password)))
+            password = "*" * len(self.new_password_le.text())
+            self.table.setItem(
+                row_count, 2, (QTableWidgetItem("+ " + password))
+            )
 
-            self.newWebsite_le.setText("")
-            self.newUsername_le.setText("")
-            self.newPassword_le.setText("")
-            self.reNewPassword_le.setText("")
+            self.new_website_le.setText("")
+            self.new_username_le.setText("")
+            self.new_password_le.setText("")
+            self.re_new_password_le.setText("")
 
             self.create_btns()
 
     def commit_changes(self):
         for action in self.actions:
             if action.pop() == "add":
-                r = requests.post(
+                request = requests.post(
                     Config.config()["host"],
                     {
                         "action": "add",
@@ -203,27 +206,27 @@ class ManagePasswordsWindow(QWidget):
                     auth=self.auth,
                 )
             else:
-                r = requests.post(
+                request = requests.post(
                     Config.config()["host"],
                     {"action": "delete", "id": action},
                     auth=self.auth,
                 )
-            logging.debug(r.text)
+            logging.debug(request.text)
 
-        Remove_btn.marked.clear()
+        RemoveBtn.marked.clear()
         self.actions.clear()
 
         self.create_table()
-        self.displayPasswordsWindow.create_table()
+        self.window_display_passwords.create_table()
         self.save_btn.setDisabled(True)
 
     def reset_entries(self):
-        self.newWebsite_le.setText("")
-        self.newUsername_le.setText("")
-        self.newPassword_le.setText("")
-        self.reNewPassword_le.setText("")
+        self.new_website_le.setText("")
+        self.new_username_le.setText("")
+        self.new_password_le.setText("")
+        self.re_new_password_le.setText("")
 
-    def closeEvent(self, event):
+    def closeEvent(self, event):  # pylint: disable=invalid-name
         if not self.actions:
             self.btn.setDisabled(False)
             self.reset_entries()

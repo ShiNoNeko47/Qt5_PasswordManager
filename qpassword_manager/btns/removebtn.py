@@ -1,32 +1,34 @@
 from PyQt5.QtWidgets import QPushButton
 
 
-class Remove_btn(QPushButton):
+class RemoveBtn(QPushButton):
     marked = []
 
-    def __init__(self, rowId, table, remove_btns, actions, window):
+    def __init__(self, row_id, remove_btns, window):
         super().__init__()
-        self.table = table
+
+        self.window = window
+
+        self.row_id = row_id
         self.remove_btns = remove_btns
+        self.table = window.table
+        self.actions = window.actions
+        self.action = [self.row_id, "delete"]
+
         self.clicked.connect(self.remove_row)
 
-        self.rowId = rowId
-        self.action = [self.rowId, "delete"]
-        self.actions = actions
-
-        self.w = window
-        if self.rowId not in Remove_btn.marked:
+        if self.row_id not in RemoveBtn.marked:
             self.setText("X")
         else:
             self.setText("-")
 
     def remove_row(self):
-        if self.rowId not in Remove_btn.marked:
+        if self.row_id not in RemoveBtn.marked:
             self.actions.append(self.action)
             self.setText("-")
-            Remove_btn.marked.append(self.rowId)
+            RemoveBtn.marked.append(self.row_id)
         else:
             del self.actions[self.actions.index(self.action)]
             self.setText("X")
-            del Remove_btn.marked[Remove_btn.marked.index(self.rowId)]
-        self.w.save_btn.setDisabled(not self.actions)
+            del RemoveBtn.marked[RemoveBtn.marked.index(self.row_id)]
+        self.window.save_btn.setDisabled(not self.actions)

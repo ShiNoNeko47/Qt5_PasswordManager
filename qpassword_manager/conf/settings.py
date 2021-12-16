@@ -35,6 +35,6 @@ class Settings(QWidget):
         Config.config_update(self.config)
         self.close()
 
-    def keyPressEvent(self, e):
-        if e.key() == Qt.Key_Return:
+    def keyPressEvent(self, event):  # pylint: disable=invalid-name
+        if event.key() == Qt.Key_Return:
             self.ok_btn.click()
