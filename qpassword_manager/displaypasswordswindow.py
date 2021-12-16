@@ -1,3 +1,5 @@
+import logging
+import requests
 from PyQt5.QtWidgets import (
     QWidget,
     QGridLayout,
@@ -5,8 +7,6 @@ from PyQt5.QtWidgets import (
     QTableWidgetItem,
     QAbstractItemView,
 )
-import requests
-import logging
 from cryptography.fernet import Fernet
 from qpassword_manager.btns.copybtn import Copy_btn
 from qpassword_manager.conf.connectorconfig import Config
