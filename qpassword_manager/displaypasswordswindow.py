@@ -1,3 +1,5 @@
+"""The window used for copying passwords from database"""
+
 import logging
 import requests
 from PyQt5.QtWidgets import (
@@ -13,6 +15,14 @@ from qpassword_manager.conf.connectorconfig import Config
 
 
 class DisplayPasswordsWindow(QWidget):
+    """
+    The window used for copying passwords from database
+
+    Attributes:
+        fernet: Fernet object used for decryption
+        btn: display_passwords_btn in MainWindow
+    """
+
     def __init__(self, btn):
         super().__init__()
 
@@ -29,9 +39,18 @@ class DisplayPasswordsWindow(QWidget):
         self.setLayout(self.layout)
 
     def set_key(self, key):
+        """
+        Creates Fernet object using a key
+
+        Parameters:
+            key: key used for creating a Fernet object
+        """
+
         self.fernet = Fernet(key)
 
     def create_table(self):
+        """Updates data in the table"""
+
         self.table.clear()
         self.table.setColumnCount(4)
         self.table.setRowCount(0)
@@ -62,5 +81,7 @@ class DisplayPasswordsWindow(QWidget):
         self.table.setFixedWidth(619)
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
+        """Enables display_passwords_btn in MainWindow"""
+
         self.btn.setDisabled(False)
         logging.debug(event)
