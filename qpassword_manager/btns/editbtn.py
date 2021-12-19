@@ -1,3 +1,5 @@
+'''EditBtn class'''
+
 import logging
 import requests
 from PyQt5.QtWidgets import QPushButton
@@ -5,16 +7,28 @@ from qpassword_manager.conf.connectorconfig import Config
 
 
 class EditBtn(QPushButton):
+    '''Button that copies data from a row in table to line edits
+
+    Attributes:
+        row_id: id of the row to copy from database
+        edit_btns: list of EditBtn objects in the table
+        window: parent wondow (ManagePasswordsWindow)
+        fernet: Fernet object used for decryption
+    '''
+
     def __init__(self, row_id, edit_btns, window):
         super().__init__()
         self.row_id = row_id
         self.edit_btns = edit_btns
         self.window = window
-        self.clicked.connect(self.edit_row)
         self.fernet = self.window.fernet
+
         self.setText("+")
+        self.clicked.connect(self.edit_row)
 
     def edit_row(self):
+        '''Copies data from a row in table to line edits'''
+
         if self.text() == "+":
             for btn in self.edit_btns:
                 btn.setText("+")
