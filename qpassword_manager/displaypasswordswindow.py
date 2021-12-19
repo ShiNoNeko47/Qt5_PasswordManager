@@ -20,7 +20,7 @@ class DisplayPasswordsWindow(QWidget):
 
     Attributes:
         fernet: Fernet object used for decryption
-        btn: display_passwords_btn in MainWindow
+        btn: display_passwords_btn on MainWindow
     """
 
     def __init__(self, btn):
