@@ -1,4 +1,5 @@
 #!/usr/bin/python
+"""Entry point"""
 
 import sys
 import getopt
@@ -8,6 +9,8 @@ from qpassword_manager.mainwindow import MainWindow
 
 
 def main():
+    """Argument parsing and app initialization"""
+
     try:
         opts, _ = getopt.getopt(sys.argv[1:], "l:", ["log="])
 
