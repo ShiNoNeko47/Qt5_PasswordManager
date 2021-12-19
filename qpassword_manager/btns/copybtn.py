@@ -1,16 +1,16 @@
-'''CopyBtn class'''
+"""CopyBtn class"""
 
 import pyperclip
 from PyQt5.QtWidgets import QPushButton
 
 
 class CopyBtn(QPushButton):
-    '''
+    """
     Button that copies a decrypted password to clipboard
 
     Attributes:
         decrypted: decrypted password
-    '''
+    """
 
     def __init__(self, index, data, fernet):
         super().__init__()

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-'''Module for reading and updating encrypted config file'''
+"""Module for reading and updating encrypted config file"""
 
 import os
 import json
@@ -7,19 +7,19 @@ from cryptography.fernet import Fernet
 
 
 class Config:
-    '''Class for working with encrypted config file'''
+    """Class for working with encrypted config file"""
 
     key = b"LdGzkYcr8D4rOuKAyf_9spqqDGC-2Qf8duZM6x30ElQ="
     f = Fernet(key)
 
     @staticmethod
     def config():
-        '''
+        """
         Reads and returns configuration from config.json
 
         Returns:
             dict: configuration in form of a dictionary
-        '''
+        """
 
         with open(
             os.path.join(os.path.dirname(__file__), "config.json"), "rb"
@@ -30,12 +30,12 @@ class Config:
 
     @staticmethod
     def config_update(config):
-        '''
+        """
         Updates config.json
 
         Parameters:
             config (dict): configuration in form of a dictionary
-        '''
+        """
 
         with open(
             os.path.join(os.path.dirname(__file__), "config.json"), "wb"
@@ -44,7 +44,7 @@ class Config:
 
 
 def main():
-    '''main function'''
+    """main function"""
 
     config = Config.config()
     for parameter in config:

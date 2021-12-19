@@ -1,4 +1,4 @@
-'''EditBtn class'''
+"""EditBtn class"""
 
 import logging
 import requests
@@ -7,14 +7,14 @@ from qpassword_manager.conf.connectorconfig import Config
 
 
 class EditBtn(QPushButton):
-    '''Button that copies data from a row in table to line edits
+    """Button that copies data from a row in table to line edits
 
     Attributes:
         row_id: id of the row to copy from database
         edit_btns: list of EditBtn objects in the table
         window: parent wondow (ManagePasswordsWindow)
         fernet: Fernet object used for decryption
-    '''
+    """
 
     def __init__(self, row_id, edit_btns, window):
         super().__init__()
@@ -27,7 +27,7 @@ class EditBtn(QPushButton):
         self.clicked.connect(self.edit_row)
 
     def edit_row(self):
-        '''Copies data from a row in table to line edits'''
+        """Copies data from a row in table to line edits"""
 
         if self.text() == "+":
             for btn in self.edit_btns:

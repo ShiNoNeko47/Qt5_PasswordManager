@@ -1,10 +1,10 @@
-'''RemoveBtn class'''
+"""RemoveBtn class"""
 
 from PyQt5.QtWidgets import QPushButton
 
 
 class RemoveBtn(QPushButton):
-    '''
+    """
     Button that removes a row from database
 
     Attributes:
@@ -12,7 +12,7 @@ class RemoveBtn(QPushButton):
         row_id: id of the row in database this button can delete
         actions: list of actions in queue
         action: item to add or remove from queue
-    '''
+    """
 
     marked = []
 
@@ -33,7 +33,7 @@ class RemoveBtn(QPushButton):
             self.setText("-")
 
     def remove_row(self):
-        '''Controlls button text (X or -) and adds delete action to queue'''
+        """Controlls button text (X or -) and adds delete action to queue"""
 
         if self.row_id not in RemoveBtn.marked:
             self.actions.append(self.action)
