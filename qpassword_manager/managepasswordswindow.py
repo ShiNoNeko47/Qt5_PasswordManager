@@ -1,3 +1,5 @@
+"""The window used for adding and removing passwords"""
+
 import logging
 from PyQt5.QtWidgets import (
     QWidget,
@@ -17,10 +19,21 @@ from qpassword_manager.conf.connectorconfig import Config
 
 
 class ManagePasswordsWindow(QWidget):
+    """
+    The window used for adding and removing passwords
+
+    Attributes:
+        fernet: Fernet object used for decryption
+        btn: manage_passwords_btn on MainWindow
+    """
+
     def __init__(self, window_display_passwords, btn):
         super().__init__()
         self.fernet = None
         self.btn = btn
+        self.row_ids = []
+        self.window_display_passwords = window_display_passwords
+
         self.setWindowTitle("Manage Passwords")
         self.layout = QGridLayout()
 
@@ -62,12 +75,16 @@ class ManagePasswordsWindow(QWidget):
         self.setLayout(self.layout)
         self.setFixedWidth(640)
 
-        self.window_display_passwords = window_display_passwords
-
         self.messagebox = MessageBox(self, "Save changes?")
-        self.row_ids = []
 
     def messagebox_handler(self, choice):
+        """
+        MessageBox choice handler
+
+        Arguments:
+            choice: 1 or 0 based on the button clicked on MessageBox window
+        """
+
         if choice == 1:
             self.commit_changes()
             self.close()
@@ -78,9 +95,18 @@ class ManagePasswordsWindow(QWidget):
             self.close()
 
     def set_key(self, key):
+        """
+        Creates Fernet object using a key
+
+        Parameters:
+            key: key used for creating a Fernet object
+        """
+
         self.fernet = Fernet(key)
 
     def create_table(self):
+        """Updates data in the table"""
+
         self.actions = []
 
         self.table.clear()
@@ -119,6 +145,8 @@ class ManagePasswordsWindow(QWidget):
         self.table.setFixedWidth(620)
 
     def create_btns(self):
+        """Adds buttons to the table"""
+
         remove_btns = []
         edit_btns = []
 
@@ -135,6 +163,8 @@ class ManagePasswordsWindow(QWidget):
             self.table.setCellWidget(i, 4, remove_btns[i])
 
     def valid_input_check(self):
+        """Checks if none of entries are empty and passwords match"""
+
         check = [
             all(
                 [
@@ -155,6 +185,8 @@ class ManagePasswordsWindow(QWidget):
         return False
 
     def add_password(self):
+        """Adds action to queue and a row to table"""
+
         if self.valid_input_check():
             self.actions.append(
                 [
@@ -193,6 +225,8 @@ class ManagePasswordsWindow(QWidget):
             self.create_btns()
 
     def commit_changes(self):
+        """Saves changes from queue to database"""
+
         for action in self.actions:
             if action.pop() == "add":
                 request = requests.post(
@@ -221,12 +255,17 @@ class ManagePasswordsWindow(QWidget):
         self.save_btn.setDisabled(True)
 
     def reset_entries(self):
+        """Sets all entries to \"\""""
+
         self.new_website_le.setText("")
         self.new_username_le.setText("")
         self.new_password_le.setText("")
         self.re_new_password_le.setText("")
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
+        """Closes ManagePasswordsWindow if queue is empty, otherwise opens
+        MessageBox"""
+
         if not self.actions:
             self.btn.setDisabled(False)
             self.reset_entries()
