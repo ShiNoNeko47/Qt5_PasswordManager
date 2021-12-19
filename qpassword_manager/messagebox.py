@@ -1,8 +1,15 @@
+"""MessageBox class"""
 from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QGridLayout
 from PyQt5.Qt import Qt
 
 
 class MessageBox(QWidget):
+    """
+    MessageBox class
+
+    Attributes:
+        window_parent: parent window
+    """
     def __init__(self, window_parent, title):
         super().__init__()
         self.window_parent = window_parent
@@ -36,16 +43,24 @@ class MessageBox(QWidget):
         self.setLayout(self.layout)
 
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
+        """Clicks \"yes\" if you press enter"""
+
         if event.key() == Qt.Key_Return:
             self.default.click()
 
     def choice_ok(self):
+        """Closes MessageBox"""
+
         self.close()
 
     def choice_yes(self):
+        """Closes MessageBox and sends 1 to messagebox handler"""
+
         self.window_parent.messagebox_handler(1)
         self.close()
 
     def choice_no(self):
+        """Closes MessageBox and sends 0 to messagebox handler"""
+
         self.window_parent.messagebox_handler(0)
         self.close()
