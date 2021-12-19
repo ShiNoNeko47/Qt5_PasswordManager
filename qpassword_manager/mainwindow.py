@@ -1,3 +1,5 @@
+"""Main window"""
+
 import sys
 import logging
 import base64
@@ -17,6 +19,13 @@ from qpassword_manager.conf.settings import Settings
 
 
 class MainWindow(QWidget):
+    """
+    Main window
+
+    Attributes:
+        key_input_hashed: hashed master key used for authentication
+    """
+
     def __init__(self):
         super().__init__()
         self.key_input_hashed = None
@@ -64,6 +73,9 @@ class MainWindow(QWidget):
         self.messagebox = MessageBox(self, "Wrong username or password!")
 
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
+        """Opens DisplayPasswordsWindow when you press enter of Settings when
+        you press escape"""
+
         if event.key() == Qt.Key_Return:
             self.display_passwords_btn.click()
 
@@ -71,6 +83,9 @@ class MainWindow(QWidget):
             self.settings.show()
 
     def check_input(self):
+        """Checks if name isn't empty and key is longer or equal to 4 and
+        enables or disables buttons"""
+
         self.manage_passwords_btn.setEnabled(False)
         self.display_passwords_btn.setEnabled(False)
         if len(self.key_input.text()) >= 4 and len(self.name_input.text()) > 0:
@@ -78,6 +93,8 @@ class MainWindow(QWidget):
             self.display_passwords_btn.setEnabled(True)
 
     def check_key(self):
+        """Checks if name and master key pair is correct"""
+
         self.key_input_hashed = SHA256.new(self.key_input.text().encode())
         user_id = requests.post(
             Config.config()["host"],
@@ -97,6 +114,8 @@ class MainWindow(QWidget):
         return False
 
     def manage_passwords(self):
+        """opens ManagePasswordsWindow if check_key returns True"""
+
         if self.check_key():
             self.w_manage.auth = (
                 self.name_input.text(),
@@ -116,6 +135,8 @@ class MainWindow(QWidget):
             self.manage_passwords_btn.setDisabled(True)
 
     def display_passwords(self):
+        """opens DisplayPasswordsWindow if check_key returns True"""
+
         if self.check_key():
             self.w_display.auth = (
                 self.name_input.text(),
@@ -128,9 +149,13 @@ class MainWindow(QWidget):
             self.display_passwords_btn.setDisabled(True)
 
     def new_user(self):
+        """Opens SetupWindow"""
+
         self.w_setup.show()
 
     def get_key(self):
+        """Creates key for Fernet using plain text master key"""
+
         password = self.key_input.text().encode()
         salt = b"sw\xea\x01\x9d\x109\x0eF\xef/\n\xb0mWK"
         kdf = PBKDF2HMAC(
@@ -143,6 +168,9 @@ class MainWindow(QWidget):
         return base64.urlsafe_b64encode(kdf.derive(password))
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
+        """Exits app if ManagePasswordsWindow and DisplayPasswordsWindow are
+        closed, it doesn't close otherwise"""
+
         if all([self.w_manage.isHidden(), self.w_display.isHidden()]):
             event.accept()
             sys.exit()
