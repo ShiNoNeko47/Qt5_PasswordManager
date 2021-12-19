@@ -73,7 +73,7 @@ class MainWindow(QWidget):
         self.messagebox = MessageBox(self, "Wrong username or password!")
 
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
-        """Opens DisplayPasswordsWindow when you press enter of Settings when
+        """Opens DisplayPasswordsWindow when you press enter or Settings when
         you press escape"""
 
         if event.key() == Qt.Key_Return:
