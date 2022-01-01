@@ -156,7 +156,6 @@ class ManagePasswordsWindow(QWidget):
             remove_btns.append(
                 RemoveBtn(
                     row_id,
-                    remove_btns,
                     self,
                 )
             )
