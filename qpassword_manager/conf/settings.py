@@ -20,11 +20,11 @@ class Settings(QWidget):
         self.layout = QGridLayout()
         self.setWindowTitle("Settings")
 
-        self.host_le = QLineEdit()
-        self.host_le.setText(self.config["host"])
-        self.host_le.textChanged.connect(self.check_ip)
-        self.host_le.setPlaceholderText("Host")
-        self.layout.addWidget(self.host_le, 0, 0, 1, 3)
+        self.url_le = QLineEdit()
+        self.url_le.setText(self.config["url"])
+        self.url_le.textChanged.connect(self.check_ip)
+        self.url_le.setPlaceholderText("Url")
+        self.layout.addWidget(self.url_le, 0, 0, 1, 3)
         self.setMinimumWidth(320)
 
         self.ok_btn = QPushButton("Ok")
@@ -36,7 +36,7 @@ class Settings(QWidget):
     def check_ip(self):
         """Checks if line edit is empty and enables or disables the button"""
 
-        if self.host_le.text() != "":
+        if self.url_le.text() != "":
             self.ok_btn.setEnabled(True)
         else:
             self.ok_btn.setEnabled(False)
@@ -44,7 +44,7 @@ class Settings(QWidget):
     def config_update(self):
         """Updates configuration using Config.config_update method"""
 
-        self.config["host"] = self.host_le.text()
+        self.config["url"] = self.url_le.text()
         Config.config_update(self.config)
         self.close()
 
