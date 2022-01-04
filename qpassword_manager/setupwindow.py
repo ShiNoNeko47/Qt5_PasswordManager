@@ -75,12 +75,12 @@ class SetupWindow(QWidget):
 
         master_key = SHA256.new(self.key_setup_le.text().encode()).hexdigest()
         msg = requests.post(
-            Config.config()["host"],
-            {
+            data={
                 "action": "new_user",
                 "user": self.username_setup_le.text(),
                 "master_key": master_key,
             },
+            **Config.config()
         ).text
         logging.debug(msg)
         if msg:

@@ -97,12 +97,12 @@ class MainWindow(QWidget):
 
         self.key_input_hashed = SHA256.new(self.key_input.text().encode())
         user_id = requests.post(
-            Config.config()["host"],
-            {"action": "get_id"},
+            data={"action": "get_id"},
             auth=(
                 self.name_input.text(),
                 self.key_input_hashed.hexdigest(),
             ),
+            **Config.config(),
         ).text
         logging.debug(self.name_input.text())
         logging.debug(self.key_input_hashed.hexdigest())
