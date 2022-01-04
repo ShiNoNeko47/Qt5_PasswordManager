@@ -47,21 +47,22 @@ def main():
     """main function"""
 
     config = Config.config()
+    # config["timeout"] = 5
+    config["verify"] = False
+    config_new = {}
     for parameter in config:
         print(type(config[parameter]))
-        if parameter != "connection_timeout":
-            parameter_new = input(parameter + ": ")
-        else:
-            try:
-                parameter_new = int(input(parameter + ": "))
-            except ValueError:
-                parameter_new = ""
+        parameter_new = input(parameter + ": ")
 
-        if parameter_new != "":
-            config[parameter] = parameter_new
-    # print(config)
+        if parameter_new != " ":
+            if parameter_new != "":
+                config_new[parameter] = parameter_new
+            else:
+                config_new[parameter] = config[parameter]
 
-    Config.config_update(config)
+    print(config_new)
+
+    Config.config_update(config_new)
 
 
 if __name__ == "__main__":
