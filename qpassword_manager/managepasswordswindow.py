@@ -121,7 +121,6 @@ class ManagePasswordsWindow(QWidget):
             auth=self.auth,
             **Config.config(),
         ).json()
-        logging.warn(data)
 
         self.row_ids = requests.post(
             data={"action": "get_pass_ids"},
