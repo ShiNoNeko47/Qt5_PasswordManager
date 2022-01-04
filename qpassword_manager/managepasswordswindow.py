@@ -117,8 +117,8 @@ class ManagePasswordsWindow(QWidget):
             ["Website", "Username", "Password", "", ""]
         )
         data = requests.post(
-            data={"action": "create_table"},
             auth=self.auth,
+            data={"action": "create_table"},
             **Config.config(),
         ).json()
 
@@ -257,7 +257,7 @@ class ManagePasswordsWindow(QWidget):
         self.save_btn.setDisabled(True)
 
     def reset_entries(self):
-        """Sets all entries to \"\""""
+        """Sets all entries to \"\" """
 
         self.new_website_le.setText("")
         self.new_username_le.setText("")
