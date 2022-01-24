@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QAbstractItemView,
+    QHeaderView,
 )
 import requests
 from cryptography.fernet import Fernet
@@ -70,6 +71,7 @@ class ManagePasswordsWindow(QWidget):
         self.layout.addWidget(self.save_btn, 3, 3)
 
         self.table = QTableWidget()
+        self.table.setSelectionMode(QAbstractItemView.NoSelection)
         self.layout.addWidget(self.table, 2, 0, 1, 4)
 
         self.setLayout(self.layout)
@@ -113,6 +115,10 @@ class ManagePasswordsWindow(QWidget):
         self.table.setRowCount(0)
         self.table.setColumnCount(5)
         self.table.verticalHeader().setVisible(False)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.table.horizontalHeader().setSectionResizeMode(
+            0, QHeaderView.Stretch
+        )
         self.table.setHorizontalHeaderLabels(
             ["Website", "Username", "Password", "", ""]
         )

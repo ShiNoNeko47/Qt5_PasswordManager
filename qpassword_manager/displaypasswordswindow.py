@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QAbstractItemView,
+    QHeaderView,
 )
 from cryptography.fernet import Fernet
 from qpassword_manager.btns.copybtn import CopyBtn
@@ -33,6 +34,7 @@ class DisplayPasswordsWindow(QWidget):
         self.layout = QGridLayout()
 
         self.table = QTableWidget()
+        self.table.setSelectionMode(QAbstractItemView.NoSelection)
         self.layout.addWidget(self.table, 0, 0)
 
         self.setFixedWidth(640)
@@ -55,6 +57,10 @@ class DisplayPasswordsWindow(QWidget):
         self.table.setColumnCount(4)
         self.table.setRowCount(0)
         self.table.verticalHeader().setVisible(False)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.table.horizontalHeader().setSectionResizeMode(
+            0, QHeaderView.Stretch
+        )
         self.table.setHorizontalHeaderLabels(
             ["Website", "Username", "Password", ""]
         )
