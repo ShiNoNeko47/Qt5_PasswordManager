@@ -109,7 +109,7 @@ class SetupWindow(QWidget):
             self.close()
 
     def reset_entries(self):
-        """Sets all entries to \"\""""
+        """Sets all entries to \"\" """
 
         self.username_setup_le.setText("")
         self.key_setup_le.setText("")

@@ -10,6 +10,7 @@ class MessageBox(QWidget):
     Attributes:
         window_parent: parent window
     """
+
     def __init__(self, window_parent, title):
         super().__init__()
         self.window_parent = window_parent
