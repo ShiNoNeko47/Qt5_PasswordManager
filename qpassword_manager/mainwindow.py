@@ -1,8 +1,10 @@
 """Main window"""
 
+import os
 import sys
 import logging
 import base64
+import json
 import requests
 from Crypto.Hash import SHA256
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLineEdit, QPushButton
@@ -71,6 +73,17 @@ class MainWindow(QWidget):
 
         self.settings = Settings()
         self.messagebox = MessageBox(self, "Wrong username or password!")
+
+        with open(
+            os.path.join(os.path.dirname(__file__), "autofill.json"), "r"
+        ) as file:
+            autofill = json.loads(file.read())
+
+        self.name_input.setText(autofill["Username"])
+        self.key_input.setText(autofill["Password"])
+
+        if autofill["Username"]:
+            self.key_input.setFocus()
 
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
         """Opens DisplayPasswordsWindow when you press enter or Settings when
