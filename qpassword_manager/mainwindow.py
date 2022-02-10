@@ -75,7 +75,9 @@ class MainWindow(QWidget):
         self.messagebox = MessageBox(self, "Wrong username or password!")
 
         with open(
-            os.path.join(os.path.dirname(__file__), "autofill.json"), "r"
+            os.path.join(os.path.dirname(__file__), "autofill.json"),
+            "r",
+            encoding="utf8",
         ) as file:
             autofill = json.loads(file.read())
 
