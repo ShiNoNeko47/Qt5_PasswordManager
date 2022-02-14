@@ -1,16 +1,12 @@
 #!/usr/bin/python
-"""Module for reading and updating encrypted config file"""
+"""Module for reading and updating the config file"""
 
 import os
 import json
-from cryptography.fernet import Fernet
 
 
 class Config:
-    """Class for working with encrypted config file"""
-
-    key = b"LdGzkYcr8D4rOuKAyf_9spqqDGC-2Qf8duZM6x30ElQ="
-    f = Fernet(key)
+    """Class for working with the config file"""
 
     @staticmethod
     def config():
@@ -22,10 +18,11 @@ class Config:
         """
 
         with open(
-            os.path.join(os.path.dirname(__file__), "config.json"), "rb"
+            os.path.join(os.path.dirname(__file__), "config.json"),
+            "r",
+            encoding="utf8",
         ) as file:
-            config_enc = file.read()
-        config = json.loads(Config.f.decrypt(config_enc).decode())
+            config = json.loads(file.read())
         return config
 
     @staticmethod
@@ -38,32 +35,8 @@ class Config:
         """
 
         with open(
-            os.path.join(os.path.dirname(__file__), "config.json"), "wb"
+            os.path.join(os.path.dirname(__file__), "config.json"),
+            "w",
+            encoding="utf8",
         ) as file:
-            file.write(Config.f.encrypt(json.dumps(config).encode()))
-
-
-def main():
-    """main function"""
-
-    config = Config.config()
-    # config["timeout"] = 5
-    config["verify"] = False
-    config_new = {}
-    for parameter in config:
-        print(type(config[parameter]))
-        parameter_new = input(parameter + ": ")
-
-        if parameter_new != " ":
-            if parameter_new != "":
-                config_new[parameter] = parameter_new
-            else:
-                config_new[parameter] = config[parameter]
-
-    print(config_new)
-
-    Config.config_update(config_new)
-
-
-if __name__ == "__main__":
-    main()
+            file.write(json.dumps(config))
