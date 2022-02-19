@@ -1,4 +1,1 @@
-{
-    "timeout": 5,
-    "url": "https://qpasswordmanager.ddns.net"
-}
+{"host": {"timeout": 5, "url": "https://qpasswordmanager.ddns.net"}, "database_online": false, "database_offline": ""}
