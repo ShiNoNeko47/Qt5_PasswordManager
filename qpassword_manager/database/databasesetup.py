@@ -36,8 +36,8 @@ class SetupWindow(QWidget):
 
         self.setLayout(self.layout)
 
-    def keyPressEvent(self, e):
-        if e.key() == Qt.Key_Return:
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Return:
             self.ok_btn.click()
 
     def check(self):
@@ -51,7 +51,7 @@ class SetupWindow(QWidget):
             self.ok_btn.setEnabled(True)
 
     def ok(self):
-        self.close()
+        """Creates new database"""
 
         conn = sqlite3.connect("passwords.db")
         cursor = conn.cursor()
@@ -74,8 +74,12 @@ class SetupWindow(QWidget):
         cursor.close()
         conn.close()
 
+        self.close()
+
 
 def main():
+    """Main function"""
+
     app = QApplication([])
     window = SetupWindow()
     window.show()

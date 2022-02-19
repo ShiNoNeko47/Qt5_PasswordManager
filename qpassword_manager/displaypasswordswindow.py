@@ -67,7 +67,7 @@ class DisplayPasswordsWindow(QWidget):
         data = requests.post(
             data={"action": "create_table"},
             auth=self.auth,
-            **Config.config(),
+            **Config.config()["host"],
         ).json()
         logging.debug(data)
 

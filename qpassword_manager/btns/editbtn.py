@@ -37,7 +37,7 @@ class EditBtn(QPushButton):
             row = requests.post(
                 data={"action": "get_row", "id": self.row_id},
                 auth=(self.window.auth),
-                **Config.config()
+                **Config.config()["host"]
             ).json()
             logging.debug(self.row_id)
             self.window.new_website_le.setText(row["0"])

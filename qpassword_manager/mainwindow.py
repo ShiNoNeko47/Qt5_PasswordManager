@@ -117,7 +117,7 @@ class MainWindow(QWidget):
                 self.name_input.text(),
                 self.key_input_hashed.hexdigest(),
             ),
-            **Config.config(),
+            **Config.config()["host"],
         ).text
         logging.debug(self.name_input.text())
         logging.debug(self.key_input_hashed.hexdigest())

@@ -125,13 +125,13 @@ class ManagePasswordsWindow(QWidget):
         data = requests.post(
             auth=self.auth,
             data={"action": "create_table"},
-            **Config.config(),
+            **Config.config()["host"],
         ).json()
 
         self.row_ids = requests.post(
             data={"action": "get_pass_ids"},
             auth=self.auth,
-            **Config.config(),
+            **Config.config()["host"],
         ).json()
         logging.debug(self.row_ids)
 
@@ -245,13 +245,13 @@ class ManagePasswordsWindow(QWidget):
                         "website": action[0],
                     },
                     auth=self.auth,
-                    **Config.config(),
+                    **Config.config()["host"],
                 )
             else:
                 request = requests.post(
                     data={"action": "delete", "id": action},
                     auth=self.auth,
-                    **Config.config(),
+                    **Config.config()["host"],
                 )
             logging.debug(request.text)
 
