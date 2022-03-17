@@ -1,3 +1,5 @@
+"""Database setup window"""
+
 import sys
 import sqlite3
 from PyQt5.QtWidgets import (
@@ -12,6 +14,10 @@ from Crypto.Hash import SHA256
 
 
 class SetupWindow(QWidget):
+    """
+    The window for setting up an offline database
+    """
+
     def __init__(self):
         super().__init__()
         self.layout = QGridLayout()
@@ -31,16 +37,20 @@ class SetupWindow(QWidget):
 
         self.ok_btn = QPushButton("Ok")
         self.ok_btn.setEnabled(False)
-        self.ok_btn.clicked.connect(self.ok)
+        self.ok_btn.clicked.connect(self.create)
         self.layout.addWidget(self.ok_btn, 1, 1)
 
         self.setLayout(self.layout)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event):  # pylint: disable=invalid-name
+        """Clicks ok button when you press enter"""
+
         if event.key() == Qt.Key_Return:
             self.ok_btn.click()
 
     def check(self):
+        """Checks if inputs are valid"""
+
         self.ok_btn.setEnabled(False)
         if all(
             [
@@ -50,7 +60,7 @@ class SetupWindow(QWidget):
         ):
             self.ok_btn.setEnabled(True)
 
-    def ok(self):
+    def create(self):
         """Creates new database"""
 
         conn = sqlite3.connect("passwords.db")
