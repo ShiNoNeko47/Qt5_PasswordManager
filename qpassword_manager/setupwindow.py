@@ -80,7 +80,7 @@ class SetupWindow(QWidget):
                 "user": self.username_setup_le.text(),
                 "master_key": master_key,
             },
-            **Config.config()
+            **Config.config()["host"]
         ).text
         logging.debug(msg)
         if msg:

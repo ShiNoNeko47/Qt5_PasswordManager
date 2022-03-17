@@ -1,4 +1,5 @@
 import sys
+import sqlite3
 from PyQt5.QtWidgets import (
     QGridLayout,
     QPushButton,
@@ -7,7 +8,6 @@ from PyQt5.QtWidgets import (
     QApplication,
 )
 from PyQt5.Qt import Qt
-import sqlite3
 from Crypto.Hash import SHA256
 
 
