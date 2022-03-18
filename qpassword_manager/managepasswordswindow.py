@@ -15,7 +15,7 @@ from cryptography.fernet import Fernet
 from qpassword_manager.messagebox import MessageBox
 from qpassword_manager.btns.removebtn import RemoveBtn
 from qpassword_manager.btns.editbtn import EditBtn
-from qpassword_manager.database.database_handler import Database_handler
+from qpassword_manager.database.database_handler import DatabaseHandler
 
 
 class ManagePasswordsWindow(QWidget):
@@ -121,9 +121,9 @@ class ManagePasswordsWindow(QWidget):
         self.table.setHorizontalHeaderLabels(
             ["Website", "Username", "Password", "", ""]
         )
-        data = Database_handler.action("create_table", self.auth)
+        data = DatabaseHandler.action("create_table", self.auth)
 
-        self.row_ids = Database_handler.action("get_pass_ids", self.auth)
+        self.row_ids = DatabaseHandler.action("get_pass_ids", self.auth)
         logging.debug(self.row_ids)
 
         for i in range(3):
@@ -228,9 +228,11 @@ class ManagePasswordsWindow(QWidget):
 
         for action in self.actions:
             if action.pop() == "add":
-                request = Database_handler.add_to_database(action, self.auth)
+                DatabaseHandler.add_to_database(
+                    action[2], action[1], action[0], self.auth
+                )
             else:
-                request = Database_handler.action_row("delete", action, self.auth)
+                DatabaseHandler.action_row("delete", action, self.auth)
 
         RemoveBtn.marked.clear()
         self.actions.clear()

@@ -15,8 +15,9 @@ from qpassword_manager.managepasswordswindow import ManagePasswordsWindow
 from qpassword_manager.displaypasswordswindow import DisplayPasswordsWindow
 from qpassword_manager.setupwindow import SetupWindow
 from qpassword_manager.messagebox import MessageBox
+
 # from qpassword_manager.conf.connectorconfig import Config
-from qpassword_manager.database.database_handler import Database_handler
+from qpassword_manager.database.database_handler import DatabaseHandler
 from qpassword_manager.conf.settings import Settings
 
 
@@ -111,8 +112,9 @@ class MainWindow(QWidget):
         """Checks if name and master key pair is correct"""
 
         self.key_input_hashed = SHA256.new(self.key_input.text().encode())
-        user_id = Database_handler.get_id(
-            self.name_input.text(), self.key_input_hashed.hexdigest())
+        user_id = DatabaseHandler.get_id(
+            self.name_input.text(), self.key_input_hashed.hexdigest()
+        )
         logging.debug(self.name_input.text())
         logging.debug(self.key_input_hashed.hexdigest())
         logging.debug(user_id)

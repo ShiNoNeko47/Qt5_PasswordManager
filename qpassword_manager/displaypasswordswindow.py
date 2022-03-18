@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (
 )
 from cryptography.fernet import Fernet
 from qpassword_manager.btns.copybtn import CopyBtn
-from qpassword_manager.database.database_handler import Database_handler
+from qpassword_manager.database.database_handler import DatabaseHandler
 
 
 class DisplayPasswordsWindow(QWidget):
@@ -63,7 +63,7 @@ class DisplayPasswordsWindow(QWidget):
         self.table.setHorizontalHeaderLabels(
             ["Website", "Username", "Password", ""]
         )
-        data = Database_handler.action("create_table", self.auth)
+        data = DatabaseHandler.action("create_table", self.auth)
         logging.debug(data)
 
         for i in range(3):
