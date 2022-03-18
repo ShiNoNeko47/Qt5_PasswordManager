@@ -1,7 +1,6 @@
 """The window used for copying passwords from database"""
 
 import logging
-import requests
 from PyQt5.QtWidgets import (
     QWidget,
     QGridLayout,
@@ -12,7 +11,7 @@ from PyQt5.QtWidgets import (
 )
 from cryptography.fernet import Fernet
 from qpassword_manager.btns.copybtn import CopyBtn
-from qpassword_manager.conf.connectorconfig import Config
+from qpassword_manager.database.database_handler import Database_handler
 
 
 class DisplayPasswordsWindow(QWidget):
@@ -64,11 +63,7 @@ class DisplayPasswordsWindow(QWidget):
         self.table.setHorizontalHeaderLabels(
             ["Website", "Username", "Password", ""]
         )
-        data = requests.post(
-            data={"action": "create_table"},
-            auth=self.auth,
-            **Config.config()["host"],
-        ).json()
+        data = Database_handler.action("create_table", self.auth)
         logging.debug(data)
 
         for i in range(3):

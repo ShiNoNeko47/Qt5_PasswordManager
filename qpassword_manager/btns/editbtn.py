@@ -1,9 +1,8 @@
 """EditBtn class"""
 
 import logging
-import requests
 from PyQt5.QtWidgets import QPushButton
-from qpassword_manager.conf.connectorconfig import Config
+from qpassword_manager.database.database_handler import Database_handler
 
 
 class EditBtn(QPushButton):
@@ -34,11 +33,8 @@ class EditBtn(QPushButton):
                 btn.setText("+")
 
             self.setText("-")
-            row = requests.post(
-                data={"action": "get_row", "id": self.row_id},
-                auth=(self.window.auth),
-                **Config.config()["host"]
-            ).json()
+            row = Database_handler.action_row(
+                "get_row", self.row_id, self.window.auth)
             logging.debug(self.row_id)
             self.window.new_website_le.setText(row["0"])
             self.window.new_username_le.setText(row["1"])

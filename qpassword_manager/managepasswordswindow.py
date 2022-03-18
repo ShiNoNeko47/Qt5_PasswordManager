@@ -11,12 +11,11 @@ from PyQt5.QtWidgets import (
     QAbstractItemView,
     QHeaderView,
 )
-import requests
 from cryptography.fernet import Fernet
 from qpassword_manager.messagebox import MessageBox
 from qpassword_manager.btns.removebtn import RemoveBtn
 from qpassword_manager.btns.editbtn import EditBtn
-from qpassword_manager.conf.connectorconfig import Config
+from qpassword_manager.database.database_handler import Database_handler
 
 
 class ManagePasswordsWindow(QWidget):
@@ -122,17 +121,9 @@ class ManagePasswordsWindow(QWidget):
         self.table.setHorizontalHeaderLabels(
             ["Website", "Username", "Password", "", ""]
         )
-        data = requests.post(
-            auth=self.auth,
-            data={"action": "create_table"},
-            **Config.config()["host"],
-        ).json()
+        data = Database_handler.action("create_table", self.auth)
 
-        self.row_ids = requests.post(
-            data={"action": "get_pass_ids"},
-            auth=self.auth,
-            **Config.config()["host"],
-        ).json()
+        self.row_ids = Database_handler.action("get_pass_ids", self.auth)
         logging.debug(self.row_ids)
 
         for i in range(3):
@@ -237,23 +228,9 @@ class ManagePasswordsWindow(QWidget):
 
         for action in self.actions:
             if action.pop() == "add":
-                request = requests.post(
-                    data={
-                        "action": "add",
-                        "password": action[2],
-                        "username": action[1],
-                        "website": action[0],
-                    },
-                    auth=self.auth,
-                    **Config.config()["host"],
-                )
+                request = Database_handler.add_to_database(action, self.auth)
             else:
-                request = requests.post(
-                    data={"action": "delete", "id": action},
-                    auth=self.auth,
-                    **Config.config()["host"],
-                )
-            logging.debug(request.text)
+                request = Database_handler.action_row("delete", action, self.auth)
 
         RemoveBtn.marked.clear()
         self.actions.clear()

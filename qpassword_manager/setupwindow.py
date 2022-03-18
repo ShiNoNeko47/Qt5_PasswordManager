@@ -3,10 +3,9 @@
 import logging
 from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QGridLayout
 from PyQt5.Qt import Qt
-import requests
 from Crypto.Hash import SHA256
 from qpassword_manager.messagebox import MessageBox
-from qpassword_manager.conf.connectorconfig import Config
+from qpassword_manager.database.database_handler import Database_handler
 
 
 class SetupWindow(QWidget):
@@ -74,14 +73,8 @@ class SetupWindow(QWidget):
         """Adds new user to database"""
 
         master_key = SHA256.new(self.key_setup_le.text().encode()).hexdigest()
-        msg = requests.post(
-            data={
-                "action": "new_user",
-                "user": self.username_setup_le.text(),
-                "master_key": master_key,
-            },
-            **Config.config()["host"]
-        ).text
+        msg = Database_handler.add_user(
+            self.username_setup_le.text(), master_key)
         logging.debug(msg)
         if msg:
             if msg.startswith("Duplicate entry"):
