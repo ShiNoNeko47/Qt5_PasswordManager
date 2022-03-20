@@ -18,6 +18,7 @@ class EditBtn(QPushButton):
     def __init__(self, row_id, edit_btns, window):
         super().__init__()
         self.row_id = row_id
+        logging.debug("row_id:", self.row_id)
         self.edit_btns = edit_btns
         self.window = window
         self.fernet = self.window.fernet
@@ -33,13 +34,12 @@ class EditBtn(QPushButton):
                 btn.setText("+")
 
             self.setText("-")
-            row = DatabaseHandler.action_row(
-                "get_row", self.row_id, self.window.auth
+            row = DatabaseHandler.get_row(
+                self.row_id, self.window.auth
             )
-            logging.debug(self.row_id)
-            self.window.new_website_le.setText(row["0"])
-            self.window.new_username_le.setText(row["1"])
-            password = self.fernet.decrypt(row["2"].encode()).decode()
+            self.window.new_website_le.setText(row[0])
+            self.window.new_username_le.setText(row[1])
+            password = self.fernet.decrypt(row[2].encode()).decode()
             self.window.new_password_le.setText(password)
             self.window.re_new_password_le.setText(password)
 

@@ -14,6 +14,6 @@ class CopyBtn(QPushButton):
 
     def __init__(self, index, data, fernet):
         super().__init__()
-        self.decrypted = fernet.decrypt(data[index]["2"].encode()).decode()
+        self.decrypted = fernet.decrypt(data[index][2].encode()).decode()
         self.clicked.connect(lambda: pyperclip.copy(self.decrypted))
         self.setText("📋")

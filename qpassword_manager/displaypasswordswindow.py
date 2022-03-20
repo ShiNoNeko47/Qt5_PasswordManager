@@ -63,7 +63,7 @@ class DisplayPasswordsWindow(QWidget):
         self.table.setHorizontalHeaderLabels(
             ["Website", "Username", "Password", ""]
         )
-        data = DatabaseHandler.action("create_table", self.auth)
+        data = DatabaseHandler.create_table(self.auth)
         logging.debug(data)
 
         for i in range(3):
@@ -75,8 +75,8 @@ class DisplayPasswordsWindow(QWidget):
         for i, row in enumerate(data):
             self.table.insertRow(i)
             for j in range(2):
-                self.table.setItem(i, j, (QTableWidgetItem(row[str(j)])))
-            row = "*" * len(self.fernet.decrypt(row["2"].encode()))
+                self.table.setItem(i, j, (QTableWidgetItem(row[j])))
+            row = "*" * len(self.fernet.decrypt(row[2].encode()))
             self.table.setItem(i, 2, (QTableWidgetItem(row)))
             copy_btns.append(CopyBtn(i, data, self.fernet))
             self.table.setCellWidget(i, 3, copy_btns[i])

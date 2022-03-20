@@ -121,10 +121,10 @@ class ManagePasswordsWindow(QWidget):
         self.table.setHorizontalHeaderLabels(
             ["Website", "Username", "Password", "", ""]
         )
-        data = DatabaseHandler.action("create_table", self.auth)
+        data = DatabaseHandler.create_table(self.auth)
 
-        self.row_ids = DatabaseHandler.action("get_pass_ids", self.auth)
-        logging.debug(self.row_ids)
+        self.row_ids = DatabaseHandler.get_row_ids(self.auth)
+        logging.debug("row_ids:", self.row_ids)
 
         for i in range(3):
             self.table.setColumnWidth(i, 180)
@@ -135,10 +135,10 @@ class ManagePasswordsWindow(QWidget):
         for i, row in enumerate(data):
             self.table.insertRow(i)
             for j in range(2):
-                item = row[str(j)]
+                item = row[j]
                 logging.debug(item)
                 self.table.setItem(i, j, (QTableWidgetItem(item)))
-            data = "*" * len(self.fernet.decrypt(row["2"].encode()))
+            data = "*" * len(self.fernet.decrypt(row[2].encode()))
             self.table.setItem(i, 2, (QTableWidgetItem(data)))
         self.create_btns()
 
@@ -204,7 +204,8 @@ class ManagePasswordsWindow(QWidget):
             self.table.insertRow(row_count)
 
             website = self.new_website_le.text()
-            self.table.setItem(row_count, 0, (QTableWidgetItem("+ " + website)))
+            self.table.setItem(
+                row_count, 0, (QTableWidgetItem("+ " + website)))
 
             username = self.new_username_le.text()
             self.table.setItem(
@@ -232,7 +233,7 @@ class ManagePasswordsWindow(QWidget):
                     action[2], action[1], action[0], self.auth
                 )
             else:
-                DatabaseHandler.action_row("delete", action, self.auth)
+                DatabaseHandler.delete_row(action, self.auth)
 
         RemoveBtn.marked.clear()
         self.actions.clear()
