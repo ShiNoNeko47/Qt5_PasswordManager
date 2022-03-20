@@ -206,7 +206,7 @@ class DatabaseHandler:
 
             if master_key == master_key_db:
                 return 1
-        return
+        return 0
 
     @staticmethod
     def get_database(username):

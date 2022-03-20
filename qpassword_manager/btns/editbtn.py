@@ -18,7 +18,7 @@ class EditBtn(QPushButton):
     def __init__(self, row_id, edit_btns, window):
         super().__init__()
         self.row_id = row_id
-        logging.debug("row_id: " + self.row_id)
+        logging.debug(self.row_id)
         self.edit_btns = edit_btns
         self.window = window
         self.fernet = self.window.fernet

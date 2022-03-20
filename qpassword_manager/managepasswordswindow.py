@@ -124,7 +124,7 @@ class ManagePasswordsWindow(QWidget):
         data = DatabaseHandler.create_table(self.auth)
 
         self.row_ids = DatabaseHandler.get_row_ids(self.auth)
-        logging.debug("row_ids: " + self.row_ids)
+        logging.debug(self.row_ids)
 
         for i in range(3):
             self.table.setColumnWidth(i, 180)
