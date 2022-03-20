@@ -1,17 +1,20 @@
 """This class handles all http requests"""
 
-import requests
 import os
 import sqlite3
+import requests
 from qpassword_manager.conf.connectorconfig import Config
 
 
 class DatabaseHandler:
     """This class handles all http requests"""
+
     @staticmethod
     def json_parser(data):
+        """Parses requests json into list"""
+
         data_list = []
-        for i, row in enumerate(data):
+        for row in data:
             data_list.append([row[x] for j, x in enumerate(row) if j % 2])
         return data_list
 
@@ -89,6 +92,8 @@ class DatabaseHandler:
 
     @staticmethod
     def get_row_ids(auth):
+        """Returns id value of every password in table"""
+
         if Config.config()["database_online"]:
             return requests.post(
                 data={"action": "get_pass_ids"},
@@ -123,7 +128,7 @@ class DatabaseHandler:
                 auth=auth,
                 **Config.config()["host"],
             )
-            return
+            return 0
 
         conn = sqlite3.connect(DatabaseHandler.get_database(auth[0]))
         cursor = conn.cursor()
@@ -138,7 +143,7 @@ class DatabaseHandler:
         conn.commit()
         cursor.close()
         conn.close()
-        return
+        return 0
 
     @staticmethod
     def add_user(username, master_key):
@@ -176,7 +181,7 @@ class DatabaseHandler:
         cursor.close()
         conn.close()
 
-        return
+        return 0
 
     @staticmethod
     def get_id(username, master_key):
@@ -205,4 +210,6 @@ class DatabaseHandler:
 
     @staticmethod
     def get_database(username):
+        """Returns database path in offline mode"""
+
         return os.path.join(os.path.dirname(__file__), username + ".db")
