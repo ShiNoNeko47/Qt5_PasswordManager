@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (
     QHeaderView,
 )
 from cryptography.fernet import Fernet
+import pyperclip
 from qpassword_manager.btns.copybtn import CopyBtn
 from qpassword_manager.database.database_handler import DatabaseHandler
 
@@ -33,7 +34,8 @@ class DisplayPasswordsWindow(QWidget):
         self.layout = QGridLayout()
 
         self.table = QTableWidget()
-        self.table.setSelectionMode(QAbstractItemView.NoSelection)
+        # self.table.setSelectionMode(QAbstractItemView.NoSelection)
+        self.table.itemClicked.connect(self.copy_selected)
         self.layout.addWidget(self.table, 0, 0)
 
         self.setFixedWidth(640)
@@ -82,6 +84,11 @@ class DisplayPasswordsWindow(QWidget):
             self.table.setCellWidget(i, 3, copy_btns[i])
 
         self.table.setFixedWidth(619)
+
+    def copy_selected(self):
+        logging.debug(self.table.selectedItems()[0].text())
+        pyperclip.copy(self.table.selectedItems()[0].text())
+        self.table.clearSelection()
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
         """Enables display_passwords_btn in MainWindow"""
