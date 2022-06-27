@@ -86,6 +86,8 @@ class DisplayPasswordsWindow(QWidget):
         self.table.setFixedWidth(619)
 
     def copy_selected(self):
+        """Copy selected item in table"""
+
         logging.debug(self.table.selectedItems()[0].text())
         pyperclip.copy(self.table.selectedItems()[0].text())
         self.table.clearSelection()
