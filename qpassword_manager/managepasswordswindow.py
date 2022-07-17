@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (
     QAbstractItemView,
     QHeaderView,
 )
+from PyQt5.Qt import Qt
 from cryptography.fernet import Fernet
 from qpassword_manager.messagebox import MessageBox
 from qpassword_manager.btns.removebtn import RemoveBtn
@@ -182,6 +183,17 @@ class ManagePasswordsWindow(QWidget):
 
         self.add_btn.setDisabled(True)
         return False
+
+    def keyPressEvent(self, event):  # pylint: disable=invalid-name
+        """Pressing enter clicks whichever button is enabled"""
+
+        if event.key() == Qt.Key_Return:
+            if self.add_btn.isEnabled():
+                print(0)
+                self.add_btn.click()
+            else:
+                print(1)
+                self.save_btn.click()
 
     def add_password(self):
         """Adds action to queue and a row to table"""
