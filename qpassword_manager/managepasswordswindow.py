@@ -189,10 +189,8 @@ class ManagePasswordsWindow(QWidget):
 
         if event.key() == Qt.Key_Return:
             if self.add_btn.isEnabled():
-                print(0)
                 self.add_btn.click()
             else:
-                print(1)
                 self.save_btn.click()
 
     def add_password(self):
