@@ -1,6 +1,7 @@
 """This class handles all http requests"""
 
 import os
+from xdg import xdg_data_home
 import sqlite3
 import requests
 from qpassword_manager.conf.connectorconfig import Config
@@ -158,7 +159,7 @@ class DatabaseHandler:
                 },
                 **Config.config()["host"],
             ).text
-        if os.path.exists(os.path.join(__file__, username + ".db")):
+        if os.path.exists(os.path.join(xdg_data_home(), 'qpassword_manager', username + ".db")):
             return "Duplicate entry"
         conn = sqlite3.connect(DatabaseHandler.get_database(username))
         cursor = conn.cursor()
@@ -212,4 +213,7 @@ class DatabaseHandler:
     def get_database(username):
         """Returns database path in offline mode"""
 
-        return os.path.join(os.path.dirname(__file__), username + ".db")
+        directory = os.path.join(xdg_data_home(), 'qpassword_manager')
+        if not os.path.exists(directory):
+            os.mkdir()
+        return os.path.join(xdg_data_home(), 'qpassword_manager', username + ".db")
