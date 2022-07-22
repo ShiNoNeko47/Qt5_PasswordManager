@@ -1,8 +1,8 @@
 """This class handles all http requests"""
 
 import os
-from xdg import xdg_data_home
 import sqlite3
+from xdg import xdg_data_home
 import requests
 from qpassword_manager.conf.connectorconfig import Config
 
