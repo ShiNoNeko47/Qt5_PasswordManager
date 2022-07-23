@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import (
 )
 from cryptography.fernet import Fernet
 import pyperclip
-from qpassword_manager.btns.copybtn import CopyBtn
 from qpassword_manager.database.database_handler import DatabaseHandler
 
 
@@ -41,6 +40,8 @@ class DisplayPasswordsWindow(QWidget):
         self.setFixedWidth(640)
         self.setLayout(self.layout)
 
+        self.data = None
+
     def set_key(self, key):
         """
         Creates Fernet object using a key
@@ -55,41 +56,42 @@ class DisplayPasswordsWindow(QWidget):
         """Updates data in the table"""
 
         self.table.clear()
-        self.table.setColumnCount(4)
+        self.table.setColumnCount(3)
         self.table.setRowCount(0)
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table.horizontalHeader().setSectionResizeMode(
-            0, QHeaderView.Stretch
+            1, QHeaderView.Stretch
         )
         self.table.setHorizontalHeaderLabels(
-            ["Website", "Username", "Password", ""]
+            ["Website", "Username", "Password"]
         )
-        data = DatabaseHandler.create_table(self.auth)
-        logging.debug(data)
+        self.data = DatabaseHandler.create_table(self.auth)
+        logging.debug(self.data)
 
         for i in range(3):
             self.table.setColumnWidth(i, 190)
         self.table.setColumnWidth(3, 30)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-        copy_btns = []
-        for i, row in enumerate(data):
+        for i, row in enumerate(self.data):
             self.table.insertRow(i)
             for j in range(2):
                 self.table.setItem(i, j, (QTableWidgetItem(row[j])))
             row = "*" * len(self.fernet.decrypt(row[2].encode()))
             self.table.setItem(i, 2, (QTableWidgetItem(row)))
-            copy_btns.append(CopyBtn(i, data, self.fernet))
-            self.table.setCellWidget(i, 3, copy_btns[i])
 
         self.table.setFixedWidth(619)
 
     def copy_selected(self):
         """Copy selected item in table"""
 
-        logging.debug(self.table.selectedItems()[0].text())
-        pyperclip.copy(self.table.selectedItems()[0].text())
+        if self.table.selectedIndexes()[0].column() != 2:
+            logging.debug(self.table.selectedItems()[0].text())
+            pyperclip.copy(self.table.selectedItems()[0].text())
+        else:
+            pyperclip.copy(self.fernet.decrypt(
+                self.data[self.table.selectedIndexes()[0].row()][2].encode()).decode())
         self.table.clearSelection()
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
