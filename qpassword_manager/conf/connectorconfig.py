@@ -3,8 +3,8 @@
 
 import os
 import logging
-from xdg import xdg_data_home
 import json
+from xdg import xdg_data_home
 
 
 class Config:
@@ -28,17 +28,24 @@ class Config:
             ) as file:
                 config = json.loads(file.read())
             return config
-        except Exception as x:
+        except FileNotFoundError as error:
             with open(
                 os.path.join(xdg_data_home(), 'qpassword_manager',
                              "config.json"),
                 "w+",
                 encoding="utf8",
             ) as file:
-                config = "{\"host\": {\"timeout\": 5, \"url\": \"https://qpasswordmanager.ddns.net\"}, \"database_online\": false, \"vim_mode\": true}"
+                config = """{
+                    \"host\": {
+                        \"timeout\": 5,
+                        \"url\": \"https://qpasswordmanager.ddns.net\"
+                    },
+                    \"database_online\": false,
+                    \"vim_mode\": true
+                }"""
                 file.write(config)
                 return json.loads(config)
-            logging.debug(x)
+            logging.debug(error)
 
     @staticmethod
     def config_update(config):

@@ -4,8 +4,8 @@ import os
 import sys
 import logging
 import base64
-from xdg import xdg_data_home
 import json
+from xdg import xdg_data_home
 from Crypto.Hash import SHA256
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLineEdit, QPushButton
 from PyQt5.Qt import Qt
@@ -90,8 +90,7 @@ class MainWindow(QWidget):
 
             if autofill["Username"]:
                 self.key_input.setFocus()
-        except Exception as x:
-            print(x)
+        except FileNotFoundError as error:
             with open(
                 os.path.join(xdg_data_home(), 'qpassword_manager',
                              "autofill.json"),
@@ -99,7 +98,7 @@ class MainWindow(QWidget):
                 encoding="utf8",
             ) as file:
                 file.write("{\"Username\": \"\", \"Password\": \"\"}")
-            logging.debug(x)
+            logging.debug(error)
 
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
         """Opens DisplayPasswordsWindow when you press enter or Settings when
