@@ -16,6 +16,7 @@ if __name__ == "__main__":
             "pyperclip",
             "PyQt5",
             "requests",
+            "xdg",
         ],
         entry_points={
             "gui_scripts": [

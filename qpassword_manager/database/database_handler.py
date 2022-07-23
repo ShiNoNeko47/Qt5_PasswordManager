@@ -215,5 +215,5 @@ class DatabaseHandler:
 
         directory = os.path.join(xdg_data_home(), 'qpassword_manager')
         if not os.path.exists(directory):
-            os.mkdir()
+            os.mkdir(directory)
         return os.path.join(xdg_data_home(), 'qpassword_manager', username + ".db")

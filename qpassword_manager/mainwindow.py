@@ -4,6 +4,7 @@ import os
 import sys
 import logging
 import base64
+from xdg import xdg_data_home
 import json
 from Crypto.Hash import SHA256
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLineEdit, QPushButton
@@ -75,18 +76,30 @@ class MainWindow(QWidget):
         self.settings = Settings()
         self.messagebox = MessageBox(self, "Wrong username or password!")
 
-        with open(
-            os.path.join(os.path.dirname(__file__), "autofill.json"),
-            "r",
-            encoding="utf8",
-        ) as file:
-            autofill = json.loads(file.read())
+        try:
+            with open(
+                os.path.join(xdg_data_home(), 'qpassword_manager',
+                             "autofill.json"),
+                "r",
+                encoding="utf8",
+            ) as file:
+                autofill = json.loads(file.read())
 
-        self.name_input.setText(autofill["Username"])
-        self.key_input.setText(autofill["Password"])
+            self.name_input.setText(autofill["Username"])
+            self.key_input.setText(autofill["Password"])
 
-        if autofill["Username"]:
-            self.key_input.setFocus()
+            if autofill["Username"]:
+                self.key_input.setFocus()
+        except Exception as x:
+            print(x)
+            with open(
+                os.path.join(xdg_data_home(), 'qpassword_manager',
+                             "autofill.json"),
+                "w+",
+                encoding="utf8",
+            ) as file:
+                file.write("{\"Username\": \"\", \"Password\": \"\"}")
+            logging.debug(x)
 
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
         """Opens DisplayPasswordsWindow when you press enter or Settings when
