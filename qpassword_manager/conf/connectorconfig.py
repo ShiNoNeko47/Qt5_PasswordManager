@@ -4,7 +4,7 @@
 import os
 import logging
 import json
-from xdg import xdg_data_home
+from xdg import xdg_config_home
 
 
 class Config:
@@ -19,9 +19,12 @@ class Config:
             dict: configuration in form of a dictionary
         """
 
+        directory = os.path.join(xdg_config_home(), 'qpassword_manager')
+        if not os.path.exists(directory):
+            os.mkdir(directory)
         try:
             with open(
-                os.path.join(xdg_data_home(), 'qpassword_manager',
+                os.path.join(xdg_config_home(), 'qpassword_manager',
                              "config.json"),
                 "r",
                 encoding="utf8",
@@ -30,7 +33,7 @@ class Config:
             return config
         except FileNotFoundError as error:
             with open(
-                os.path.join(xdg_data_home(), 'qpassword_manager',
+                os.path.join(xdg_config_home(), 'qpassword_manager',
                              "config.json"),
                 "w+",
                 encoding="utf8",
@@ -57,7 +60,7 @@ class Config:
         """
 
         with open(
-            os.path.join(xdg_data_home(), 'qpassword_manager',
+            os.path.join(xdg_config_home(), 'qpassword_manager',
                          "config.json"),
             "w",
             encoding="utf8",

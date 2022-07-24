@@ -5,7 +5,7 @@ import sys
 import logging
 import base64
 import json
-from xdg import xdg_data_home
+from xdg import xdg_config_home
 from Crypto.Hash import SHA256
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLineEdit, QPushButton
 from PyQt5.Qt import Qt
@@ -78,7 +78,7 @@ class MainWindow(QWidget):
 
         try:
             with open(
-                os.path.join(xdg_data_home(), 'qpassword_manager',
+                os.path.join(xdg_config_home(), 'qpassword_manager',
                              "autofill.json"),
                 "r",
                 encoding="utf8",
@@ -92,7 +92,7 @@ class MainWindow(QWidget):
                 self.key_input.setFocus()
         except FileNotFoundError as error:
             with open(
-                os.path.join(xdg_data_home(), 'qpassword_manager',
+                os.path.join(xdg_config_home(), 'qpassword_manager',
                              "autofill.json"),
                 "w+",
                 encoding="utf8",
