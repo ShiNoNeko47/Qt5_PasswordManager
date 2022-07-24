@@ -41,7 +41,7 @@ class Config:
                 config = """{
                     \"host\": {
                         \"timeout\": 5,
-                        \"url\": \"https://qpasswordmanager.ddns.net\"
+                        \"url\": \"\"
                     },
                     \"database_online\": false,
                     \"vim_mode\": true
