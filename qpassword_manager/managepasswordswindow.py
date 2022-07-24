@@ -117,7 +117,7 @@ class ManagePasswordsWindow(QWidget):
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table.horizontalHeader().setSectionResizeMode(
-            0, QHeaderView.Stretch
+            1, QHeaderView.Stretch
         )
         self.table.setHorizontalHeaderLabels(
             ["Website", "Username", "Password", "", ""]
@@ -142,8 +142,6 @@ class ManagePasswordsWindow(QWidget):
             data = "*" * len(self.fernet.decrypt(row[2].encode()))
             self.table.setItem(i, 2, (QTableWidgetItem(data)))
         self.create_btns()
-
-        self.table.setFixedWidth(620)
 
     def create_btns(self):
         """Adds buttons to the table"""

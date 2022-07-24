@@ -81,8 +81,6 @@ class DisplayPasswordsWindow(QWidget):
             row = "*" * len(self.fernet.decrypt(row[2].encode()))
             self.table.setItem(i, 2, (QTableWidgetItem(row)))
 
-        self.table.setFixedWidth(619)
-
     def copy_selected(self):
         """Copy selected item in table"""
 
