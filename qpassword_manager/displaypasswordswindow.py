@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (
     QLineEdit,
 )
 from PyQt5.Qt import Qt
+from PyQt5 import QtCore
 from cryptography.fernet import Fernet
 import pyperclip
 from pynput.keyboard import Key, Controller
@@ -54,6 +55,7 @@ class MyQTableWidget(QTableWidget):
         elif key == '/':
             self.window.search_input.show()
             self.window.search_input.setFocus()
+            self.window.selected = self.window.table.selectedItems()[0]
 
 
 class DisplayPasswordsWindow(QWidget):
@@ -77,9 +79,11 @@ class DisplayPasswordsWindow(QWidget):
         self.search_input = QLineEdit()
         self.layout.addWidget(self.search_input, 0, 0)
         self.search_input.hide()
+        self.search_input.textChanged.connect(self.search)
 
         self.table = MyQTableWidget(self)
         self.layout.addWidget(self.table, 1, 0)
+        self.selected = None
 
         self.setFixedWidth(640)
         self.setLayout(self.layout)
@@ -95,6 +99,18 @@ class DisplayPasswordsWindow(QWidget):
         """
 
         self.fernet = Fernet(key)
+
+    def search(self):
+        self.table.setCurrentItem(None)
+        search_string = self.search_input.text()
+
+        if not search_string:
+            return 0
+
+        matching_items = self.table.findItems(search_string, QtCore.Qt.MatchContains)
+        if matching_items:
+            for item in matching_items:
+                item.setSelected(True)
 
     def create_table(self):
         """Updates data in the table"""
