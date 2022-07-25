@@ -2,7 +2,7 @@
 extension-pkg-whitelist=PyQt5
 
 [MESSAGES CONTROL]
-disable=too-many-instance-attributes
+disable=too-many-instance-attributes,fixme
 
 [SIMILARITIES]
 min-similarity-lines=10

@@ -15,6 +15,7 @@ import pyperclip
 from pynput.keyboard import Key, Controller
 from qpassword_manager.database.database_handler import DatabaseHandler
 
+
 class MyQTableWidget(QTableWidget):
     """
     Reimplementation of QTableWidget class
@@ -27,10 +28,14 @@ class MyQTableWidget(QTableWidget):
     def __init__(self):
         super().__init__()
         self.keybinds = {
-            'h': Key.left,
-            'j': Key.down,
-            'k': Key.up,
-            'l': Key.right
+            'h': [Key.left],
+            'j': [Key.down],
+            'k': [Key.up],
+            'l': [Key.right],
+            'g': [Key.ctrl, Key.home],
+            'G': [Key.ctrl, Key.end],
+            '0': [Key.home],
+            '$': [Key.end],
         }
         self.keyboard = Controller()
 
@@ -39,8 +44,14 @@ class MyQTableWidget(QTableWidget):
 
         logging.debug(key)
         if key in self.keybinds:
-            self.keyboard.press(self.keybinds[key])
-            self.keyboard.release(self.keybinds[key])
+            for keybind in self.keybinds[key]:
+                self.keyboard.press(keybind)
+            for keybind in self.keybinds[key]:
+                self.keyboard.release(keybind)
+
+        elif key == '/':
+            # TODO: make a window with lineedit for search
+            pass
 
 
 class DisplayPasswordsWindow(QWidget):
