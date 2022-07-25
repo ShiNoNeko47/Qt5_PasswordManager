@@ -9,9 +9,38 @@ from PyQt5.QtWidgets import (
     QAbstractItemView,
     QHeaderView,
 )
+from PyQt5.Qt import Qt
 from cryptography.fernet import Fernet
 import pyperclip
+from pynput.keyboard import Key, Controller
 from qpassword_manager.database.database_handler import DatabaseHandler
+
+
+class MyQTableWidget(QTableWidget):
+    """
+    Reimplementation of QTableWidget class
+
+    Attributes:
+        keybinds: dictionary for keybind translations
+        keyboard: controller that sends keys
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.keybinds = {
+            'h': Key.left,
+            'j': Key.down,
+            'k': Key.up,
+            'l': Key.right
+        }
+        self.keyboard = Controller()
+
+    def keyboardSearch(self, key):  # pylint: disable=invalid-name
+        """Handles keys based on keybinds"""
+
+        logging.debug(key)
+        self.keyboard.press(self.keybinds[key])
+        self.keyboard.release(self.keybinds[key])
 
 
 class DisplayPasswordsWindow(QWidget):
@@ -32,9 +61,7 @@ class DisplayPasswordsWindow(QWidget):
         self.setWindowTitle("Passwords")
         self.layout = QGridLayout()
 
-        self.table = QTableWidget()
-        # self.table.setSelectionMode(QAbstractItemView.NoSelection)
-        self.table.itemClicked.connect(self.copy_selected)
+        self.table = MyQTableWidget()
         self.layout.addWidget(self.table, 0, 0)
 
         self.setFixedWidth(640)
@@ -73,6 +100,7 @@ class DisplayPasswordsWindow(QWidget):
             self.table.setColumnWidth(i, 190)
         self.table.setColumnWidth(3, 30)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.setSelectionMode(QTableWidget.SingleSelection)
 
         for i, row in enumerate(self.data):
             self.table.insertRow(i)
@@ -80,17 +108,18 @@ class DisplayPasswordsWindow(QWidget):
                 self.table.setItem(i, j, (QTableWidgetItem(row[j])))
             row = "*" * len(self.fernet.decrypt(row[2].encode()))
             self.table.setItem(i, 2, (QTableWidgetItem(row)))
+        self.table.item(0, 0).setSelected(True)
 
-    def copy_selected(self):
+    def keyPressEvent(self, event):  # pylint: disable=invalid-name
         """Copy selected item in table"""
 
-        if self.table.selectedIndexes()[0].column() != 2:
-            logging.debug(self.table.selectedItems()[0].text())
-            pyperclip.copy(self.table.selectedItems()[0].text())
-        else:
-            pyperclip.copy(self.fernet.decrypt(
-                self.data[self.table.selectedIndexes()[0].row()][2].encode()).decode())
-        self.table.clearSelection()
+        if event.key() == Qt.Key_Return:
+            if self.table.selectedIndexes()[0].column() != 2:
+                logging.debug(self.table.selectedItems()[0].text())
+                pyperclip.copy(self.table.selectedItems()[0].text())
+            else:
+                pyperclip.copy(self.fernet.decrypt(
+                    self.data[self.table.selectedIndexes()[0].row()][2].encode()).decode())
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
         """Enables display_passwords_btn in MainWindow"""
