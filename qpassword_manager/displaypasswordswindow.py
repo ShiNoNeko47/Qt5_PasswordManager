@@ -108,7 +108,8 @@ class DisplayPasswordsWindow(QWidget):
                 self.table.setItem(i, j, (QTableWidgetItem(row[j])))
             row = "*" * len(self.fernet.decrypt(row[2].encode()))
             self.table.setItem(i, 2, (QTableWidgetItem(row)))
-        self.table.item(0, 0).setSelected(True)
+        if self.table.rowCount():
+            self.table.item(0, 0).setSelected(True)
 
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
         """Copy selected item in table"""
