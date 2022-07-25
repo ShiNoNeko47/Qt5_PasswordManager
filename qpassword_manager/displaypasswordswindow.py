@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
     QTableWidgetItem,
     QAbstractItemView,
     QHeaderView,
+    QLineEdit,
 )
 from PyQt5.Qt import Qt
 from cryptography.fernet import Fernet
@@ -25,8 +26,9 @@ class MyQTableWidget(QTableWidget):
         keyboard: controller that sends keys
     """
 
-    def __init__(self):
+    def __init__(self, window):
         super().__init__()
+        self.window = window
         self.keybinds = {
             'h': [Key.left],
             'j': [Key.down],
@@ -50,8 +52,8 @@ class MyQTableWidget(QTableWidget):
                 self.keyboard.release(keybind)
 
         elif key == '/':
-            # TODO: make a window with lineedit for search
-            pass
+            self.window.search_input.show()
+            self.window.search_input.setFocus()
 
 
 class DisplayPasswordsWindow(QWidget):
@@ -72,8 +74,12 @@ class DisplayPasswordsWindow(QWidget):
         self.setWindowTitle("Passwords")
         self.layout = QGridLayout()
 
-        self.table = MyQTableWidget()
-        self.layout.addWidget(self.table, 0, 0)
+        self.search_input = QLineEdit()
+        self.layout.addWidget(self.search_input, 0, 0)
+        self.search_input.hide()
+
+        self.table = MyQTableWidget(self)
+        self.layout.addWidget(self.table, 1, 0)
 
         self.setFixedWidth(640)
         self.setLayout(self.layout)
@@ -126,12 +132,16 @@ class DisplayPasswordsWindow(QWidget):
         """Copy selected item in table"""
 
         if event.key() == Qt.Key_Return:
-            if self.table.selectedIndexes()[0].column() != 2:
-                logging.debug(self.table.selectedItems()[0].text())
-                pyperclip.copy(self.table.selectedItems()[0].text())
+            if self.table.hasFocus():
+                if self.table.selectedIndexes()[0].column() != 2:
+                    logging.debug(self.table.selectedItems()[0].text())
+                    pyperclip.copy(self.table.selectedItems()[0].text())
+                else:
+                    pyperclip.copy(self.fernet.decrypt(
+                        self.data[self.table.selectedIndexes()[0].row()][2].encode()).decode())
             else:
-                pyperclip.copy(self.fernet.decrypt(
-                    self.data[self.table.selectedIndexes()[0].row()][2].encode()).decode())
+                self.table.setFocus()
+                self.search_input.hide()
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
         """Enables display_passwords_btn in MainWindow"""
