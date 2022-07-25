@@ -15,7 +15,6 @@ import pyperclip
 from pynput.keyboard import Key, Controller
 from qpassword_manager.database.database_handler import DatabaseHandler
 
-
 class MyQTableWidget(QTableWidget):
     """
     Reimplementation of QTableWidget class
@@ -39,8 +38,9 @@ class MyQTableWidget(QTableWidget):
         """Handles keys based on keybinds"""
 
         logging.debug(key)
-        self.keyboard.press(self.keybinds[key])
-        self.keyboard.release(self.keybinds[key])
+        if key in self.keybinds.keys():
+            self.keyboard.press(self.keybinds[key])
+            self.keyboard.release(self.keybinds[key])
 
 
 class DisplayPasswordsWindow(QWidget):
