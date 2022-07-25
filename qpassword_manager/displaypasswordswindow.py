@@ -38,7 +38,7 @@ class MyQTableWidget(QTableWidget):
         """Handles keys based on keybinds"""
 
         logging.debug(key)
-        if key in self.keybinds.keys():
+        if key in self.keybinds:
             self.keyboard.press(self.keybinds[key])
             self.keyboard.release(self.keybinds[key])
 
