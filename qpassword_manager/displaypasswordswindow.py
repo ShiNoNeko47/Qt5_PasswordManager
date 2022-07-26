@@ -50,13 +50,16 @@ class MyQTableWidget(QTableWidget):
         if key in self.keybinds:
             for keybind in self.keybinds[key]:
                 self.keyboard.press(keybind)
+
             for keybind in self.keybinds[key]:
                 self.keyboard.release(keybind)
 
         elif key == '/':
             self.window.search_input.show()
             self.window.search_input.setFocus()
-            self.window.selected = self.window.table.selectedItems()[0]
+            if self.window.table.selectedItems():
+                self.window.selected = self.window.table.selectedItems()[0]
+
             self.window.select()
 
         elif key in ['n', 'N']:
@@ -118,16 +121,21 @@ class DisplayPasswordsWindow(QWidget):
         if not self.table.currentItem():
             self.table.setCurrentItem(items[0])
             self.table.current_index = 0
+
         else:
             try:
                 self.table.current_index += 1 if key == 'n' else -1
                 self.table.setCurrentItem(items[self.table.current_index])
+
             except IndexError:
                 if self.table.current_index > 0:
                     self.table.current_index = 0
+
                 else:
                     self.table.current_index = -1
+
                 self.table.setCurrentItem(items[self.table.current_index])
+
         return 0
 
     def search(self):
@@ -138,7 +146,9 @@ class DisplayPasswordsWindow(QWidget):
         if not search_string:
             return []
 
-        return self.table.findItems(search_string, QtCore.Qt.MatchContains)
+        items = self.table.findItems(search_string, QtCore.Qt.MatchContains)
+        items.sort(key=lambda x: x.row())
+        return items
 
     def select(self):
         """Selects search results"""
@@ -168,6 +178,7 @@ class DisplayPasswordsWindow(QWidget):
 
         for i in range(3):
             self.table.setColumnWidth(i, 190)
+
         self.table.setColumnWidth(3, 30)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.setSelectionMode(QTableWidget.SingleSelection)
@@ -176,8 +187,10 @@ class DisplayPasswordsWindow(QWidget):
             self.table.insertRow(i)
             for j in range(2):
                 self.table.setItem(i, j, (QTableWidgetItem(row[j])))
+
             row = "*" * len(self.fernet.decrypt(row[2].encode()))
             self.table.setItem(i, 2, (QTableWidgetItem(row)))
+
         if self.table.rowCount():
             self.table.item(0, 0).setSelected(True)
 
@@ -189,9 +202,11 @@ class DisplayPasswordsWindow(QWidget):
                 if self.table.selectedIndexes()[0].column() != 2:
                     logging.debug(self.table.selectedItems()[0].text())
                     pyperclip.copy(self.table.selectedItems()[0].text())
+
                 else:
                     pyperclip.copy(self.fernet.decrypt(
                         self.data[self.table.selectedIndexes()[0].row()][2].encode()).decode())
+
             else:
                 self.table.setFocus()
                 self.search_input.hide()
