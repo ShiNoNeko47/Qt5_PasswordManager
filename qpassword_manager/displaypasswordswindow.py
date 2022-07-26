@@ -41,6 +41,7 @@ class MyQTableWidget(QTableWidget):
             '$': [Key.end],
         }
         self.keyboard = Controller()
+        self.current_index = 0
 
     def keyboardSearch(self, key):  # pylint: disable=invalid-name
         """Handles keys based on keybinds"""
@@ -56,6 +57,10 @@ class MyQTableWidget(QTableWidget):
             self.window.search_input.show()
             self.window.search_input.setFocus()
             self.window.selected = self.window.table.selectedItems()[0]
+            self.window.select()
+
+        elif key in ['n', 'N']:
+            self.window.search_next_prev(key, self.window.search())
 
 
 class DisplayPasswordsWindow(QWidget):
@@ -79,7 +84,7 @@ class DisplayPasswordsWindow(QWidget):
         self.search_input = QLineEdit()
         self.layout.addWidget(self.search_input, 0, 0)
         self.search_input.hide()
-        self.search_input.textChanged.connect(self.search)
+        self.search_input.textChanged.connect(self.select)
 
         self.table = MyQTableWidget(self)
         self.layout.addWidget(self.table, 1, 0)
@@ -100,16 +105,34 @@ class DisplayPasswordsWindow(QWidget):
 
         self.fernet = Fernet(key)
 
+    def search_next_prev(self, key, items):
+        if not items:
+            return 0
+
+        if not self.table.currentItem():
+            self.table.setCurrentItem(items[0])
+            self.table.current_index = 0
+        else:
+            try:
+                self.table.current_index += 1 if key == 'n' else -1
+                self.table.setCurrentItem(items[self.table.current_index])
+            except IndexError:
+                self.table.current_index = 0
+                self.table.setCurrentItem(items[self.table.current_index])
+
     def search(self):
-        self.table.setCurrentItem(None)
         search_string = self.search_input.text()
 
         if not search_string:
             return 0
 
-        matching_items = self.table.findItems(search_string, QtCore.Qt.MatchContains)
-        if matching_items:
-            for item in matching_items:
+        return self.table.findItems(search_string, QtCore.Qt.MatchContains)
+
+    def select(self):
+        self.table.setCurrentItem(None)
+        items = self.search()
+        if items:
+            for item in items:
                 item.setSelected(True)
 
     def create_table(self):
