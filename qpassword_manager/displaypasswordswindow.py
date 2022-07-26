@@ -106,6 +106,12 @@ class DisplayPasswordsWindow(QWidget):
         self.fernet = Fernet(key)
 
     def search_next_prev(self, key, items):
+        """
+        Allows you to navigate search results:
+            n -> forward
+            N -> backward
+        """
+
         if not items:
             return 0
 
@@ -117,18 +123,26 @@ class DisplayPasswordsWindow(QWidget):
                 self.table.current_index += 1 if key == 'n' else -1
                 self.table.setCurrentItem(items[self.table.current_index])
             except IndexError:
-                self.table.current_index = 0
+                if self.table.current_index > 0:
+                    self.table.current_index = 0
+                else:
+                    self.table.current_index = -1
                 self.table.setCurrentItem(items[self.table.current_index])
+        return 0
 
     def search(self):
+        """Searches trough the table and returns a list of results"""
+
         search_string = self.search_input.text()
 
         if not search_string:
-            return 0
+            return []
 
         return self.table.findItems(search_string, QtCore.Qt.MatchContains)
 
     def select(self):
+        """Selects search results"""
+
         self.table.setCurrentItem(None)
         items = self.search()
         if items:
