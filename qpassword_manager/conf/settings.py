@@ -41,7 +41,7 @@ class Settings(QWidget):
         self.layout_vbox.addLayout(self.layout_form)
 
         self.url_le = QLineEdit()
-        self.url_le.setText(self.config["host"]["url"])
+        self.url_le.setText(self.config["url"])
         self.url_le.textChanged.connect(self.check_ip)
         self.layout_form.addRow("url: ", self.url_le)
 
@@ -62,7 +62,7 @@ class Settings(QWidget):
     def config_update(self):
         """Updates configuration using Config.config_update method"""
 
-        self.config["host"]["url"] = self.url_le.text()
+        self.config["url"] = self.url_le.text()
         self.config["database_online"] = self.radiobutton_online.isChecked()
         Config.config_update(self.config)
         self.close()

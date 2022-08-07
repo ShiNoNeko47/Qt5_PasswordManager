@@ -21,7 +21,7 @@ class Config:
 
         directory = os.path.join(xdg_config_home(), 'qpassword_manager')
         if not os.path.exists(directory):
-            os.mkdir(directory)
+            os.makedirs(directory)
         try:
             with open(
                 os.path.join(xdg_config_home(), 'qpassword_manager',
@@ -39,10 +39,7 @@ class Config:
                 encoding="utf8",
             ) as file:
                 config = """{
-                    \"host\": {
-                        \"timeout\": 5,
-                        \"url\": \"\"
-                    },
+                    \"url\": \"\"
                     \"database_online\": false,
                     \"vim_mode\": true
                 }"""

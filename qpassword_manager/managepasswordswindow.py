@@ -241,7 +241,7 @@ class ManagePasswordsWindow(QWidget):
                     action[2], action[1], action[0], self.auth
                 )
             else:
-                DatabaseHandler.delete_row(action, self.auth)
+                DatabaseHandler.delete_row(action[0], self.auth)
 
         RemoveBtn.marked.clear()
         self.actions.clear()

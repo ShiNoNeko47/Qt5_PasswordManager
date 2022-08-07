@@ -146,7 +146,7 @@ class DisplayPasswordsWindow(QWidget):
         if not search_string:
             return []
 
-        items = self.table.findItems(search_string, QtCore.Qt.MatchContains)
+        items = self.table.findItems(".*" + search_string + ".*", QtCore.Qt.MatchRegExp)
         items.sort(key=lambda x: x.row())
         return items
 

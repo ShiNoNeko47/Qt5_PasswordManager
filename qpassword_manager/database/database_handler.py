@@ -11,23 +11,14 @@ class DatabaseHandler:
     """This class handles all http requests"""
 
     @staticmethod
-    def json_parser(data):
-        """Parses requests json into list"""
-
-        data_list = []
-        for row in data:
-            data_list.append([row[x] for j, x in enumerate(row) if j % 2])
-        return data_list
-
-    @staticmethod
     def delete_row(row_id, auth):
         """Function for working with only one row in database"""
 
         if Config.config()["database_online"]:
             requests.post(
-                data={"action": "delete", "id": row_id},
+                url=Config.config()["url"] + "/remove_from_database",
+                json={"id": row_id},
                 auth=auth,
-                **Config.config()["host"]
             )
             return
 
@@ -48,12 +39,11 @@ class DatabaseHandler:
         """Function for working with only one row in database"""
 
         if Config.config()["database_online"]:
-            return DatabaseHandler.json_parser(
-                [requests.post(
-                    data={"action": "get_row", "id": row_id},
-                    auth=auth,
-                    **Config.config()["host"]
-                ).json()])[0]
+            return requests.post(
+                url=Config.config()["url"] + "/get_entry",
+                json={"id": row_id},
+                auth=auth
+            ).json()
 
         conn = sqlite3.connect(DatabaseHandler.get_database(auth[0]))
         cursor = conn.cursor()
@@ -72,12 +62,10 @@ class DatabaseHandler:
         """Function for working with multiple rows in database"""
 
         if Config.config()["database_online"]:
-            return DatabaseHandler.json_parser(
-                requests.post(
-                    data={"action": "create_table"},
-                    auth=auth,
-                    **Config.config()["host"]
-                ).json())
+            return requests.post(
+                url=Config.config()["url"] + "/get_all",
+                auth=auth,
+            ).json()
 
         conn = sqlite3.connect(DatabaseHandler.get_database(auth[0]))
         cursor = conn.cursor()
@@ -97,9 +85,8 @@ class DatabaseHandler:
 
         if Config.config()["database_online"]:
             return requests.post(
-                data={"action": "get_pass_ids"},
+                url=Config.config()["url"] + "/get_entry_ids",
                 auth=auth,
-                **Config.config()["host"]
             ).json()
 
         conn = sqlite3.connect(DatabaseHandler.get_database(auth[0]))
@@ -120,14 +107,13 @@ class DatabaseHandler:
 
         if Config.config()["database_online"]:
             requests.post(
-                data={
-                    "action": "add",
-                    "password": password,
-                    "username": username,
+                url=Config.config()["url"] + "/add_to_database",
+                json={
                     "website": website,
+                    "username": username,
+                    "password": password,
                 },
                 auth=auth,
-                **Config.config()["host"],
             )
             return 0
 
@@ -152,15 +138,17 @@ class DatabaseHandler:
 
         if Config.config()["database_online"]:
             return requests.post(
-                data={
-                    "action": "new_user",
-                    "user": username,
-                    "master_key": master_key,
+                url=Config.config()["url"] + "/register",
+                json={
+                    "username": username,
+                    "password": master_key,
+                    "email": "email"
                 },
-                **Config.config()["host"],
             ).text
+
         if os.path.exists(os.path.join(xdg_data_home(), 'qpassword_manager', username + ".db")):
-            return "Duplicate entry"
+            return "Username already taken"
+
         conn = sqlite3.connect(DatabaseHandler.get_database(username))
         cursor = conn.cursor()
         cursor.execute(
@@ -190,13 +178,13 @@ class DatabaseHandler:
 
         if Config.config()["database_online"]:
             return requests.post(
-                data={"action": "get_id"},
+                url=Config.config()["url"] + "/register",
                 auth=(
                     username,
                     master_key,
-                ),
-                **Config.config()["host"],
+                )
             ).text
+
         if os.path.exists(DatabaseHandler.get_database(username)):
             conn = sqlite3.connect(DatabaseHandler.get_database(username))
             cursor = conn.cursor()
@@ -207,6 +195,7 @@ class DatabaseHandler:
 
             if master_key == master_key_db:
                 return 1
+
         return 0
 
     @staticmethod
@@ -215,5 +204,5 @@ class DatabaseHandler:
 
         directory = os.path.join(xdg_data_home(), 'qpassword_manager')
         if not os.path.exists(directory):
-            os.mkdir(directory)
+            os.makedirs(directory)
         return os.path.join(xdg_data_home(), 'qpassword_manager', username + ".db")
