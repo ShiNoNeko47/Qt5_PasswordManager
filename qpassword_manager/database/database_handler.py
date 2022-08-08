@@ -178,7 +178,7 @@ class DatabaseHandler:
 
         if Config.config()["database_online"]:
             return requests.post(
-                url=Config.config()["url"] + "/register",
+                url=Config.config()["url"] + "/check_credentials",
                 auth=(
                     username,
                     master_key,
