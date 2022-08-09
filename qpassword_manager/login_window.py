@@ -12,8 +12,8 @@ from PyQt5.Qt import Qt
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from qpassword_manager.mainwindow import MainWindow
-from qpassword_manager.setupwindow import SetupWindow
+from qpassword_manager.main_window import MainWindow
+from qpassword_manager.setup_window import SetupWindow
 from qpassword_manager.messagebox import MessageBox
 
 from qpassword_manager.database.database_handler import DatabaseHandler

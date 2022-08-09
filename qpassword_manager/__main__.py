@@ -5,7 +5,7 @@ import sys
 import getopt
 import logging
 from PyQt5.QtWidgets import QApplication
-from qpassword_manager.loginwindow import LoginWindow
+from qpassword_manager.login_window import LoginWindow
 
 
 def main():
