@@ -1,4 +1,4 @@
-"""Main window"""
+"""Login window"""
 
 import os
 import sys
@@ -22,9 +22,9 @@ from qpassword_manager.database.database_handler import DatabaseHandler
 from qpassword_manager.conf.settings import Settings
 
 
-class MainWindow(QWidget):
+class LoginWindow(QWidget):
     """
-    Main window
+    Login window
 
     Attributes:
         key_input_hashed: hashed master key used for authentication

@@ -25,7 +25,7 @@ class ManagePasswordsWindow(QWidget):
 
     Attributes:
         fernet: Fernet object used for decryption
-        btn: manage_passwords_btn on MainWindow
+        btn: manage_passwords_btn on LoginWindow
     """
 
     def __init__(self, window_display_passwords, btn):

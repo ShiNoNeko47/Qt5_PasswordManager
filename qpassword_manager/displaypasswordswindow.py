@@ -72,7 +72,7 @@ class DisplayPasswordsWindow(QWidget):
 
     Attributes:
         fernet: Fernet object used for decryption
-        btn: display_passwords_btn on MainWindow
+        btn: display_passwords_btn on LoginWindow
     """
 
     def __init__(self, btn):
@@ -212,7 +212,7 @@ class DisplayPasswordsWindow(QWidget):
                 self.search_input.hide()
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
-        """Enables display_passwords_btn in MainWindow"""
+        """Enables display_passwords_btn in LoginWindow"""
 
         self.btn.setDisabled(False)
         logging.debug(event)

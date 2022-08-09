@@ -5,7 +5,7 @@ import sys
 import getopt
 import logging
 from PyQt5.QtWidgets import QApplication
-from qpassword_manager.mainwindow import MainWindow
+from qpassword_manager.loginwindow import LoginWindow
 
 
 def main():
@@ -29,7 +29,7 @@ def main():
 
     app = QApplication(["qpassword_manager"])
 
-    window = MainWindow()
+    window = LoginWindow()
     window.show()
 
     app.exec()

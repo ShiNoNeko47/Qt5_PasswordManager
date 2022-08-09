@@ -13,14 +13,14 @@ class SetupWindow(QWidget):
     Setup window
 
     Attributes:
-        window_main: main window
+        window_login: login window
 
     """
 
-    def __init__(self, window_main):
+    def __init__(self, window_login):
         super().__init__()
 
-        self.window_main = window_main
+        self.window_login = window_login
 
         self.layout = QGridLayout()
         self.setWindowTitle("New user")
@@ -85,8 +85,8 @@ class SetupWindow(QWidget):
             self.messagebox.show()
 
         else:
-            self.window_main.key_input.setText(self.key_setup_le.text())
-            self.window_main.name_input.setText(self.username_setup_le.text())
+            self.window_login.key_input.setText(self.key_setup_le.text())
+            self.window_login.name_input.setText(self.username_setup_le.text())
             self.close()
 
     def messagebox_handler(self, choice):
@@ -98,8 +98,8 @@ class SetupWindow(QWidget):
         """
 
         if choice == 1:
-            self.window_main.name_input.setText(self.username_setup_le.text())
-            self.window_main.key_input.setText("")
+            self.window_login.name_input.setText(self.username_setup_le.text())
+            self.window_login.key_input.setText("")
             self.close()
 
     def reset_entries(self):
