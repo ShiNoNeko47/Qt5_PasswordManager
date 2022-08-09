@@ -66,13 +66,13 @@ class MyQTableWidget(QTableWidget):
             self.window.search_next_prev(key, self.window.search())
 
 
-class DisplayPasswordsWindow(QWidget):
+class MainWindow(QWidget):
     """
     The window used for copying passwords from database
 
     Attributes:
         fernet: Fernet object used for decryption
-        btn: display_passwords_btn on LoginWindow
+        btn: login_btn on LoginWindow
     """
 
     def __init__(self, btn):
@@ -212,7 +212,7 @@ class DisplayPasswordsWindow(QWidget):
                 self.search_input.hide()
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
-        """Enables display_passwords_btn in LoginWindow"""
+        """Enables login_btn in LoginWindow"""
 
         self.btn.setDisabled(False)
         logging.debug(event)

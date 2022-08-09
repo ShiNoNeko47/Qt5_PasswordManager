@@ -12,12 +12,10 @@ from PyQt5.Qt import Qt
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from qpassword_manager.managepasswordswindow import ManagePasswordsWindow
-from qpassword_manager.displaypasswordswindow import DisplayPasswordsWindow
+from qpassword_manager.mainwindow import MainWindow
 from qpassword_manager.setupwindow import SetupWindow
 from qpassword_manager.messagebox import MessageBox
 
-# from qpassword_manager.conf.connectorconfig import Config
 from qpassword_manager.database.database_handler import DatabaseHandler
 from qpassword_manager.conf.settings import Settings
 
@@ -51,15 +49,10 @@ class LoginWindow(QWidget):
         self.key_input.setPlaceholderText("Master key")
         self.layout.addWidget(self.key_input, 1, 0, 1, 3)
 
-        self.display_passwords_btn = QPushButton("Display passwords")
-        self.display_passwords_btn.setEnabled(False)
-        self.display_passwords_btn.clicked.connect(self.display_passwords)
-        self.layout.addWidget(self.display_passwords_btn, 2, 0, 1, 3)
-
-        self.manage_passwords_btn = QPushButton("Manage passwords")
-        self.manage_passwords_btn.setEnabled(False)
-        self.manage_passwords_btn.clicked.connect(self.manage_passwords)
-        self.layout.addWidget(self.manage_passwords_btn, 3, 0, 1, 3)
+        self.login_btn = QPushButton("Login")
+        self.login_btn.setEnabled(False)
+        self.login_btn.clicked.connect(self.login)
+        self.layout.addWidget(self.login_btn, 2, 0, 1, 3)
 
         self.new_user_btn = QPushButton("New user")
         self.new_user_btn.clicked.connect(self.new_user)
@@ -67,10 +60,7 @@ class LoginWindow(QWidget):
 
         self.setLayout(self.layout)
 
-        self.w_display = DisplayPasswordsWindow(self.display_passwords_btn)
-        self.w_manage = ManagePasswordsWindow(
-            self.w_display, self.manage_passwords_btn
-        )
+        self.w_main = MainWindow(self.login_btn)
         self.w_setup = SetupWindow(self)
 
         self.settings = Settings()
@@ -101,11 +91,11 @@ class LoginWindow(QWidget):
             logging.debug(error)
 
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
-        """Opens DisplayPasswordsWindow when you press enter or Settings when
+        """Opens MainWindow when you press enter or Settings when
         you press escape"""
 
         if event.key() == Qt.Key_Return:
-            self.display_passwords_btn.click()
+            self.login_btn.click()
 
         if event.key() == Qt.Key_Escape:
             self.settings.show()
@@ -114,11 +104,9 @@ class LoginWindow(QWidget):
         """Checks if name isn't empty and key is longer or equal to 4 and
         enables or disables buttons"""
 
-        self.manage_passwords_btn.setEnabled(False)
-        self.display_passwords_btn.setEnabled(False)
+        self.login_btn.setEnabled(False)
         if len(self.key_input.text()) >= 4 and len(self.name_input.text()) > 0:
-            self.manage_passwords_btn.setEnabled(True)
-            self.display_passwords_btn.setEnabled(True)
+            self.login_btn.setEnabled(True)
 
     def check_key(self):
         """Checks if name and master key pair is correct"""
@@ -136,40 +124,19 @@ class LoginWindow(QWidget):
         self.messagebox.show()
         return False
 
-    def manage_passwords(self):
-        """opens ManagePasswordsWindow if check_key returns True"""
+    def login(self):
+        """opens MainWindow if check_key returns True"""
 
         if self.check_key():
-            self.w_manage.auth = (
+            self.w_main.auth = (
                 self.name_input.text(),
                 self.key_input_hashed.hexdigest(),
             )
-            self.w_manage.set_key(self.get_key())
+            self.w_main.set_key(self.get_key())
+            self.w_main.create_table()
+            self.w_main.show()
 
-            self.w_display.auth = (
-                self.name_input.text(),
-                self.key_input_hashed.hexdigest(),
-            )
-            self.w_display.set_key(self.get_key())
-
-            self.w_manage.create_table()
-            self.w_manage.show()
-
-            self.manage_passwords_btn.setDisabled(True)
-
-    def display_passwords(self):
-        """opens DisplayPasswordsWindow if check_key returns True"""
-
-        if self.check_key():
-            self.w_display.auth = (
-                self.name_input.text(),
-                self.key_input_hashed.hexdigest(),
-            )
-            self.w_display.set_key(self.get_key())
-            self.w_display.create_table()
-            self.w_display.show()
-
-            self.display_passwords_btn.setDisabled(True)
+            self.login_btn.setDisabled(True)
 
     def new_user(self):
         """Opens SetupWindow"""
@@ -191,10 +158,10 @@ class LoginWindow(QWidget):
         return base64.urlsafe_b64encode(kdf.derive(password))
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
-        """Exits app if ManagePasswordsWindow and DisplayPasswordsWindow are
+        """Exits app if ManagePasswordsWindow and MainWindow are
         closed, it doesn't close otherwise"""
 
-        if all([self.w_manage.isHidden(), self.w_display.isHidden()]):
+        if self.w_main.isHidden():
             event.accept()
             sys.exit()
         else:
