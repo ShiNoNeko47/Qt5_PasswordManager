@@ -42,7 +42,7 @@ class DatabaseHandler:
             return requests.post(
                 url=Config.config()["url"] + "/get_entry",
                 json={"id": row_id},
-                auth=auth
+                auth=auth,
             ).json()
 
         conn = sqlite3.connect(DatabaseHandler.get_database(auth[0]))
@@ -102,7 +102,7 @@ class DatabaseHandler:
         return data
 
     @staticmethod
-    def add_to_database(password, username, website, auth):
+    def add_to_database(website, username, password, auth):
         """Function for adding a password to database"""
 
         if Config.config()["database_online"]:
@@ -142,11 +142,13 @@ class DatabaseHandler:
                 json={
                     "username": username,
                     "password": master_key,
-                    "email": "email"
+                    "email": "email",
                 },
             ).text
 
-        if os.path.exists(os.path.join(xdg_data_home(), 'qpassword_manager', username + ".db")):
+        if os.path.exists(
+            os.path.join(xdg_data_home(), "qpassword_manager", username + ".db")
+        ):
             return "Username already taken"
 
         conn = sqlite3.connect(DatabaseHandler.get_database(username))
@@ -182,7 +184,7 @@ class DatabaseHandler:
                 auth=(
                     username,
                     master_key,
-                )
+                ),
             ).text
 
         if os.path.exists(DatabaseHandler.get_database(username)):
@@ -202,7 +204,9 @@ class DatabaseHandler:
     def get_database(username):
         """Returns database path in offline mode"""
 
-        directory = os.path.join(xdg_data_home(), 'qpassword_manager')
+        directory = os.path.join(xdg_data_home(), "qpassword_manager")
         if not os.path.exists(directory):
             os.makedirs(directory)
-        return os.path.join(xdg_data_home(), 'qpassword_manager', username + ".db")
+        return os.path.join(
+            xdg_data_home(), "qpassword_manager", username + ".db"
+        )

@@ -84,7 +84,7 @@ class MainWindow(QWidget):
 
         else:
             try:
-                self.table.current_index += 1 if key == 'n' else -1
+                self.table.current_index += 1 if key == "n" else -1
                 self.table.setCurrentItem(items[self.table.current_index])
 
             except IndexError:
@@ -107,7 +107,8 @@ class MainWindow(QWidget):
             return []
 
         items = self.table.findItems(
-            ".*" + search_string + ".*", QtCore.Qt.MatchRegExp)
+            ".*" + search_string + ".*", QtCore.Qt.MatchRegExp
+        )
         items.sort(key=lambda x: x.row())
         return items
 
@@ -158,7 +159,11 @@ class MainWindow(QWidget):
     def commit_changes(self):
         """Commits changes to database"""
 
-        logging.debug("saving changes...")
+        for change in self.changes:
+            if change[0]:
+                DatabaseHandler.add_to_database(*change[1], self.auth)
+
+        self.changes.clear()
 
     def run_cmd(self):
         """Runs the command in cmd_input"""
@@ -166,17 +171,17 @@ class MainWindow(QWidget):
         cmd = self.cmd_input.text()[1::]
         logging.debug(cmd)
 
-        if cmd == 'w':
+        if cmd == "w":
             self.commit_changes()
 
-        elif cmd == 'q':
+        elif cmd == "q":
             self.close()
 
-        elif cmd == 'wq':
+        elif cmd == "wq":
             self.commit_changes()
             self.close()
 
-        elif cmd == 'q!':
+        elif cmd == "q!":
             self.changes.clear()
             self.close()
 
@@ -191,11 +196,18 @@ class MainWindow(QWidget):
                         pyperclip.copy(self.table.selectedItems()[0].text())
 
                     else:
-                        pyperclip.copy(self.fernet.decrypt(
-                            self.data[self.table.selectedIndexes()[0].row()][2].encode()).decode())
+                        pyperclip.copy(
+                            self.fernet.decrypt(
+                                self.data[
+                                    self.table.selectedIndexes()[0].row()
+                                ][2].encode()
+                            ).decode()
+                        )
 
-                elif self.table.insert_mode and self.table.currentRow() == 0:
-                    if not self.table.currentColumn() == 2:
+                elif all(self.table.insert_mode()):
+                    if self.table.check_entry_input():
+                        self.changes.append(
+                            [1, self.table.get_entry_input(self.fernet)])
                         self.table.removeRow(0)
                         self.table.setFocus()
 
@@ -208,8 +220,11 @@ class MainWindow(QWidget):
                 self.search_input.hide()
                 self.search_input.clear()
                 self.cmd_input.hide()
-                if all(self.table.insert_mode()) and self.table.currentRow() == 0:
-                    self.table.setCurrentCell(1, 0)
+                if (
+                    all(self.table.insert_mode())
+                    and self.table.currentRow() == 0
+                ):
+                    self.table.setCurrentCell(1, self.table.currentColumn())
                     self.table.setFocus()
 
     def messagebox_handler(self, choice):

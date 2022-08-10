@@ -19,13 +19,14 @@ class Config:
             dict: configuration in form of a dictionary
         """
 
-        directory = os.path.join(xdg_config_home(), 'qpassword_manager')
+        directory = os.path.join(xdg_config_home(), "qpassword_manager")
         if not os.path.exists(directory):
             os.makedirs(directory)
         try:
             with open(
-                os.path.join(xdg_config_home(), 'qpassword_manager',
-                             "config.json"),
+                os.path.join(
+                    xdg_config_home(), "qpassword_manager", "config.json"
+                ),
                 "r",
                 encoding="utf8",
             ) as file:
@@ -33,8 +34,9 @@ class Config:
             return config
         except FileNotFoundError as error:
             with open(
-                os.path.join(xdg_config_home(), 'qpassword_manager',
-                             "config.json"),
+                os.path.join(
+                    xdg_config_home(), "qpassword_manager", "config.json"
+                ),
                 "w+",
                 encoding="utf8",
             ) as file:
@@ -57,8 +59,7 @@ class Config:
         """
 
         with open(
-            os.path.join(xdg_config_home(), 'qpassword_manager',
-                         "config.json"),
+            os.path.join(xdg_config_home(), "qpassword_manager", "config.json"),
             "w",
             encoding="utf8",
         ) as file:

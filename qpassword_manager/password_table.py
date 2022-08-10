@@ -1,9 +1,7 @@
 import logging
 from PyQt5.QtWidgets import QTableWidget, QLineEdit
-from PyQt5.Qt import Qt
 from qpassword_manager.entry_input import NewPasswordInput, NewWebsiteInput
 from pynput.keyboard import Key, Controller
-
 
 
 class PasswordTable(QTableWidget):
@@ -19,21 +17,30 @@ class PasswordTable(QTableWidget):
         super().__init__()
         self.window = window
         self.keybinds = {
-            'h': [Key.left],
-            'j': [Key.down],
-            'k': [Key.up],
-            'l': [Key.right],
-            'g': [Key.ctrl, Key.home],
-            'G': [Key.ctrl, Key.end],
-            '0': [Key.home],
-            '$': [Key.end],
+            "h": [Key.left],
+            "j": [Key.down],
+            "k": [Key.up],
+            "l": [Key.right],
+            "g": [Key.ctrl, Key.home],
+            "G": [Key.ctrl, Key.end],
+            "0": [Key.home],
+            "$": [Key.end],
         }
         self.keyboard = Controller()
         self.current_index = 0
         self.setTabKeyNavigation(False)
 
     def insert_mode(self):
-        return (type(self.cellWidget(0, 2)) == NewPasswordInput, self.currentRow() == 0)
+        return (
+            type(self.cellWidget(0, 2)) == NewPasswordInput,
+            self.currentRow() == 0,
+        )
+
+    def check_entry_input(self):
+        return all([widget.text() for widget in self.entry_input]) and self.entry_input[2].text() == self.entry_input[2].other_text
+
+    def get_entry_input(self, fernet):
+        return [self.entry_input[0].text(), self.entry_input[1].text(), fernet.encrypt(self.entry_input[2].text().encode()).decode()]
 
     def focus_entry_input(self):
         for i, widget in enumerate(self.entry_input):
@@ -53,7 +60,7 @@ class PasswordTable(QTableWidget):
             for keybind in self.keybinds[key]:
                 self.keyboard.release(keybind)
 
-        elif key == '/':
+        elif key == "/":
             self.window.search_input.clear()
             self.window.search_input.show()
             self.window.search_input.setFocus()
@@ -62,22 +69,22 @@ class PasswordTable(QTableWidget):
 
             self.window.select()
 
-        elif key in ['n', 'N']:
+        elif key in ["n", "N"]:
             self.window.search_next_prev(key, self.window.search())
 
-        elif key == ':':
+        elif key == ":":
             self.window.cmd_input.setText(":")
             self.window.cmd_input.show()
             self.window.cmd_input.setFocus()
 
-        elif key in ['o', 'O']:
+        elif key in ["o", "O"]:
             if not self.insert_mode()[0]:
                 self.insertRow(0)
 
                 self.entry_input = [
                     NewWebsiteInput(),
                     QLineEdit(),
-                    NewPasswordInput()
+                    NewPasswordInput(),
                 ]
 
                 for i in range(3):

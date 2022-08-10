@@ -68,8 +68,9 @@ class LoginWindow(QWidget):
 
         try:
             with open(
-                os.path.join(xdg_config_home(), 'qpassword_manager',
-                             "autofill.json"),
+                os.path.join(
+                    xdg_config_home(), "qpassword_manager", "autofill.json"
+                ),
                 "r",
                 encoding="utf8",
             ) as file:
@@ -82,12 +83,13 @@ class LoginWindow(QWidget):
                 self.key_input.setFocus()
         except FileNotFoundError as error:
             with open(
-                os.path.join(xdg_config_home(), 'qpassword_manager',
-                             "autofill.json"),
+                os.path.join(
+                    xdg_config_home(), "qpassword_manager", "autofill.json"
+                ),
                 "w+",
                 encoding="utf8",
             ) as file:
-                file.write("{\"Username\": \"\", \"Password\": \"\"}")
+                file.write('{"Username": "", "Password": ""}')
             logging.debug(error)
 
     def keyPressEvent(self, event):  # pylint: disable=invalid-name

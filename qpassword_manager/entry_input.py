@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QLineEdit
 
 
 class NewPasswordInput(QLineEdit):
-
     def __init__(self):
         super().__init__()
         self.setEchoMode(QLineEdit.Password)
@@ -23,7 +22,6 @@ class NewPasswordInput(QLineEdit):
 
 
 class NewWebsiteInput(QLineEdit):
-
     def __init__(self):
         super().__init__()
 
