@@ -1,8 +1,9 @@
 import logging
 from PyQt5.QtWidgets import QTableWidget, QLineEdit
 from PyQt5.Qt import Qt
-from qpassword_manager.new_password_input import NewPasswordInput
+from qpassword_manager.entry_input import NewPasswordInput, NewWebsiteInput
 from pynput.keyboard import Key, Controller
+
 
 
 class PasswordTable(QTableWidget):
@@ -32,7 +33,14 @@ class PasswordTable(QTableWidget):
         self.setTabKeyNavigation(False)
 
     def insert_mode(self):
-        return (type(self.cellWidget(0, 0)) == QLineEdit, self.currentRow() == 0)
+        return (type(self.cellWidget(0, 2)) == NewPasswordInput, self.currentRow() == 0)
+
+    def focus_entry_input(self):
+        for i, widget in enumerate(self.entry_input):
+            if not widget.text():
+                self.setCurrentCell(0, i)
+                break
+            self.setCurrentCell(0, 2)
 
     def keyboardSearch(self, key):  # pylint: disable=invalid-name
         """Handles keys based on keybinds"""
@@ -67,20 +75,14 @@ class PasswordTable(QTableWidget):
                 self.insertRow(0)
 
                 self.entry_input = [
-                    QLineEdit(),
+                    NewWebsiteInput(),
                     QLineEdit(),
                     NewPasswordInput()
                 ]
 
                 for i in range(3):
                     self.setCellWidget(0, i, self.entry_input[i])
-
-            for i, widget in enumerate(self.entry_input):
-                if not widget.text():
-                    self.setCurrentCell(0, i)
-                    break
-                self.setCurrentCell(0, 2)
-            self.entry_input[2].switch_values()
+            self.focus_entry_input()
 
         # elif key in ['y', 'Y']:
         # elif key in ['p', 'P']:

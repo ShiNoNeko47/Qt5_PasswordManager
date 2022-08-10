@@ -212,9 +212,6 @@ class MainWindow(QWidget):
                     self.table.setCurrentCell(1, 0)
                     self.table.setFocus()
 
-            case Qt.Key_Tab:
-                print("tab")
-
     def messagebox_handler(self, choice):
         """
         MessageBox choice handler
