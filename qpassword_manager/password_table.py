@@ -1,5 +1,7 @@
 import logging
-from PyQt5.QtWidgets import QTableWidget
+from PyQt5.QtWidgets import QTableWidget, QLineEdit
+from PyQt5.Qt import Qt
+from qpassword_manager.new_password_input import NewPasswordInput
 from pynput.keyboard import Key, Controller
 
 
@@ -27,6 +29,10 @@ class PasswordTable(QTableWidget):
         }
         self.keyboard = Controller()
         self.current_index = 0
+        self.setTabKeyNavigation(False)
+
+    def insert_mode(self):
+        return (type(self.cellWidget(0, 0)) == QLineEdit, self.currentRow() == 0)
 
     def keyboardSearch(self, key):  # pylint: disable=invalid-name
         """Handles keys based on keybinds"""
@@ -40,6 +46,7 @@ class PasswordTable(QTableWidget):
                 self.keyboard.release(keybind)
 
         elif key == '/':
+            self.window.search_input.clear()
             self.window.search_input.show()
             self.window.search_input.setFocus()
             if self.window.table.selectedItems():
@@ -49,3 +56,32 @@ class PasswordTable(QTableWidget):
 
         elif key in ['n', 'N']:
             self.window.search_next_prev(key, self.window.search())
+
+        elif key == ':':
+            self.window.cmd_input.setText(":")
+            self.window.cmd_input.show()
+            self.window.cmd_input.setFocus()
+
+        elif key in ['o', 'O']:
+            if not self.insert_mode()[0]:
+                self.insertRow(0)
+
+                self.entry_input = [
+                    QLineEdit(),
+                    QLineEdit(),
+                    NewPasswordInput()
+                ]
+
+                for i in range(3):
+                    self.setCellWidget(0, i, self.entry_input[i])
+
+            for i, widget in enumerate(self.entry_input):
+                if not widget.text():
+                    self.setCurrentCell(0, i)
+                    break
+                self.setCurrentCell(0, 2)
+            self.entry_input[2].switch_values()
+
+        # elif key in ['y', 'Y']:
+        # elif key in ['p', 'P']:
+        # elif key == 'u':

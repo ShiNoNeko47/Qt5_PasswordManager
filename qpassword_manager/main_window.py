@@ -16,6 +16,7 @@ from cryptography.fernet import Fernet
 import pyperclip
 from qpassword_manager.database.database_handler import DatabaseHandler
 from qpassword_manager.password_table import PasswordTable
+from qpassword_manager.messagebox import MessageBox
 
 
 class MainWindow(QWidget):
@@ -45,10 +46,17 @@ class MainWindow(QWidget):
         self.layout.addWidget(self.table, 1, 0)
         self.selected = None
 
+        self.cmd_input = QLineEdit()
+        self.layout.addWidget(self.cmd_input, 3, 0)
+        self.cmd_input.hide()
+
         self.setFixedWidth(640)
         self.setLayout(self.layout)
 
+        self.changes = []
         self.data = None
+
+        self.messagebox = MessageBox(self, "Save changes?")
 
     def set_key(self, key):
         """
@@ -98,7 +106,8 @@ class MainWindow(QWidget):
         if not search_string:
             return []
 
-        items = self.table.findItems(".*" + search_string + ".*", QtCore.Qt.MatchRegExp)
+        items = self.table.findItems(
+            ".*" + search_string + ".*", QtCore.Qt.MatchRegExp)
         items.sort(key=lambda x: x.row())
         return items
 
@@ -146,25 +155,89 @@ class MainWindow(QWidget):
         if self.table.rowCount():
             self.table.item(0, 0).setSelected(True)
 
+    def commit_changes(self):
+        """Commits changes to database"""
+
+        logging.debug("saving changes...")
+
+    def run_cmd(self):
+        """Runs the command in cmd_input"""
+
+        cmd = self.cmd_input.text()[1::]
+        logging.debug(cmd)
+
+        if cmd == 'w':
+            self.commit_changes()
+
+        elif cmd == 'q':
+            self.close()
+
+        elif cmd == 'wq':
+            self.commit_changes()
+            self.close()
+
+        elif cmd == 'q!':
+            self.changes.clear()
+            self.close()
+
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
         """Copy selected item in table"""
 
-        if event.key() == Qt.Key_Return:
-            if self.table.hasFocus():
-                if self.table.selectedIndexes()[0].column() != 2:
-                    logging.debug(self.table.selectedItems()[0].text())
-                    pyperclip.copy(self.table.selectedItems()[0].text())
+        match event.key():
+            case Qt.Key_Return:
+                if self.table.hasFocus():
+                    if self.table.selectedIndexes()[0].column() != 2:
+                        logging.debug(self.table.selectedItems()[0].text())
+                        pyperclip.copy(self.table.selectedItems()[0].text())
+
+                    else:
+                        pyperclip.copy(self.fernet.decrypt(
+                            self.data[self.table.selectedIndexes()[0].row()][2].encode()).decode())
+
+                elif self.table.insert_mode and self.table.currentRow() == 0:
+                    if not self.table.currentColumn() == 2:
+                        self.table.removeRow(0)
+                        self.table.setFocus()
 
                 else:
-                    pyperclip.copy(self.fernet.decrypt(
-                        self.data[self.table.selectedIndexes()[0].row()][2].encode()).decode())
+                    self.search_input.hide()
+                    self.run_cmd()
+                    self.cmd_input.hide()
 
-            else:
-                self.table.setFocus()
+            case Qt.Key_Escape:
                 self.search_input.hide()
+                self.search_input.clear()
+                self.cmd_input.hide()
+                if all(self.table.insert_mode()) and self.table.currentRow() == 0:
+                    self.table.setCurrentCell(1, 0)
+                    self.table.setFocus()
+
+            case Qt.Key_Tab:
+                print("tab")
+
+    def messagebox_handler(self, choice):
+        """
+        MessageBox choice handler
+
+        Arguments:
+            choice: 1 or 0 based on the button clicked on MessageBox window
+        """
+
+        if choice:
+            self.commit_changes()
+            self.close()
+        else:
+            self.changes.clear()
+            self.close()
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
-        """Enables login_btn in LoginWindow"""
+        """Closes the window and enables the login button if action queue is
+        empty, otherwise open messagebox"""
 
-        self.btn.setDisabled(False)
-        logging.debug(event)
+        if not self.changes:
+            event.accept()
+            self.btn.setDisabled(False)
+        else:
+            event.ignore()
+            self.messagebox.close()
+            self.messagebox.show()
