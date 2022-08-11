@@ -163,6 +163,7 @@ class MainWindow(QWidget):
             if change[0]:
                 DatabaseHandler.add_to_database(*change[1], self.auth)
 
+        self.create_table()
         self.changes.clear()
 
     def run_cmd(self):
@@ -220,11 +221,11 @@ class MainWindow(QWidget):
                 self.search_input.hide()
                 self.search_input.clear()
                 self.cmd_input.hide()
-                if (
-                    all(self.table.insert_mode())
-                    and self.table.currentRow() == 0
-                ):
+                if all(self.table.insert_mode()):
                     self.table.setCurrentCell(1, self.table.currentColumn())
+                    self.table.setFocus()
+                if self.table.insert_mode()[0] and all([entry.text() == "" for entry in self.table.entry_input]):
+                    self.table.removeRow(0)
                     self.table.setFocus()
 
     def messagebox_handler(self, choice):
