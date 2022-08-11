@@ -1,7 +1,12 @@
-import logging
-from PyQt5.QtWidgets import QTableWidget, QLineEdit
-from qpassword_manager.entry_input import NewPasswordInput, NewWebsiteInput
 from pynput.keyboard import Key, Controller
+from qpassword_manager.database.database_handler import DatabaseHandler
+from qpassword_manager.entry_input import NewPasswordInput, NewWebsiteInput
+import logging
+from PyQt5.QtWidgets import (
+    QTableWidget,
+    QLineEdit,
+    QTableWidgetItem,
+)
 
 
 class PasswordTable(QTableWidget):
@@ -21,19 +26,58 @@ class PasswordTable(QTableWidget):
             "j": [Key.down],
             "k": [Key.up],
             "l": [Key.right],
-            "g": [Key.ctrl, Key.home],
-            "G": [Key.ctrl, Key.end],
             "0": [Key.home],
             "$": [Key.end],
         }
         self.keyboard = Controller()
         self.current_index = 0
         self.setTabKeyNavigation(False)
+        self.entry_ids = []
+        self.entry_row_index = 0
+
+    def fill_row(self, row, index=None):
+        index = index or self.rowCount()
+        self.insertRow(index)
+        for j in range(2):
+            self.setItem(index, j, (QTableWidgetItem(row[j])))
+
+        row = "*" * len(self.window.fernet.decrypt(row[2].encode()))
+        self.setItem(index, 2, (QTableWidgetItem(row)))
+
+    def search_next_prev(self, key, items):
+        """
+        Allows you to navigate search results:
+            n -> forward
+            N -> backward
+        """
+
+        if not items:
+            return 0
+
+        if not self.currentItem():
+            self.setCurrentItem(items[0])
+            self.current_index = 0
+
+        else:
+            try:
+                self.current_index += 1 if key == "n" else -1
+                self.setCurrentItem(items[self.current_index])
+
+            except IndexError:
+                if self.current_index > 0:
+                    self.current_index = 0
+
+                else:
+                    self.current_index = -1
+
+                self.setCurrentItem(items[self.current_index])
+
+        return 0
 
     def insert_mode(self):
         return (
-            type(self.cellWidget(0, 2)) == NewPasswordInput,
-            self.currentRow() == 0,
+            type(self.cellWidget(self.entry_row_index, 2)) == NewPasswordInput,
+            self.currentRow() == self.entry_row_index,
         )
 
     def check_entry_input(self):
@@ -45,9 +89,9 @@ class PasswordTable(QTableWidget):
     def focus_entry_input(self):
         for i, widget in enumerate(self.entry_input):
             if not widget.text():
-                self.setCurrentCell(0, i)
+                self.setCurrentCell(self.entry_row_index, i)
                 break
-            self.setCurrentCell(0, 2)
+            self.setCurrentCell(self.entry_row_index, 2)
 
     def keyboardSearch(self, key):  # pylint: disable=invalid-name
         """Handles keys based on keybinds"""
@@ -69,17 +113,22 @@ class PasswordTable(QTableWidget):
 
             self.window.select()
 
+        elif key in ["g", "G"]:
+            self.setCurrentCell(
+                0 if key == "g" else self.rowCount() - 1, self.currentColumn())
+
         elif key in ["n", "N"]:
-            self.window.search_next_prev(key, self.window.search())
+            self.search_next_prev(key, self.window.search())
 
         elif key == ":":
             self.window.cmd_input.setText(":")
             self.window.cmd_input.show()
             self.window.cmd_input.setFocus()
 
-        elif key in ["o", "O"]:
+        elif key in ["i", "I", "a", "A", "o", "O"]:
             if not self.insert_mode()[0]:
-                self.insertRow(0)
+                self.entry_row_index = self.rowCount()
+                self.insertRow(self.entry_row_index)
 
                 self.entry_input = [
                     NewWebsiteInput(),
@@ -88,9 +137,13 @@ class PasswordTable(QTableWidget):
                 ]
 
                 for i in range(3):
-                    self.setCellWidget(0, i, self.entry_input[i])
+                    self.setCellWidget(self.entry_row_index, i,
+                                       self.entry_input[i])
             self.focus_entry_input()
 
-        # elif key in ['y', 'Y']:
+        elif key in ['y', 'Y']:
+            print(DatabaseHandler.get_row(
+                self.entry_ids[self.currentRow()], self.window.auth))
         # elif key in ['p', 'P']:
-        # elif key == 'u':
+        # elif key in ['u', 'U']:
+        # elif key in ['r', 'R']:

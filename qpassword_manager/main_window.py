@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import (
     QWidget,
     QGridLayout,
     QTableWidget,
-    QTableWidgetItem,
     QAbstractItemView,
     QHeaderView,
     QLineEdit,
@@ -68,36 +67,6 @@ class MainWindow(QWidget):
 
         self.fernet = Fernet(key)
 
-    def search_next_prev(self, key, items):
-        """
-        Allows you to navigate search results:
-            n -> forward
-            N -> backward
-        """
-
-        if not items:
-            return 0
-
-        if not self.table.currentItem():
-            self.table.setCurrentItem(items[0])
-            self.table.current_index = 0
-
-        else:
-            try:
-                self.table.current_index += 1 if key == "n" else -1
-                self.table.setCurrentItem(items[self.table.current_index])
-
-            except IndexError:
-                if self.table.current_index > 0:
-                    self.table.current_index = 0
-
-                else:
-                    self.table.current_index = -1
-
-                self.table.setCurrentItem(items[self.table.current_index])
-
-        return 0
-
     def search(self):
         """Searches trough the table and returns a list of results"""
 
@@ -146,15 +115,12 @@ class MainWindow(QWidget):
         self.table.setSelectionMode(QTableWidget.SingleSelection)
 
         for i, row in enumerate(self.data):
-            self.table.insertRow(i)
-            for j in range(2):
-                self.table.setItem(i, j, (QTableWidgetItem(row[j])))
-
-            row = "*" * len(self.fernet.decrypt(row[2].encode()))
-            self.table.setItem(i, 2, (QTableWidgetItem(row)))
+            self.table.fill_row(row, i)
 
         if self.table.rowCount():
             self.table.item(0, 0).setSelected(True)
+
+        self.table.entry_ids = DatabaseHandler.get_row_ids(self.auth)
 
     def commit_changes(self):
         """Commits changes to database"""
@@ -209,7 +175,8 @@ class MainWindow(QWidget):
                     if self.table.check_entry_input():
                         self.changes.append(
                             [1, self.table.get_entry_input(self.fernet)])
-                        self.table.removeRow(0)
+                        self.table.fill_row(self.table.get_entry_input(self.fernet))
+                        self.table.removeRow(self.table.entry_row_index)
                         self.table.setFocus()
 
                 else:
@@ -222,10 +189,10 @@ class MainWindow(QWidget):
                 self.search_input.clear()
                 self.cmd_input.hide()
                 if all(self.table.insert_mode()):
-                    self.table.setCurrentCell(1, self.table.currentColumn())
+                    self.table.setCurrentCell(self.table.entry_row_index - 1, self.table.currentColumn())
                     self.table.setFocus()
                 if self.table.insert_mode()[0] and all([entry.text() == "" for entry in self.table.entry_input]):
-                    self.table.removeRow(0)
+                    self.table.removeRow(self.table.entry_row_index)
                     self.table.setFocus()
 
     def messagebox_handler(self, choice):
