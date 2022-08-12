@@ -2,8 +2,10 @@
 """Entry point"""
 
 import sys
+import os
 import getopt
 import logging
+from xdg import xdg_data_home
 from PyQt5.QtWidgets import QApplication
 from qpassword_manager.login_window import LoginWindow
 
@@ -28,6 +30,8 @@ def main():
         print(str(err))
 
     app = QApplication(["qpassword_manager"])
+
+    os.chdir(os.path.join(xdg_data_home(), "qpassword_manager"))
 
     window = LoginWindow()
     window.show()

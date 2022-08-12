@@ -2,7 +2,6 @@
 
 import os
 import sqlite3
-from xdg import xdg_data_home
 import requests
 from qpassword_manager.conf.connectorconfig import Config
 
@@ -22,7 +21,7 @@ class DatabaseHandler:
             )
             return
 
-        conn = sqlite3.connect(DatabaseHandler.get_database(auth[0]))
+        conn = sqlite3.connect(auth[0] + ".db")
         cursor = conn.cursor()
         cursor.execute(
             f"""delete
@@ -45,7 +44,7 @@ class DatabaseHandler:
                 auth=auth,
             ).json()
 
-        conn = sqlite3.connect(DatabaseHandler.get_database(auth[0]))
+        conn = sqlite3.connect(auth[0] + ".db")
         cursor = conn.cursor()
         cursor.execute(
             f"""select website, username, password
@@ -67,7 +66,7 @@ class DatabaseHandler:
                 auth=auth,
             ).json()
 
-        conn = sqlite3.connect(DatabaseHandler.get_database(auth[0]))
+        conn = sqlite3.connect(auth[0] + ".db")
         cursor = conn.cursor()
         cursor.execute(
             """select website, username, password
@@ -89,7 +88,7 @@ class DatabaseHandler:
                 auth=auth,
             ).json()
 
-        conn = sqlite3.connect(DatabaseHandler.get_database(auth[0]))
+        conn = sqlite3.connect(auth[0] + ".db")
         cursor = conn.cursor()
         cursor.execute(
             """select id
@@ -118,7 +117,7 @@ class DatabaseHandler:
             )
             return 0
 
-        conn = sqlite3.connect(DatabaseHandler.get_database(auth[0]))
+        conn = sqlite3.connect(auth[0] + ".db")
         cursor = conn.cursor()
         cursor.execute(
             f"""insert into passwords
@@ -147,12 +146,10 @@ class DatabaseHandler:
                 },
             ).text
 
-        if os.path.exists(
-            os.path.join(xdg_data_home(), "qpassword_manager", username + ".db")
-        ):
+        if os.path.exists(username + ".db"):
             return "Username already taken"
 
-        conn = sqlite3.connect(DatabaseHandler.get_database(username))
+        conn = sqlite3.connect(username + ".db")
         cursor = conn.cursor()
         cursor.execute(
             """create table passwords
@@ -188,8 +185,8 @@ class DatabaseHandler:
                 ),
             ).text
 
-        if os.path.exists(DatabaseHandler.get_database(username)):
-            conn = sqlite3.connect(DatabaseHandler.get_database(username))
+        if os.path.exists(username + ".db"):
+            conn = sqlite3.connect(username + ".db")
             cursor = conn.cursor()
             cursor.execute("select password from passwords where (id = 1)")
             master_key_db = cursor.fetchone()[0]
@@ -200,14 +197,3 @@ class DatabaseHandler:
                 return 1
 
         return 0
-
-    @staticmethod
-    def get_database(username):
-        """Returns database path in offline mode"""
-
-        directory = os.path.join(xdg_data_home(), "qpassword_manager")
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        return os.path.join(
-            xdg_data_home(), "qpassword_manager", username + ".db"
-        )

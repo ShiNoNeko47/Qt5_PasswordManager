@@ -95,24 +95,22 @@ class PasswordTable(QTableWidget):
             self.window.add_to_changes([1, json.loads(pyperclip.paste())])
 
         elif key in ['d', 'D']:
-            entry_id = self.entry_ids[self.currentRow()]
-            if entry_id < 0:
-                self.window.changes[-entry_id - 1] = -1
+            if self.entry_ids:
+                entry_id = self.entry_ids[self.currentRow()]
+                if entry_id < 0:
+                    self.window.changes[-entry_id - 1] = -1
 
-            else:
-                self.window.add_to_changes(
-                    [0, self.currentRow(), entry_id])
+                    while self.window.changes[-1] == -1:
+                        self.window.changes.pop()
+                        if not self.window.changes:
+                            break
 
-            self.entry_ids.pop(self.currentRow())
-            self.removeRow(self.currentRow())
+                else:
+                    self.window.add_to_changes(
+                        [0, self.currentRow(), entry_id])
 
-            while self.window.changes[-1] == -1:
-                self.window.changes.pop()
-                if not self.window.changes:
-                    break
-
-        # elif key in ['u', 'U']:
-        # elif key in ['r', 'R']:
+                self.entry_ids.pop(self.currentRow())
+                self.removeRow(self.currentRow())
 
     def fill_row(self, row, index=None):
         index = index or self.rowCount()
