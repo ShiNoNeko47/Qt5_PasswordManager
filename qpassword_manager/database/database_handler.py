@@ -27,7 +27,7 @@ class DatabaseHandler:
         cursor.execute(
             f"""delete
                 from passwords
-                where (id = {row_id[0][0]})"""
+                where (id = {row_id})"""
         )
         conn.commit()
         cursor.close()
@@ -50,7 +50,7 @@ class DatabaseHandler:
         cursor.execute(
             f"""select website, username, password
                from passwords
-               where (id = {row_id[0]})"""
+               where (id = {row_id})"""
         )
         data = cursor.fetchone()
         cursor.close()
@@ -97,6 +97,7 @@ class DatabaseHandler:
                where (id > 1)"""
         )
         data = cursor.fetchall()
+        data = list(map(lambda x: x[0], data))
         cursor.close()
         conn.close()
         return data

@@ -118,18 +118,32 @@ class MainWindow(QWidget):
             self.table.fill_row(row, i)
 
         if self.table.rowCount():
-            self.table.item(0, 0).setSelected(True)
+            self.table.setCurrentCell(0, 0)
 
         self.table.entry_ids = DatabaseHandler.get_row_ids(self.auth)
+
+    def add_to_changes(self, change):
+        self.changes.append(change)
+        if change[0]:
+            self.table.entry_ids.append(len(self.changes) * -1)
 
     def commit_changes(self):
         """Commits changes to database"""
 
+        current_cell = (self.table.currentRow(), self.table.currentColumn())
+
         for change in self.changes:
+            if change[0] == -1:
+                continue
+
             if change[0]:
                 DatabaseHandler.add_to_database(*change[1], self.auth)
+                continue
+
+            DatabaseHandler.delete_row(change[2], self.auth)
 
         self.create_table()
+        self.table.setCurrentCell(*current_cell)
         self.changes.clear()
 
     def run_cmd(self):
@@ -173,7 +187,7 @@ class MainWindow(QWidget):
 
                 elif all(self.table.insert_mode()):
                     if self.table.check_entry_input():
-                        self.changes.append(
+                        self.add_to_changes(
                             [1, self.table.get_entry_input(self.fernet)])
                         self.table.fill_row(self.table.get_entry_input(self.fernet))
                         self.table.removeRow(self.table.entry_row_index)
