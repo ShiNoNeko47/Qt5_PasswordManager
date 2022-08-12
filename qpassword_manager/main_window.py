@@ -171,53 +171,52 @@ class MainWindow(QWidget):
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
         """Copy selected item in table"""
 
-        match event.key():
-            case Qt.Key_Return:
-                if self.table.hasFocus():
-                    if self.table.selectedIndexes()[0].column() != 2:
-                        logging.debug(self.table.selectedItems()[0].text())
-                        pyperclip.copy(self.table.selectedItems()[0].text())
-
-                    else:
-                        pyperclip.copy(
-                            self.fernet.decrypt(
-                                self.data[
-                                    self.table.selectedIndexes()[0].row()
-                                ][2].encode()
-                            ).decode()
-                        )
-
-                elif all(self.table.insert_mode()):
-                    if self.table.check_entry_input():
-                        self.add_to_changes(
-                            [1, self.table.get_entry_input(self.fernet)]
-                        )
-                        self.table.fill_row(
-                            self.table.get_entry_input(self.fernet)
-                        )
-                        self.table.removeRow(self.table.entry_row_index)
-                        self.table.setFocus()
+        if event.key() == Qt.Key_Return:
+            if self.table.hasFocus():
+                if self.table.selectedIndexes()[0].column() != 2:
+                    logging.debug(self.table.selectedItems()[0].text())
+                    pyperclip.copy(self.table.selectedItems()[0].text())
 
                 else:
-                    self.search_input.hide()
-                    self.run_cmd()
-                    self.cmd_input.hide()
-
-            case Qt.Key_Escape:
-                self.search_input.hide()
-                self.search_input.clear()
-                self.cmd_input.hide()
-                if all(self.table.insert_mode()):
-                    self.table.setCurrentCell(
-                        self.table.entry_row_index - 1,
-                        self.table.currentColumn(),
+                    pyperclip.copy(
+                        self.fernet.decrypt(
+                            self.data[
+                                self.table.selectedIndexes()[0].row()
+                            ][2].encode()
+                        ).decode()
                     )
-                    self.table.setFocus()
-                if self.table.insert_mode()[0] and all(
-                    entry.text() == "" for entry in self.table.entry_input
-                ):
+
+            elif all(self.table.insert_mode()):
+                if self.table.check_entry_input():
+                    self.add_to_changes(
+                        [1, self.table.get_entry_input(self.fernet)]
+                    )
+                    self.table.fill_row(
+                        self.table.get_entry_input(self.fernet)
+                    )
                     self.table.removeRow(self.table.entry_row_index)
                     self.table.setFocus()
+
+            else:
+                self.search_input.hide()
+                self.run_cmd()
+                self.cmd_input.hide()
+
+        elif event.key() == Qt.Key_Escape:
+            self.search_input.hide()
+            self.search_input.clear()
+            self.cmd_input.hide()
+            if all(self.table.insert_mode()):
+                self.table.setCurrentCell(
+                    self.table.entry_row_index - 1,
+                    self.table.currentColumn(),
+                )
+                self.table.setFocus()
+            if self.table.insert_mode()[0] and all(
+                entry.text() == "" for entry in self.table.entry_input
+            ):
+                self.table.removeRow(self.table.entry_row_index)
+                self.table.setFocus()
 
     def messagebox_handler(self, choice):
         """
