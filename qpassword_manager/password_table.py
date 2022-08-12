@@ -1,14 +1,16 @@
+"""QTableWidget in main_window"""
+
+import json
+import logging
 from pynput.keyboard import Key, Controller
 import pyperclip
-import json
-from qpassword_manager.database.database_handler import DatabaseHandler
-from qpassword_manager.entry_input import NewPasswordInput, NewWebsiteInput
-import logging
 from PyQt5.QtWidgets import (
     QTableWidget,
     QLineEdit,
     QTableWidgetItem,
 )
+from qpassword_manager.database.database_handler import DatabaseHandler
+from qpassword_manager.entry_input import NewPasswordInput, NewWebsiteInput
 
 
 class PasswordTable(QTableWidget):
@@ -23,6 +25,7 @@ class PasswordTable(QTableWidget):
     def __init__(self, window):
         super().__init__()
         self.window = window
+
         self.keybinds = {
             "h": [Key.left],
             "j": [Key.down],
@@ -32,12 +35,15 @@ class PasswordTable(QTableWidget):
             "$": [Key.end],
         }
         self.keyboard = Controller()
+
         self.current_index = 0
         self.setTabKeyNavigation(False)
+
         self.entry_ids = []
         self.entry_row_index = 0
+        self.entry_input = None
 
-    def keyboardSearch(self, key):  # pylint: disable=invalid-name
+    def keyboardSearch(self, key):  # pylint: disable=invalid-name, too-many-branches
         """Handles keys based on keybinds"""
 
         logging.debug(key)
@@ -59,7 +65,8 @@ class PasswordTable(QTableWidget):
 
         elif key in ["g", "G"]:
             self.setCurrentCell(
-                0 if key == "g" else self.rowCount() - 1, self.currentColumn())
+                0 if key == "g" else self.rowCount() - 1, self.currentColumn()
+            )
 
         elif key in ["n", "N"]:
             self.search_next_prev(key, self.window.search())
@@ -81,20 +88,26 @@ class PasswordTable(QTableWidget):
                 ]
 
                 for i in range(3):
-                    self.setCellWidget(self.entry_row_index, i,
-                                       self.entry_input[i])
+                    self.setCellWidget(
+                        self.entry_row_index, i, self.entry_input[i]
+                    )
             self.focus_entry_input()
 
-        elif key in ['y', 'Y']:
+        elif key in ["y", "Y"]:
             entry_id = self.entry_ids[self.currentRow()]
-            pyperclip.copy(json.dumps(DatabaseHandler.get_row(
-                entry_id, self.window.auth) if entry_id >= 0 else self.window.changes[-entry_id - 1][1]))
+            pyperclip.copy(
+                json.dumps(
+                    DatabaseHandler.get_row(entry_id, self.window.auth)
+                    if entry_id >= 0
+                    else self.window.changes[-entry_id - 1][1]
+                )
+            )
 
-        elif key in ['p', 'P']:
+        elif key in ["p", "P"]:
             self.fill_row(json.loads(pyperclip.paste()))
             self.window.add_to_changes([1, json.loads(pyperclip.paste())])
 
-        elif key in ['d', 'D']:
+        elif key in ["d", "D"]:
             if self.entry_ids:
                 entry_id = self.entry_ids[self.currentRow()]
                 if entry_id < 0:
@@ -106,13 +119,14 @@ class PasswordTable(QTableWidget):
                             break
 
                 else:
-                    self.window.add_to_changes(
-                        [0, self.currentRow(), entry_id])
+                    self.window.add_to_changes([0, self.currentRow(), entry_id])
 
                 self.entry_ids.pop(self.currentRow())
                 self.removeRow(self.currentRow())
 
     def fill_row(self, row, index=None):
+        """Fills table row with values from the list passed to it"""
+
         index = index or self.rowCount()
         self.insertRow(index)
         for j in range(2):
@@ -153,18 +167,33 @@ class PasswordTable(QTableWidget):
         return 0
 
     def insert_mode(self):
+        """Checks if last row in table is entry_input and if it's focused"""
+
         return (
-            type(self.cellWidget(self.entry_row_index, 2)) == NewPasswordInput,
+            isinstance(self.cellWidget(self.entry_row_index, 2), NewPasswordInput),
             self.currentRow() == self.entry_row_index,
         )
 
     def check_entry_input(self):
-        return all([widget.text() for widget in self.entry_input]) and self.entry_input[2].text() == self.entry_input[2].other_text
+        """Checks if all values in entry_input are valid"""
+
+        return (
+            all(widget.text() for widget in self.entry_input)
+            and self.entry_input[2].text() == self.entry_input[2].other_text
+        )
 
     def get_entry_input(self, fernet):
-        return [self.entry_input[0].text(), self.entry_input[1].text(), fernet.encrypt(self.entry_input[2].text().encode()).decode()]
+        """Returns values from entry_input"""
+
+        return [
+            self.entry_input[0].text(),
+            self.entry_input[1].text(),
+            fernet.encrypt(self.entry_input[2].text().encode()).decode(),
+        ]
 
     def focus_entry_input(self):
+        """Gives focus to first empty field in entry_input"""
+
         for i, widget in enumerate(self.entry_input):
             if not widget.text():
                 self.setCurrentCell(self.entry_row_index, i)

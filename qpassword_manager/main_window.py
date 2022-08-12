@@ -123,6 +123,8 @@ class MainWindow(QWidget):
         self.table.entry_ids = DatabaseHandler.get_row_ids(self.auth)
 
     def add_to_changes(self, change):
+        """Appends to self.changes"""
+
         self.changes.append(change)
         if change[0]:
             self.table.entry_ids.append(len(self.changes) * -1)
@@ -188,8 +190,11 @@ class MainWindow(QWidget):
                 elif all(self.table.insert_mode()):
                     if self.table.check_entry_input():
                         self.add_to_changes(
-                            [1, self.table.get_entry_input(self.fernet)])
-                        self.table.fill_row(self.table.get_entry_input(self.fernet))
+                            [1, self.table.get_entry_input(self.fernet)]
+                        )
+                        self.table.fill_row(
+                            self.table.get_entry_input(self.fernet)
+                        )
                         self.table.removeRow(self.table.entry_row_index)
                         self.table.setFocus()
 
@@ -203,9 +208,14 @@ class MainWindow(QWidget):
                 self.search_input.clear()
                 self.cmd_input.hide()
                 if all(self.table.insert_mode()):
-                    self.table.setCurrentCell(self.table.entry_row_index - 1, self.table.currentColumn())
+                    self.table.setCurrentCell(
+                        self.table.entry_row_index - 1,
+                        self.table.currentColumn(),
+                    )
                     self.table.setFocus()
-                if self.table.insert_mode()[0] and all([entry.text() == "" for entry in self.table.entry_input]):
+                if self.table.insert_mode()[0] and all(
+                    entry.text() == "" for entry in self.table.entry_input
+                ):
                     self.table.removeRow(self.table.entry_row_index)
                     self.table.setFocus()
 
