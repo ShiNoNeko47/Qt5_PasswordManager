@@ -37,17 +37,25 @@ class MessageBox(QWidget):
         if title[-1] == "?":
             self.layout.addWidget(self.yes_btn, 1, 2)
             self.layout.addWidget(self.no_btn, 1, 0)
-            self.default = self.yes_btn
+            self.default = None
         else:
             self.layout.addWidget(self.ok_btn, 1, 1)
             self.default = self.ok_btn
+
         self.setLayout(self.layout)
 
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
         """Clicks \"yes\" if you press enter"""
 
         if event.key() == Qt.Key_Return:
-            self.default.click()
+            if self.default:
+                self.default.click()
+
+        elif event.key() == Qt.Key_Y:
+            self.choice_yes()
+
+        elif event.key() == Qt.Key_N:
+            self.choice_no()
 
     def choice_ok(self):
         """Closes MessageBox"""
