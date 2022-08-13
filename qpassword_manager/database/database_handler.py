@@ -10,7 +10,7 @@ class DatabaseHandler:
     """This class handles all http requests"""
 
     @staticmethod
-    def delete_row(row_id, auth):
+    def remove_from_database(row_id, auth):
         """Function for working with only one row in database"""
 
         if Config.config()["database_online"]:
@@ -34,7 +34,7 @@ class DatabaseHandler:
         return
 
     @staticmethod
-    def get_row(row_id, auth):
+    def get_entry(row_id, auth):
         """Function for working with only one row in database"""
 
         if Config.config()["database_online"]:
@@ -57,7 +57,7 @@ class DatabaseHandler:
         return data
 
     @staticmethod
-    def create_table(auth):
+    def get_all(auth):
         """Function for working with multiple rows in database"""
 
         if Config.config()["database_online"]:
@@ -79,7 +79,7 @@ class DatabaseHandler:
         return data
 
     @staticmethod
-    def get_row_ids(auth):
+    def get_entry_ids(auth):
         """Returns id value of every password in table"""
 
         if Config.config()["database_online"]:
@@ -133,7 +133,7 @@ class DatabaseHandler:
         return 0
 
     @staticmethod
-    def add_user(username, master_key):
+    def register(username, master_key):
         """Function for adding a new user to database"""
 
         if Config.config()["database_online"]:
@@ -173,7 +173,7 @@ class DatabaseHandler:
         return 0
 
     @staticmethod
-    def get_id(username, master_key):
+    def check_credentials(username, master_key):
         """Function that returns user id if user-password combination exists"""
 
         if Config.config()["database_online"]:

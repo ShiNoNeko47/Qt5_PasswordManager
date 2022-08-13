@@ -114,7 +114,7 @@ class LoginWindow(QWidget):
         """Checks if name and master key pair is correct"""
 
         self.key_input_hashed = SHA256.new(self.key_input.text().encode())
-        user_id = DatabaseHandler.get_id(
+        user_id = DatabaseHandler.check_credentials(
             self.name_input.text(), self.key_input_hashed.hexdigest()
         )
         logging.debug(self.name_input.text())
@@ -135,7 +135,7 @@ class LoginWindow(QWidget):
                 self.key_input_hashed.hexdigest(),
             )
             self.w_main.set_key(self.get_key())
-            self.w_main.create_table()
+            self.w_main.table.fill_table()
             self.w_main.show()
 
             self.login_btn.setDisabled(True)

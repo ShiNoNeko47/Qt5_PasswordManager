@@ -5,8 +5,6 @@ from PyQt5.QtWidgets import (
     QWidget,
     QGridLayout,
     QTableWidget,
-    QAbstractItemView,
-    QHeaderView,
     QLineEdit,
 )
 from PyQt5.Qt import Qt
@@ -90,38 +88,6 @@ class MainWindow(QWidget):
             for item in items:
                 item.setSelected(True)
 
-    def create_table(self):
-        """Updates data in the table"""
-
-        self.table.clear()
-        self.table.setColumnCount(3)
-        self.table.setRowCount(0)
-        self.table.verticalHeader().setVisible(False)
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.table.horizontalHeader().setSectionResizeMode(
-            1, QHeaderView.Stretch
-        )
-        self.table.setHorizontalHeaderLabels(
-            ["Website", "Username", "Password"]
-        )
-        self.data = DatabaseHandler.create_table(self.auth)
-        logging.debug(self.data)
-
-        for i in range(3):
-            self.table.setColumnWidth(i, 190)
-
-        self.table.setColumnWidth(3, 30)
-        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.table.setSelectionMode(QTableWidget.SingleSelection)
-
-        for i, row in enumerate(self.data):
-            self.table.fill_row(row, i)
-
-        if self.table.rowCount():
-            self.table.setCurrentCell(0, 0)
-
-        self.table.entry_ids = DatabaseHandler.get_row_ids(self.auth)
-
     def add_to_changes(self, change):
         """Appends to self.changes"""
 
@@ -142,9 +108,9 @@ class MainWindow(QWidget):
                 DatabaseHandler.add_to_database(*change[1], self.auth)
                 continue
 
-            DatabaseHandler.delete_row(change[2], self.auth)
+            DatabaseHandler.remove_from_database(change[2], self.auth)
 
-        self.create_table()
+        self.table.fill_table()
         self.table.setCurrentCell(*current_cell)
         self.changes.clear()
 

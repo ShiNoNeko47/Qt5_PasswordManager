@@ -73,7 +73,7 @@ class SetupWindow(QWidget):
         """Adds new user to database"""
 
         master_key = SHA256.new(self.key_setup_le.text().encode()).hexdigest()
-        msg = DatabaseHandler.add_user(
+        msg = DatabaseHandler.register(
             self.username_setup_le.text(), master_key
         )
         logging.debug(msg)

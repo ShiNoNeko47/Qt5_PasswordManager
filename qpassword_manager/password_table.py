@@ -8,6 +8,8 @@ from PyQt5.QtWidgets import (
     QTableWidget,
     QLineEdit,
     QTableWidgetItem,
+    QHeaderView,
+    QAbstractItemView,
 )
 from qpassword_manager.database.database_handler import DatabaseHandler
 from qpassword_manager.entry_input import NewPasswordInput, NewWebsiteInput
@@ -97,7 +99,7 @@ class PasswordTable(QTableWidget):
             entry_id = self.entry_ids[self.currentRow()]
             pyperclip.copy(
                 json.dumps(
-                    DatabaseHandler.get_row(entry_id, self.window.auth)
+                    DatabaseHandler.get_entry(entry_id, self.window.auth)
                     if entry_id >= 0
                     else self.window.changes[-entry_id - 1][1]
                 )
@@ -135,6 +137,38 @@ class PasswordTable(QTableWidget):
         row = "*" * len(self.window.fernet.decrypt(row[2].encode()))
         self.setItem(index, 2, (QTableWidgetItem(row)))
         self.setCurrentCell(self.rowCount() - 1, self.currentColumn())
+
+    def fill_table(self):
+        """Updates data in the table"""
+
+        self.clear()
+        self.setColumnCount(3)
+        self.setRowCount(0)
+        self.verticalHeader().setVisible(False)
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.horizontalHeader().setSectionResizeMode(
+            1, QHeaderView.Stretch
+        )
+        self.setHorizontalHeaderLabels(
+            ["Website", "Username", "Password"]
+        )
+        self.data = DatabaseHandler.get_all(self.window.auth)
+        logging.debug(self.data)
+
+        for i in range(3):
+            self.setColumnWidth(i, 190)
+
+        self.setColumnWidth(3, 30)
+        self.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.setSelectionMode(QTableWidget.SingleSelection)
+
+        for i, row in enumerate(self.data):
+            self.fill_row(row, i)
+
+        if self.rowCount():
+            self.setCurrentCell(0, 0)
+
+        self.entry_ids = DatabaseHandler.get_entry_ids(self.window.auth)
 
     def search_next_prev(self, key, items):
         """
