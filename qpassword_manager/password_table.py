@@ -44,6 +44,7 @@ class PasswordTable(QTableWidget):
         self.entry_ids = []
         self.entry_row_index = 0
         self.entry_input = None
+        self.data = None
 
     def keyboardSearch(self, key):  # pylint: disable=invalid-name, too-many-branches
         """Handles keys based on keybinds"""

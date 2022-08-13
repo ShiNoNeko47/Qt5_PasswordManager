@@ -4,7 +4,6 @@ import logging
 from PyQt5.QtWidgets import (
     QWidget,
     QGridLayout,
-    QTableWidget,
     QLineEdit,
 )
 from PyQt5.Qt import Qt
@@ -51,7 +50,6 @@ class MainWindow(QWidget):
         self.setLayout(self.layout)
 
         self.changes = []
-        self.data = None
 
         self.messagebox = MessageBox(self, "Save changes?")
 

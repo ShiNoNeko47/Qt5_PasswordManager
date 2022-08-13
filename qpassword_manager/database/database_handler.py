@@ -7,10 +7,12 @@ from qpassword_manager.conf.connectorconfig import Config
 
 
 def check_server(func):
+    """Wrapper that checks for exceptions"""
+
     def wrapper(*args):
         try:
-            func(*args)
-        except Exception as exception:
+            return func(*args)
+        except Exception as exception:  # pylint: disable=broad-except
             return exception
     return wrapper
 
