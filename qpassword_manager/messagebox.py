@@ -20,6 +20,7 @@ class MessageBox(QWidget):
 
         self.label = QLabel()
         self.label.setText(title)
+        self.label.setWordWrap(True)
         self.layout.addWidget(self.label, 0, 0, 1, 3)
 
         self.ok_btn = QPushButton()

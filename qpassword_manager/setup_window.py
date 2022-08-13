@@ -6,6 +6,8 @@ from PyQt5.Qt import Qt
 from Crypto.Hash import SHA256
 from qpassword_manager.messagebox import MessageBox
 from qpassword_manager.database.database_handler import DatabaseHandler
+from qpassword_manager.entry_input import NewPasswordInput
+from qpassword_manager.conf.connectorconfig import Config
 
 
 class SetupWindow(QWidget):
@@ -27,26 +29,24 @@ class SetupWindow(QWidget):
         self.setFixedHeight(150)
         self.setFixedWidth(600)
 
-        self.username_setup_le = QLineEdit()
-        self.username_setup_le.setPlaceholderText("New username")
-        self.layout.addWidget(self.username_setup_le, 0, 0)
+        self.username_input = QLineEdit()
+        self.username_input.setPlaceholderText("Username")
+        self.layout.addWidget(self.username_input, 0, 0, 1, 3)
 
-        self.key_setup_le = QLineEdit()
-        self.key_setup_le.setEchoMode(QLineEdit.Password)
-        self.key_setup_le.textChanged.connect(self.check_password)
-        self.key_setup_le.setPlaceholderText("Master key")
-        self.layout.addWidget(self.key_setup_le, 1, 0)
+        if Config.config()["database_online"]:
+            self.email_input = QLineEdit()
+            self.email_input.setPlaceholderText("E-mail")
+            self.layout.addWidget(self.email_input, 1, 0, 1, 3)
 
-        self.key_reenter_le = QLineEdit()
-        self.key_reenter_le.setEchoMode(QLineEdit.Password)
-        self.key_reenter_le.textChanged.connect(self.check_password)
-        self.key_reenter_le.setPlaceholderText("Confirm master key")
-        self.layout.addWidget(self.key_reenter_le, 2, 0)
+        self.key_input = NewPasswordInput()
+        self.key_input.textChanged.connect(self.check_password)
+        self.key_input.setPlaceholderText("Master key")
+        self.layout.addWidget(self.key_input, 2, 0, 1, 3)
 
-        self.ok_btn = QPushButton("Ok")
+        self.ok_btn = QPushButton("Register")
         self.ok_btn.setEnabled(False)
         self.ok_btn.clicked.connect(self.add_user)
-        self.layout.addWidget(self.ok_btn, 2, 1)
+        self.layout.addWidget(self.ok_btn, 3, 1)
 
         self.setLayout(self.layout)
         self.messagebox = MessageBox(self, "message")
@@ -63,8 +63,8 @@ class SetupWindow(QWidget):
         self.ok_btn.setEnabled(False)
         if all(
             [
-                self.key_setup_le.text() == self.key_reenter_le.text(),
-                len(self.key_setup_le.text()) > 3,
+                self.key_input.text() == self.key_input.other_text,
+                len(self.key_input.text()) > 3,
             ]
         ):
             self.ok_btn.setEnabled(True)
@@ -72,21 +72,21 @@ class SetupWindow(QWidget):
     def add_user(self):
         """Adds new user to database"""
 
-        master_key = SHA256.new(self.key_setup_le.text().encode()).hexdigest()
+        master_key = SHA256.new(self.key_input.text().encode()).hexdigest()
         msg = DatabaseHandler.register(
-            self.username_setup_le.text(), master_key
+            self.username_input.text(), master_key
         )
+        if isinstance(msg, Exception):
+            msg = msg.args[0].args[0]
+
         logging.debug(msg)
         if msg:
-            if msg.startswith("Duplicate entry"):
-                msg = "User exists. Login?"
-
             self.messagebox = MessageBox(self, msg)
             self.messagebox.show()
 
         else:
-            self.window_login.key_input.setText(self.key_setup_le.text())
-            self.window_login.name_input.setText(self.username_setup_le.text())
+            self.window_login.key_input.setText(self.key_input.text())
+            self.window_login.name_input.setText(self.username_input.text())
             self.close()
 
     def messagebox_handler(self, choice):
@@ -98,16 +98,16 @@ class SetupWindow(QWidget):
         """
 
         if choice == 1:
-            self.window_login.name_input.setText(self.username_setup_le.text())
+            self.window_login.name_input.setText(self.username_input.text())
             self.window_login.key_input.setText("")
             self.close()
 
     def reset_entries(self):
         """Sets all entries to \"\" """
 
-        self.username_setup_le.setText("")
-        self.key_setup_le.setText("")
-        self.key_reenter_le.setText("")
+        self.username_input.setText("")
+        self.key_input.setText("")
+        self.key_input.other_text = ""
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
         """Closes MessageBox and sets all entries to \"\" when closing

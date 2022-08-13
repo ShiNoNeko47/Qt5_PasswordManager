@@ -6,10 +6,20 @@ import requests
 from qpassword_manager.conf.connectorconfig import Config
 
 
+def check_server(func):
+    def wrapper(*args):
+        try:
+            func(*args)
+        except Exception as exception:
+            return exception
+    return wrapper
+
+
 class DatabaseHandler:
     """This class handles all http requests"""
 
     @staticmethod
+    @check_server
     def remove_from_database(row_id, auth):
         """Function for working with only one row in database"""
 
@@ -34,6 +44,7 @@ class DatabaseHandler:
         return
 
     @staticmethod
+    @check_server
     def get_entry(row_id, auth):
         """Function for working with only one row in database"""
 
@@ -57,6 +68,7 @@ class DatabaseHandler:
         return data
 
     @staticmethod
+    @check_server
     def get_all(auth):
         """Function for working with multiple rows in database"""
 
@@ -79,6 +91,7 @@ class DatabaseHandler:
         return data
 
     @staticmethod
+    @check_server
     def get_entry_ids(auth):
         """Returns id value of every password in table"""
 
@@ -102,6 +115,7 @@ class DatabaseHandler:
         return data
 
     @staticmethod
+    @check_server
     def add_to_database(website, username, password, auth):
         """Function for adding a password to database"""
 
@@ -133,6 +147,7 @@ class DatabaseHandler:
         return 0
 
     @staticmethod
+    @check_server
     def register(username, master_key):
         """Function for adding a new user to database"""
 
@@ -173,6 +188,7 @@ class DatabaseHandler:
         return 0
 
     @staticmethod
+    @check_server
     def check_credentials(username, master_key):
         """Function that returns user id if user-password combination exists"""
 

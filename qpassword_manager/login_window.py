@@ -117,6 +117,11 @@ class LoginWindow(QWidget):
         user_id = DatabaseHandler.check_credentials(
             self.name_input.text(), self.key_input_hashed.hexdigest()
         )
+        if isinstance(user_id, Exception):
+            self.messagebox = MessageBox(self, user_id.args[0].args[0])
+            self.messagebox.show()
+            return False
+
         logging.debug(self.name_input.text())
         logging.debug(self.key_input_hashed.hexdigest())
         logging.debug(user_id)
