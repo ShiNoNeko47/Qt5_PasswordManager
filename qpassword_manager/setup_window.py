@@ -49,7 +49,7 @@ class SetupWindow(QWidget):
         self.layout.addWidget(self.ok_btn, 3, 1)
 
         self.setLayout(self.layout)
-        self.messagebox = MessageBox(self, "message")
+        self.messagebox = None
 
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
         """Clicks ok when you press enter"""
@@ -74,14 +74,14 @@ class SetupWindow(QWidget):
 
         master_key = SHA256.new(self.key_input.text().encode()).hexdigest()
         msg = DatabaseHandler.register(
-            self.username_input.text(), master_key
+            self.username_input.text(), self.email_input.text(), master_key
         )
         if isinstance(msg, Exception):
             msg = msg.args[0].args[0]
 
         logging.debug(msg)
         if msg:
-            self.messagebox = MessageBox(self, msg)
+            self.messagebox = MessageBox(msg, self)
             self.messagebox.show()
 
         else:

@@ -51,7 +51,7 @@ class MainWindow(QWidget):
 
         self.changes = []
 
-        self.messagebox = MessageBox(self, "Save changes?")
+        self.messagebox = MessageBox("Save changes?", self)
 
     def set_key(self, key):
         """
@@ -144,9 +144,9 @@ class MainWindow(QWidget):
                 else:
                     pyperclip.copy(
                         self.fernet.decrypt(
-                            self.data[
-                                self.table.selectedIndexes()[0].row()
-                            ][2].encode()
+                            self.data[self.table.selectedIndexes()[0].row()][
+                                2
+                            ].encode()
                         ).decode()
                     )
 
@@ -155,9 +155,7 @@ class MainWindow(QWidget):
                     self.add_to_changes(
                         [1, self.table.get_entry_input(self.fernet)]
                     )
-                    self.table.fill_row(
-                        self.table.get_entry_input(self.fernet)
-                    )
+                    self.table.fill_row(self.table.get_entry_input(self.fernet))
                     self.table.removeRow(self.table.entry_row_index)
                     self.table.setFocus()
 

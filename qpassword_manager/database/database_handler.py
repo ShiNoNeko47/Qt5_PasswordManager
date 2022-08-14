@@ -4,6 +4,7 @@ import os
 import sqlite3
 import requests
 from qpassword_manager.conf.connectorconfig import Config
+from qpassword_manager.messagebox import MessageBox
 
 
 def check_server(func):
@@ -13,7 +14,10 @@ def check_server(func):
         try:
             return func(*args)
         except Exception as exception:  # pylint: disable=broad-except
-            return exception
+            messagebox = MessageBox(exception.args[0].args[0])
+            messagebox.show()
+            return
+
     return wrapper
 
 
@@ -150,7 +154,7 @@ class DatabaseHandler:
 
     @staticmethod
     @check_server
-    def register(username, master_key):
+    def register(username, email, master_key):
         """Function for adding a new user to database"""
 
         if Config.config()["database_online"]:
@@ -158,8 +162,8 @@ class DatabaseHandler:
                 url=Config.config()["url"] + "/register",
                 json={
                     "username": username,
+                    "email": email,
                     "password": master_key,
-                    "email": "email",
                 },
             ).text
 
@@ -195,15 +199,16 @@ class DatabaseHandler:
         """Function that returns user id if user-password combination exists"""
 
         if Config.config()["database_online"]:
-            return requests.post(
+            if requests.post(
                 url=Config.config()["url"] + "/check_credentials",
                 auth=(
                     username,
                     master_key,
                 ),
-            ).text
+            ).text:
+                return 1
 
-        if os.path.exists(username + ".db"):
+        elif os.path.exists(username + ".db"):
             conn = sqlite3.connect(username + ".db")
             cursor = conn.cursor()
             cursor.execute("select password from passwords where (id = 1)")
@@ -214,4 +219,6 @@ class DatabaseHandler:
             if master_key == master_key_db:
                 return 1
 
+        messagebox = MessageBox("Wrong username or password!")
+        messagebox.show()
         return 0

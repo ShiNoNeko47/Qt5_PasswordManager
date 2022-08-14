@@ -46,7 +46,9 @@ class PasswordTable(QTableWidget):
         self.entry_input = None
         self.data = None
 
-    def keyboardSearch(self, key):  # pylint: disable=invalid-name, too-many-branches
+    def keyboardSearch(
+        self, key
+    ):  # pylint: disable=invalid-name, too-many-branches
         """Handles keys based on keybinds"""
 
         logging.debug(key)
@@ -147,12 +149,8 @@ class PasswordTable(QTableWidget):
         self.setRowCount(0)
         self.verticalHeader().setVisible(False)
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.horizontalHeader().setSectionResizeMode(
-            1, QHeaderView.Stretch
-        )
-        self.setHorizontalHeaderLabels(
-            ["Website", "Username", "Password"]
-        )
+        self.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.setHorizontalHeaderLabels(["Website", "Username", "Password"])
         self.data = DatabaseHandler.get_all(self.window.auth)
         logging.debug(self.data)
 
@@ -205,7 +203,9 @@ class PasswordTable(QTableWidget):
         """Checks if last row in table is entry_input and if it's focused"""
 
         return (
-            isinstance(self.cellWidget(self.entry_row_index, 2), NewPasswordInput),
+            isinstance(
+                self.cellWidget(self.entry_row_index, 2), NewPasswordInput
+            ),
             self.currentRow() == self.entry_row_index,
         )
 
