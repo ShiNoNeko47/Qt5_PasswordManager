@@ -33,9 +33,9 @@ class SetupWindow(QWidget):
         self.username_input.setPlaceholderText("Username")
         self.layout.addWidget(self.username_input, 0, 0, 1, 3)
 
+        self.email_input = QLineEdit()
+        self.email_input.setPlaceholderText("E-mail")
         if Config.config()["database_online"]:
-            self.email_input = QLineEdit()
-            self.email_input.setPlaceholderText("E-mail")
             self.layout.addWidget(self.email_input, 1, 0, 1, 3)
 
         self.key_input = NewPasswordInput()
@@ -49,7 +49,7 @@ class SetupWindow(QWidget):
         self.layout.addWidget(self.ok_btn, 3, 1)
 
         self.setLayout(self.layout)
-        self.messagebox = None
+        self.messagebox = MessageBox(" ")
 
     def keyPressEvent(self, event):  # pylint: disable=invalid-name
         """Clicks ok when you press enter"""
@@ -76,18 +76,18 @@ class SetupWindow(QWidget):
         msg = DatabaseHandler.register(
             self.username_input.text(), self.email_input.text(), master_key
         )
-        if isinstance(msg, Exception):
-            msg = msg.args[0].args[0]
 
         logging.debug(msg)
-        if msg:
-            self.messagebox = MessageBox(msg, self)
-            self.messagebox.show()
-
-        else:
+        if msg in [
+            "Registration successfull!",
+            "Please confirm your email to finish the registration",
+        ]:
             self.window_login.key_input.setText(self.key_input.text())
             self.window_login.name_input.setText(self.username_input.text())
             self.close()
+
+        self.messagebox = MessageBox(msg, self)
+        self.messagebox.show()
 
     def messagebox_handler(self, choice):
         """

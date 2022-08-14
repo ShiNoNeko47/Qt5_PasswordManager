@@ -14,9 +14,9 @@ def check_server(func):
         try:
             return func(*args)
         except Exception as exception:  # pylint: disable=broad-except
-            messagebox = MessageBox(exception.args[0].args[0])
+            messagebox = MessageBox(str(exception))
             messagebox.show()
-            return
+            return None
 
     return wrapper
 
@@ -191,7 +191,7 @@ class DatabaseHandler:
         cursor.close()
         conn.close()
 
-        return 0
+        return "Registration successfull!"
 
     @staticmethod
     @check_server
