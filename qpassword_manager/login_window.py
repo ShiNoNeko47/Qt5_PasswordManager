@@ -59,7 +59,7 @@ class LoginWindow(QWidget):
         self.setLayout(self.layout)
 
         self.w_main = MainWindow(self.login_btn)
-        self.w_setup = SetupWindow(self)
+        self.w_setup = None
 
         self.settings = Settings()
 
@@ -140,6 +140,7 @@ class LoginWindow(QWidget):
     def new_user(self):
         """Opens SetupWindow"""
 
+        self.w_setup = SetupWindow(self)
         self.w_setup.show()
 
     def get_key(self):
