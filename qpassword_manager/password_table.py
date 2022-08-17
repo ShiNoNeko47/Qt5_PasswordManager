@@ -4,6 +4,7 @@ import json
 import logging
 from pynput.keyboard import Key, Controller
 import pyperclip
+from PyQt5.QtCore import QEvent, Qt
 from PyQt5.QtWidgets import (
     QTableWidget,
     QLineEdit,
@@ -29,12 +30,12 @@ class PasswordTable(QTableWidget):
         self.window = window
 
         self.keybinds = {
-            "h": [Key.left],
-            "j": [Key.down],
-            "k": [Key.up],
-            "l": [Key.right],
-            "0": [Key.home],
-            "$": [Key.end],
+            Qt.Key_H: [Key.left],
+            Qt.Key_J: [Key.down],
+            Qt.Key_K: [Key.up],
+            Qt.Key_L: [Key.right],
+            Qt.Key_0: [Key.home],
+            Qt.Key_Dollar: [Key.end],
         }
         self.keyboard = Controller()
 
@@ -46,20 +47,29 @@ class PasswordTable(QTableWidget):
         self.entry_input = None
         self.data = None
 
+    def event(self, event):
+        """Handles keys for navigation"""
+
+        if event.type() == QEvent.KeyPress and event.key() in self.keybinds:
+            for keybind in self.keybinds[event.key()]:
+                self.keyboard.press(keybind)
+
+            return True
+
+        if event.type() == QEvent.KeyRelease and event.key() in self.keybinds:
+            for keybind in self.keybinds[event.key()]:
+                self.keyboard.release(keybind)
+
+            return True
+
+        return QTableWidget.event(self, event)
+
     def keyboardSearch(
         self, key
     ):  # pylint: disable=invalid-name, too-many-branches
         """Handles keys based on keybinds"""
 
-        logging.debug(key)
-        if key in self.keybinds:
-            for keybind in self.keybinds[key]:
-                self.keyboard.press(keybind)
-
-            for keybind in self.keybinds[key]:
-                self.keyboard.release(keybind)
-
-        elif key == "/":
+        if key == "/":
             self.window.search_input.clear()
             self.window.search_input.show()
             self.window.search_input.setFocus()

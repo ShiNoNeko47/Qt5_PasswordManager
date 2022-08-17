@@ -30,6 +30,7 @@ class NewPasswordInput(QLineEdit):
         if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Tab:
             self.switch_values()
             return True
+
         return QLineEdit.event(self, event)
 
 
@@ -41,4 +42,5 @@ class NewWebsiteInput(QLineEdit):
 
         if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Backtab:
             return True
+
         return QLineEdit.event(self, event)
