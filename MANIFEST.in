@@ -1,2 +1,0 @@
-include qpassword_manager/conf/config.json
-include qpassword_manager/autofill.json
