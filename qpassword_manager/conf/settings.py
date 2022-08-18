@@ -20,7 +20,7 @@ class Settings(QWidget):
         config: configuration in json format
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.config = Config.config()
         self.setWindowTitle("Settings")
@@ -51,7 +51,7 @@ class Settings(QWidget):
 
         self.setLayout(self.layout_vbox)
 
-    def check_ip(self):
+    def check_ip(self) -> None:
         """Checks if line edit is empty and enables or disables the button"""
 
         if self.url_le.text() != "":
@@ -59,7 +59,7 @@ class Settings(QWidget):
         else:
             self.ok_btn.setEnabled(False)
 
-    def config_update(self):
+    def config_update(self) -> None:
         """Updates configuration using Config.config_update method"""
 
         self.config["url"] = self.url_le.text()
@@ -67,7 +67,7 @@ class Settings(QWidget):
         Config.config_update(self.config)
         self.close()
 
-    def keyPressEvent(self, event):  # pylint: disable=invalid-name
+    def keyPressEvent(self, event) -> None:  # pylint: disable=invalid-name
         """Clicks ok button when you press enter"""
 
         if event.key() == Qt.Key_Return:

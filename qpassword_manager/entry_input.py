@@ -11,20 +11,20 @@ class NewPasswordInput(QLineEdit):
     You can switch between the value you input with tab
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.setEchoMode(QLineEdit.Password)
 
         self.other_text = ""
 
-    def switch_values(self):
+    def switch_values(self) -> None:
         """Switches values"""
 
         text = self.other_text
         self.other_text = self.text()
         self.setText(text)
 
-    def event(self, event):
+    def event(self, event) -> bool:
         """Calls switch_values when tab is pressed"""
 
         if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Tab:
@@ -37,7 +37,7 @@ class NewPasswordInput(QLineEdit):
 class NewWebsiteInput(QLineEdit):
     """First QLineEdit in entry_input"""
 
-    def event(self, event):
+    def event(self, event) -> bool:
         """Ignores shift + tab"""
 
         if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Backtab:

@@ -26,7 +26,7 @@ class DatabaseHandler:
 
     @staticmethod
     @check_server
-    def remove_from_database(row_id, auth):
+    def remove_from_database(row_id, auth) -> None:
         """Function for working with only one row in database"""
 
         if Config.config()["database_online"]:
@@ -51,7 +51,7 @@ class DatabaseHandler:
 
     @staticmethod
     @check_server
-    def get_entry(row_id, auth):
+    def get_entry(row_id, auth) -> list:
         """Function for working with only one row in database"""
 
         if Config.config()["database_online"]:
@@ -75,7 +75,7 @@ class DatabaseHandler:
 
     @staticmethod
     @check_server
-    def get_all(auth):
+    def get_all(auth) -> list:
         """Function for working with multiple rows in database"""
 
         if Config.config()["database_online"]:
@@ -98,7 +98,7 @@ class DatabaseHandler:
 
     @staticmethod
     @check_server
-    def get_entry_ids(auth):
+    def get_entry_ids(auth) -> list:
         """Returns id value of every password in table"""
 
         if Config.config()["database_online"]:
@@ -122,7 +122,7 @@ class DatabaseHandler:
 
     @staticmethod
     @check_server
-    def add_to_database(website, username, password, auth):
+    def add_to_database(website, username, password, auth) -> None:
         """Function for adding a password to database"""
 
         if Config.config()["database_online"]:
@@ -135,7 +135,7 @@ class DatabaseHandler:
                 },
                 auth=auth,
             )
-            return 0
+            return
 
         conn = sqlite3.connect(auth[0] + ".db")
         cursor = conn.cursor()
@@ -150,11 +150,11 @@ class DatabaseHandler:
         conn.commit()
         cursor.close()
         conn.close()
-        return 0
+        return
 
     @staticmethod
     @check_server
-    def register(username, email, master_key):
+    def register(username, email, master_key) -> str:
         """Function for adding a new user to database"""
 
         if Config.config()["database_online"]:
@@ -195,7 +195,7 @@ class DatabaseHandler:
 
     @staticmethod
     @check_server
-    def check_credentials(username, master_key):
+    def check_credentials(username, master_key) -> bool:
         """Function that returns user id if user-password combination exists"""
 
         if Config.config()["database_online"]:
@@ -206,7 +206,7 @@ class DatabaseHandler:
                     master_key,
                 ),
             ).text:
-                return 1
+                return True
 
         elif os.path.exists(username + ".db"):
             conn = sqlite3.connect(username + ".db")
@@ -217,8 +217,8 @@ class DatabaseHandler:
             conn.close()
 
             if master_key == master_key_db:
-                return 1
+                return True
 
         messagebox = MessageBox("Wrong username or password!")
         messagebox.show()
-        return 0
+        return False

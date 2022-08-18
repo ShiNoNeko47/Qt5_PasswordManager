@@ -26,7 +26,7 @@ class LoginWindow(QWidget):
         key_input_hashed: hashed master key used for authentication
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.key_input_hashed = None
 
@@ -89,7 +89,7 @@ class LoginWindow(QWidget):
                 file.write('{"Username": "", "Password": ""}')
             logging.debug(error)
 
-    def keyPressEvent(self, event):  # pylint: disable=invalid-name
+    def keyPressEvent(self, event) -> None:  # pylint: disable=invalid-name
         """Opens MainWindow when you press enter or Settings when
         you press escape"""
 
@@ -99,7 +99,7 @@ class LoginWindow(QWidget):
         if event.key() == Qt.Key_Escape:
             self.settings.show()
 
-    def check_input(self):
+    def check_input(self) -> None:
         """Checks if name isn't empty and key is longer or equal to 4 and
         enables or disables buttons"""
 
@@ -107,7 +107,7 @@ class LoginWindow(QWidget):
         if len(self.key_input.text()) >= 4 and len(self.name_input.text()) > 0:
             self.login_btn.setEnabled(True)
 
-    def check_key(self):
+    def check_key(self) -> bool:
         """Checks if name and master key pair is correct"""
 
         self.key_input_hashed = SHA256.new(self.key_input.text().encode())
@@ -123,7 +123,7 @@ class LoginWindow(QWidget):
 
         return False
 
-    def login(self):
+    def login(self) -> None:
         """opens MainWindow if check_key returns True"""
 
         if self.check_key():
@@ -137,13 +137,13 @@ class LoginWindow(QWidget):
 
             self.login_btn.setDisabled(True)
 
-    def new_user(self):
+    def new_user(self) -> None:
         """Opens SetupWindow"""
 
         self.w_setup = SetupWindow(self)
         self.w_setup.show()
 
-    def get_key(self):
+    def get_key(self) -> bytes:
         """Creates key for Fernet using plain text master key"""
 
         password = self.key_input.text().encode()
@@ -157,7 +157,7 @@ class LoginWindow(QWidget):
         )
         return base64.urlsafe_b64encode(kdf.derive(password))
 
-    def closeEvent(self, event):  # pylint: disable=invalid-name
+    def closeEvent(self, event) -> None:  # pylint: disable=invalid-name
         """Exits app if ManagePasswordsWindow and MainWindow are
         closed, it doesn't close otherwise"""
 

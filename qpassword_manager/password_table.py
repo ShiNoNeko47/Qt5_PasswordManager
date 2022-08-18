@@ -25,7 +25,7 @@ class PasswordTable(QTableWidget):
         keyboard: controller that sends keys
     """
 
-    def __init__(self, window):
+    def __init__(self, window) -> None:
         super().__init__()
         self.window = window
 
@@ -47,7 +47,7 @@ class PasswordTable(QTableWidget):
         self.entry_input = None
         self.data = None
 
-    def event(self, event):
+    def event(self, event) -> bool:
         """Handles keys for navigation"""
 
         if event.type() == QEvent.KeyPress and event.key() in self.keybinds:
@@ -64,9 +64,9 @@ class PasswordTable(QTableWidget):
 
         return QTableWidget.event(self, event)
 
-    def keyboardSearch(
+    def keyboardSearch(  # pylint: disable=invalid-name, too-many-branches
         self, key
-    ):  # pylint: disable=invalid-name, too-many-branches
+    ) -> None:
         """Handles keys based on keybinds"""
 
         if key == "/":
@@ -139,7 +139,7 @@ class PasswordTable(QTableWidget):
                 self.entry_ids.pop(self.currentRow())
                 self.removeRow(self.currentRow())
 
-    def fill_row(self, row, index=None):
+    def fill_row(self, row, index=None) -> None:
         """Fills table row with values from the list passed to it"""
 
         index = index or self.rowCount()
@@ -151,7 +151,7 @@ class PasswordTable(QTableWidget):
         self.setItem(index, 2, (QTableWidgetItem(row)))
         self.setCurrentCell(self.rowCount() - 1, self.currentColumn())
 
-    def fill_table(self):
+    def fill_table(self) -> None:
         """Updates data in the table"""
 
         self.clear()
@@ -179,7 +179,7 @@ class PasswordTable(QTableWidget):
 
         self.entry_ids = DatabaseHandler.get_entry_ids(self.window.auth)
 
-    def search_next_prev(self, key, items):
+    def search_next_prev(self, key, items) -> None:
         """
         Allows you to navigate search results:
             n -> forward
@@ -187,7 +187,7 @@ class PasswordTable(QTableWidget):
         """
 
         if not items:
-            return 0
+            return
 
         if not self.currentItem():
             self.setCurrentItem(items[0])
@@ -207,9 +207,9 @@ class PasswordTable(QTableWidget):
 
                 self.setCurrentItem(items[self.current_index])
 
-        return 0
+        return
 
-    def insert_mode(self):
+    def insert_mode(self) -> (bool, bool):
         """Checks if last row in table is entry_input and if it's focused"""
 
         return (
@@ -219,7 +219,7 @@ class PasswordTable(QTableWidget):
             self.currentRow() == self.entry_row_index,
         )
 
-    def check_entry_input(self):
+    def check_entry_input(self) -> bool:
         """Checks if all values in entry_input are valid"""
 
         return (
@@ -227,7 +227,7 @@ class PasswordTable(QTableWidget):
             and self.entry_input[2].text() == self.entry_input[2].other_text
         )
 
-    def get_entry_input(self, fernet):
+    def get_entry_input(self, fernet) -> [str, str, str]:
         """Returns values from entry_input"""
 
         return [
@@ -236,7 +236,7 @@ class PasswordTable(QTableWidget):
             fernet.encrypt(self.entry_input[2].text().encode()).decode(),
         ]
 
-    def focus_entry_input(self):
+    def focus_entry_input(self) -> None:
         """Gives focus to first empty field in entry_input"""
 
         for i, widget in enumerate(self.entry_input):

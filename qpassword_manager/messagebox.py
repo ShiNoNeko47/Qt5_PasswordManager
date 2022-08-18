@@ -11,7 +11,7 @@ class MessageBox(QWidget):
         window_parent: parent window
     """
 
-    def __init__(self, title, window_parent=None):
+    def __init__(self, title, window_parent=None) -> None:
         super().__init__()
         self.window_parent = window_parent
 
@@ -45,7 +45,7 @@ class MessageBox(QWidget):
 
         self.setLayout(self.layout)
 
-    def keyPressEvent(self, event):  # pylint: disable=invalid-name
+    def keyPressEvent(self, event) -> None:  # pylint: disable=invalid-name
         """Clicks \"yes\" if you press enter"""
 
         if event.key() == Qt.Key_Return:
@@ -58,18 +58,18 @@ class MessageBox(QWidget):
         elif event.key() == Qt.Key_N:
             self.choice_no()
 
-    def choice_ok(self):
+    def choice_ok(self) -> None:
         """Closes MessageBox"""
 
         self.close()
 
-    def choice_yes(self):
+    def choice_yes(self) -> None:
         """Closes MessageBox and sends 1 to messagebox handler"""
 
         self.window_parent.messagebox_handler(1)
         self.close()
 
-    def choice_no(self):
+    def choice_no(self) -> None:
         """Closes MessageBox and sends 0 to messagebox handler"""
 
         self.window_parent.messagebox_handler(0)

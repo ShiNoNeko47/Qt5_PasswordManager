@@ -11,7 +11,7 @@ class Config:
     """Class for working with the config file"""
 
     @staticmethod
-    def config():
+    def config() -> dict:
         """
         Reads and returns configuration from config.json
 
@@ -50,7 +50,7 @@ class Config:
             logging.debug(error)
 
     @staticmethod
-    def config_update(config):
+    def config_update(config) -> None:
         """
         Updates config.json
 

@@ -19,7 +19,7 @@ class SetupWindow(QWidget):
 
     """
 
-    def __init__(self, window_login):
+    def __init__(self, window_login) -> None:
         super().__init__()
 
         self.window_login = window_login
@@ -51,13 +51,13 @@ class SetupWindow(QWidget):
         self.setLayout(self.layout)
         self.messagebox = MessageBox(" ")
 
-    def keyPressEvent(self, event):  # pylint: disable=invalid-name
+    def keyPressEvent(self, event) -> None:  # pylint: disable=invalid-name
         """Clicks ok when you press enter"""
 
         if event.key() == Qt.Key_Return:
             self.ok_btn.click()
 
-    def check_password(self):
+    def check_password(self) -> None:
         """Checks if password entered is longer than 3 characters"""
 
         self.ok_btn.setEnabled(False)
@@ -69,7 +69,7 @@ class SetupWindow(QWidget):
         ):
             self.ok_btn.setEnabled(True)
 
-    def add_user(self):
+    def add_user(self) -> None:
         """Adds new user to database"""
 
         master_key = SHA256.new(self.key_input.text().encode()).hexdigest()
@@ -89,7 +89,7 @@ class SetupWindow(QWidget):
         self.messagebox = MessageBox(msg, self)
         self.messagebox.show()
 
-    def messagebox_handler(self, choice):
+    def messagebox_handler(self, choice) -> None:
         """
         MessageBox choice handler
 
@@ -102,14 +102,14 @@ class SetupWindow(QWidget):
             self.window_login.key_input.setText("")
             self.close()
 
-    def reset_entries(self):
+    def reset_entries(self) -> None:
         """Sets all entries to \"\" """
 
         self.username_input.setText("")
         self.key_input.setText("")
         self.key_input.other_text = ""
 
-    def closeEvent(self, event):  # pylint: disable=invalid-name
+    def closeEvent(self, event) -> None:  # pylint: disable=invalid-name
         """Closes MessageBox and sets all entries to \"\" when closing
         SetupWindow"""
 

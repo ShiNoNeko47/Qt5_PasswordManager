@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QApplication
 from qpassword_manager.login_window import LoginWindow
 
 
-def main():
+def main() -> None:
     """Argument parsing and app initialization"""
 
     try:

@@ -24,7 +24,7 @@ class MainWindow(QWidget):
         btn: login_btn on LoginWindow
     """
 
-    def __init__(self, btn):
+    def __init__(self, btn) -> None:
         super().__init__()
 
         self.fernet = None
@@ -53,7 +53,7 @@ class MainWindow(QWidget):
 
         self.messagebox = MessageBox("Save changes?", self)
 
-    def set_key(self, key):
+    def set_key(self, key) -> None:
         """
         Creates Fernet object using a key
 
@@ -63,7 +63,7 @@ class MainWindow(QWidget):
 
         self.fernet = Fernet(key)
 
-    def search(self):
+    def search(self) -> list:
         """Searches trough the table and returns a list of results"""
 
         search_string = self.search_input.text()
@@ -77,7 +77,7 @@ class MainWindow(QWidget):
         items.sort(key=lambda x: x.row())
         return items
 
-    def select(self):
+    def select(self) -> None:
         """Selects search results"""
 
         self.table.setCurrentItem(None)
@@ -86,14 +86,14 @@ class MainWindow(QWidget):
             for item in items:
                 item.setSelected(True)
 
-    def add_to_changes(self, change):
+    def add_to_changes(self, change) -> None:
         """Appends to self.changes"""
 
         self.changes.append(change)
         if change[0]:
             self.table.entry_ids.append(len(self.changes) * -1)
 
-    def commit_changes(self):
+    def commit_changes(self) -> None:
         """Commits changes to database"""
 
         current_cell = (self.table.currentRow(), self.table.currentColumn())
@@ -112,7 +112,7 @@ class MainWindow(QWidget):
         self.table.setCurrentCell(*current_cell)
         self.changes.clear()
 
-    def run_cmd(self):
+    def run_cmd(self) -> None:
         """Runs the command in cmd_input"""
 
         cmd = self.cmd_input.text()[1::]
@@ -132,7 +132,7 @@ class MainWindow(QWidget):
             self.changes.clear()
             self.close()
 
-    def keyPressEvent(self, event):  # pylint: disable=invalid-name
+    def keyPressEvent(self, event) -> None:  # pylint: disable=invalid-name
         """Copy selected item in table"""
 
         if event.key() == Qt.Key_Return:
@@ -180,7 +180,7 @@ class MainWindow(QWidget):
                 self.table.removeRow(self.table.entry_row_index)
                 self.table.setFocus()
 
-    def messagebox_handler(self, choice):
+    def messagebox_handler(self, choice) -> None:
         """
         MessageBox choice handler
 
@@ -195,7 +195,7 @@ class MainWindow(QWidget):
             self.changes.clear()
             self.close()
 
-    def closeEvent(self, event):  # pylint: disable=invalid-name
+    def closeEvent(self, event) -> None:  # pylint: disable=invalid-name
         """Closes the window and enables the login button if action queue is
         empty, otherwise open messagebox"""
 
