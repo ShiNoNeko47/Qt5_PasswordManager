@@ -144,7 +144,7 @@ class MainWindow(QWidget):
                 else:
                     pyperclip.copy(
                         self.fernet.decrypt(
-                            self.data[self.table.selectedIndexes()[0].row()][
+                            self.table.data[self.table.selectedIndexes()[0].row()][
                                 2
                             ].encode()
                         ).decode()
