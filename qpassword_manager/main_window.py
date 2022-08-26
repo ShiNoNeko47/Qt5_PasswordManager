@@ -21,14 +21,14 @@ class MainWindow(QWidget):
 
     Attributes:
         fernet: Fernet object used for decryption
-        btn: login_btn on LoginWindow
+        login_window: LoginWindow
     """
 
-    def __init__(self, btn) -> None:
+    def __init__(self, login_window) -> None:
         super().__init__()
 
         self.fernet = None
-        self.btn = btn
+        self.login_window = login_window
 
         self.setWindowTitle("Passwords")
         self.layout = QGridLayout()
@@ -201,7 +201,7 @@ class MainWindow(QWidget):
 
         if not self.changes:
             event.accept()
-            self.btn.setDisabled(False)
+            self.login_window.show()
         else:
             event.ignore()
             self.messagebox.close()

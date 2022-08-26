@@ -1,7 +1,6 @@
 """Login window"""
 
 import os
-import sys
 import logging
 import base64
 import json
@@ -58,10 +57,14 @@ class LoginWindow(QWidget):
 
         self.setLayout(self.layout)
 
-        self.w_main = MainWindow(self.login_btn)
+        self.w_main = MainWindow(self)
         self.w_setup = None
 
         self.settings = Settings()
+        self.autofill()
+
+    def autofill(self) -> None:
+        """Fills in credentials defined in autofill.json"""
 
         try:
             with open(
@@ -135,7 +138,8 @@ class LoginWindow(QWidget):
             self.w_main.table.fill_table()
             self.w_main.show()
 
-            self.login_btn.setDisabled(True)
+            self.autofill()
+            self.hide()
 
     def new_user(self) -> None:
         """Opens SetupWindow"""
@@ -156,13 +160,3 @@ class LoginWindow(QWidget):
             backend=default_backend(),
         )
         return base64.urlsafe_b64encode(kdf.derive(password))
-
-    def closeEvent(self, event) -> None:  # pylint: disable=invalid-name
-        """Exits app if ManagePasswordsWindow and MainWindow are
-        closed, it doesn't close otherwise"""
-
-        if self.w_main.isHidden():
-            event.accept()
-            sys.exit()
-        else:
-            event.ignore()
