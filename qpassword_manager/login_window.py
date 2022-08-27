@@ -57,7 +57,7 @@ class LoginWindow(QWidget):
 
         self.setLayout(self.layout)
 
-        self.w_main = MainWindow(self)
+        self.w_main = None
         self.w_setup = None
 
         self.settings = Settings()
@@ -130,12 +130,7 @@ class LoginWindow(QWidget):
         """opens MainWindow if check_key returns True"""
 
         if self.check_key():
-            self.w_main.auth = (
-                self.name_input.text(),
-                self.key_input_hashed.hexdigest(),
-            )
-            self.w_main.set_key(self.get_key())
-            self.w_main.table.fill_table()
+            self.w_main = MainWindow(self)
             self.w_main.show()
 
             self.autofill()

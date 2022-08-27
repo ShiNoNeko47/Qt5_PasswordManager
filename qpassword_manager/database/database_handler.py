@@ -32,6 +32,7 @@ class DatabaseHandler:
         if Config.config()["database_online"]:
             requests.post(
                 url=Config.config()["url"] + "/remove_from_database",
+                timeout=5,
                 json={"id": row_id},
                 auth=auth,
             )
@@ -57,6 +58,7 @@ class DatabaseHandler:
         if Config.config()["database_online"]:
             return requests.post(
                 url=Config.config()["url"] + "/get_entry",
+                timeout=5,
                 json={"id": row_id},
                 auth=auth,
             ).json()
@@ -81,6 +83,7 @@ class DatabaseHandler:
         if Config.config()["database_online"]:
             return requests.post(
                 url=Config.config()["url"] + "/get_all",
+                timeout=5,
                 auth=auth,
             ).json()
 
@@ -104,6 +107,7 @@ class DatabaseHandler:
         if Config.config()["database_online"]:
             return requests.post(
                 url=Config.config()["url"] + "/get_entry_ids",
+                timeout=5,
                 auth=auth,
             ).json()
 
@@ -128,6 +132,7 @@ class DatabaseHandler:
         if Config.config()["database_online"]:
             requests.post(
                 url=Config.config()["url"] + "/add_to_database",
+                timeout=5,
                 json={
                     "website": website,
                     "username": username,
@@ -160,6 +165,7 @@ class DatabaseHandler:
         if Config.config()["database_online"]:
             return requests.post(
                 url=Config.config()["url"] + "/register",
+                timeout=5,
                 json={
                     "username": username,
                     "email": email,
@@ -201,6 +207,7 @@ class DatabaseHandler:
         if Config.config()["database_online"]:
             if requests.post(
                 url=Config.config()["url"] + "/check_credentials",
+                timeout=5,
                 auth=(
                     username,
                     master_key,

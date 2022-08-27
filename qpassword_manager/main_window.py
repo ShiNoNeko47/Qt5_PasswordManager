@@ -1,6 +1,10 @@
 """The window used for copying passwords from database"""
 
 import logging
+import os
+import time
+import threading
+import json
 from PyQt5.QtWidgets import (
     QWidget,
     QGridLayout,
@@ -49,9 +53,23 @@ class MainWindow(QWidget):
         self.setFixedWidth(640)
         self.setLayout(self.layout)
 
+        self.auth = (
+            self.login_window.name_input.text(),
+            self.login_window.key_input_hashed.hexdigest()
+        )
+
+        self.set_key(self.login_window.get_key())
+        self.table.fill_table()
+
         self.changes = []
+        self.load_changes()
 
         self.messagebox = MessageBox("Save changes?", self)
+
+        self.last_event_time = 0
+        self.checking_inactivity = threading.Thread(
+            target=self.check_inactivity, daemon=True)
+        self.checking_inactivity.start()
 
     def set_key(self, key) -> None:
         """
@@ -112,6 +130,32 @@ class MainWindow(QWidget):
         self.table.setCurrentCell(*current_cell)
         self.changes.clear()
 
+    def store_changes(self) -> None:
+        """Stores changes to a file and clears the array"""
+
+        with open("changes_" + self.auth[0], "wb+") as changes_file:
+            changes_file.write(self.fernet.encrypt(
+                json.dumps(self.changes).encode()))
+
+        self.changes.clear()
+
+    def load_changes(self) -> None:
+        """Loads changes stored in a file"""
+
+        if os.path.exists("changes_" + self.auth[0]):
+            with open("changes_" + self.auth[0], "rb") as changes_file:
+                self.changes = json.loads(
+                    self.fernet.decrypt(changes_file.read()))
+
+            os.remove("changes_" + self.auth[0])
+
+            for change in self.changes:
+                if change[0]:
+                    self.table.fill_row(change[1])
+
+                else:
+                    self.table.removeRow(change[1])
+
     def run_cmd(self) -> None:
         """Runs the command in cmd_input"""
 
@@ -155,7 +199,8 @@ class MainWindow(QWidget):
                     self.add_to_changes(
                         [1, self.table.get_entry_input(self.fernet)]
                     )
-                    self.table.fill_row(self.table.get_entry_input(self.fernet))
+                    self.table.fill_row(
+                        self.table.get_entry_input(self.fernet))
                     self.table.removeRow(self.table.entry_row_index)
                     self.table.setFocus()
 
@@ -194,6 +239,27 @@ class MainWindow(QWidget):
         else:
             self.changes.clear()
             self.close()
+
+    def check_inactivity(self):
+        """Logs out after 5 minutes of inactivity"""
+
+        while True:
+            time.sleep(30)
+
+            if self.isHidden():
+                break
+
+            if time.time() - self.last_event_time > 300:
+                self.store_changes()
+                self.close()
+                break
+
+    def event(self, event) -> bool:
+        """Sets self.last_event_time to current time"""
+
+        self.last_event_time = time.time()
+
+        return QWidget.event(self, event)
 
     def closeEvent(self, event) -> None:  # pylint: disable=invalid-name
         """Closes the window and enables the login button if action queue is
