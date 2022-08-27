@@ -133,11 +133,12 @@ class MainWindow(QWidget):
     def store_changes(self) -> None:
         """Stores changes to a file and clears the array"""
 
-        with open("changes_" + self.auth[0], "wb+") as changes_file:
-            changes_file.write(self.fernet.encrypt(
-                json.dumps(self.changes).encode()))
+        if self.changes:
+            with open("changes_" + self.auth[0], "wb+") as changes_file:
+                changes_file.write(self.fernet.encrypt(
+                    json.dumps(self.changes).encode()))
 
-        self.changes.clear()
+            self.changes.clear()
 
     def load_changes(self) -> None:
         """Loads changes stored in a file"""
