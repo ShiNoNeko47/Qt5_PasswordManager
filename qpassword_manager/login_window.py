@@ -15,6 +15,7 @@ from qpassword_manager.main_window import MainWindow
 from qpassword_manager.setup_window import SetupWindow
 from qpassword_manager.database.database_handler import DatabaseHandler
 from qpassword_manager.conf.settings import Settings
+from qpassword_manager.conf.connectorconfig import Config
 
 
 class LoginWindow(QWidget):
@@ -60,7 +61,8 @@ class LoginWindow(QWidget):
         self.w_main = None
         self.w_setup = None
 
-        self.settings = Settings()
+        self.database_handler = DatabaseHandler(Config.config())
+        self.settings = Settings(self)
         self.autofill()
 
     def autofill(self) -> None:
@@ -92,6 +94,11 @@ class LoginWindow(QWidget):
                 file.write('{"Username": "", "Password": ""}')
             logging.debug(error)
 
+    def load_config(self) -> None:
+        """Loads config from file to DatabaseHandler object"""
+
+        self.database_handler.config = Config.config()
+
     def keyPressEvent(self, event) -> None:  # pylint: disable=invalid-name
         """Opens MainWindow when you press enter or Settings when
         you press escape"""
@@ -114,7 +121,7 @@ class LoginWindow(QWidget):
         """Checks if name and master key pair is correct"""
 
         self.key_input_hashed = SHA256.new(self.key_input.text().encode())
-        credentials_match = DatabaseHandler.check_credentials(
+        credentials_match = self.database_handler.check_credentials(
             self.name_input.text(), self.key_input_hashed.hexdigest()
         )
 

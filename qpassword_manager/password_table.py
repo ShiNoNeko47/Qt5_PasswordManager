@@ -12,7 +12,6 @@ from PyQt5.QtWidgets import (
     QHeaderView,
     QAbstractItemView,
 )
-from qpassword_manager.database.database_handler import DatabaseHandler
 from qpassword_manager.entry_input import NewPasswordInput, NewWebsiteInput
 
 
@@ -112,7 +111,7 @@ class PasswordTable(QTableWidget):
             entry_id = self.entry_ids[self.currentRow()]
             pyperclip.copy(
                 json.dumps(
-                    DatabaseHandler.get_entry(entry_id, self.window.auth)
+                    self.window.database_handler.get_entry(entry_id, self.window.auth)
                     if entry_id >= 0
                     else self.window.changes[-entry_id - 1][1]
                 )
@@ -161,7 +160,7 @@ class PasswordTable(QTableWidget):
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.setHorizontalHeaderLabels(["Website", "Username", "Password"])
-        self.data = DatabaseHandler.get_all(self.window.auth)
+        self.data = self.window.database_handler.get_all(self.window.auth)
         logging.debug(self.data)
 
         for i in range(3):
@@ -177,7 +176,7 @@ class PasswordTable(QTableWidget):
         if self.rowCount():
             self.setCurrentCell(0, 0)
 
-        self.entry_ids = DatabaseHandler.get_entry_ids(self.window.auth)
+        self.entry_ids = self.window.database_handler.get_entry_ids(self.window.auth)
 
     def search_next_prev(self, key, items) -> None:
         """

@@ -3,7 +3,6 @@
 import os
 import sqlite3
 import requests
-from qpassword_manager.conf.connectorconfig import Config
 from qpassword_manager.messagebox import MessageBox
 
 
@@ -24,14 +23,16 @@ def check_server(func):
 class DatabaseHandler:
     """This class handles all http requests"""
 
-    @staticmethod
+    def __init__(self, config) -> None:
+        self.config = config
+
     @check_server
-    def remove_from_database(row_id, auth) -> None:
+    def remove_from_database(self, row_id, auth) -> None:
         """Function for working with only one row in database"""
 
-        if Config.config()["database_online"]:
+        if self.config["database_online"]:
             requests.post(
-                url=Config.config()["url"] + "/remove_from_database",
+                url=self.config["url"] + "/remove_from_database",
                 timeout=5,
                 json={"id": row_id},
                 auth=auth,
@@ -50,14 +51,13 @@ class DatabaseHandler:
         conn.close()
         return
 
-    @staticmethod
     @check_server
-    def get_entry(row_id, auth) -> list:
+    def get_entry(self, row_id, auth) -> list:
         """Function for working with only one row in database"""
 
-        if Config.config()["database_online"]:
+        if self.config["database_online"]:
             return requests.post(
-                url=Config.config()["url"] + "/get_entry",
+                url=self.config["url"] + "/get_entry",
                 timeout=5,
                 json={"id": row_id},
                 auth=auth,
@@ -75,14 +75,13 @@ class DatabaseHandler:
         conn.close()
         return data
 
-    @staticmethod
     @check_server
-    def get_all(auth) -> list:
+    def get_all(self, auth) -> list:
         """Function for working with multiple rows in database"""
 
-        if Config.config()["database_online"]:
+        if self.config["database_online"]:
             return requests.post(
-                url=Config.config()["url"] + "/get_all",
+                url=self.config["url"] + "/get_all",
                 timeout=5,
                 auth=auth,
             ).json()
@@ -99,14 +98,13 @@ class DatabaseHandler:
         conn.close()
         return data
 
-    @staticmethod
     @check_server
-    def get_entry_ids(auth) -> list:
+    def get_entry_ids(self, auth) -> list:
         """Returns id value of every password in table"""
 
-        if Config.config()["database_online"]:
+        if self.config["database_online"]:
             return requests.post(
-                url=Config.config()["url"] + "/get_entry_ids",
+                url=self.config["url"] + "/get_entry_ids",
                 timeout=5,
                 auth=auth,
             ).json()
@@ -124,14 +122,13 @@ class DatabaseHandler:
         conn.close()
         return data
 
-    @staticmethod
     @check_server
-    def add_to_database(website, username, password, auth) -> None:
+    def add_to_database(self, website, username, password, auth) -> None:
         """Function for adding a password to database"""
 
-        if Config.config()["database_online"]:
+        if self.config["database_online"]:
             requests.post(
-                url=Config.config()["url"] + "/add_to_database",
+                url=self.config["url"] + "/add_to_database",
                 timeout=5,
                 json={
                     "website": website,
@@ -157,14 +154,13 @@ class DatabaseHandler:
         conn.close()
         return
 
-    @staticmethod
     @check_server
-    def register(username, email, master_key) -> str:
+    def register(self, username, email, master_key) -> str:
         """Function for adding a new user to database"""
 
-        if Config.config()["database_online"]:
+        if self.config["database_online"]:
             return requests.post(
-                url=Config.config()["url"] + "/register",
+                url=self.config["url"] + "/register",
                 timeout=5,
                 json={
                     "username": username,
@@ -199,14 +195,13 @@ class DatabaseHandler:
 
         return "Registration successfull!"
 
-    @staticmethod
     @check_server
-    def check_credentials(username, master_key) -> bool:
+    def check_credentials(self, username, master_key) -> bool:
         """Function that returns user id if user-password combination exists"""
 
-        if Config.config()["database_online"]:
+        if self.config["database_online"]:
             if requests.post(
-                url=Config.config()["url"] + "/check_credentials",
+                url=self.config["url"] + "/check_credentials",
                 timeout=5,
                 auth=(
                     username,

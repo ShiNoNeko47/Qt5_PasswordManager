@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QGridLayout
 from PyQt5.Qt import Qt
 from Crypto.Hash import SHA256
 from qpassword_manager.messagebox import MessageBox
-from qpassword_manager.database.database_handler import DatabaseHandler
 from qpassword_manager.entry_input import NewPasswordInput
 from qpassword_manager.conf.connectorconfig import Config
 
@@ -15,14 +14,14 @@ class SetupWindow(QWidget):
     Setup window
 
     Attributes:
-        window_login: login window
+        login_window: login window
 
     """
 
-    def __init__(self, window_login) -> None:
+    def __init__(self, login_window) -> None:
         super().__init__()
 
-        self.window_login = window_login
+        self.login_window = login_window
 
         self.layout = QGridLayout()
         self.setWindowTitle("New user")
@@ -73,7 +72,7 @@ class SetupWindow(QWidget):
         """Adds new user to database"""
 
         master_key = SHA256.new(self.key_input.text().encode()).hexdigest()
-        msg = DatabaseHandler.register(
+        msg = self.login_window.database_handler.register(
             self.username_input.text(), self.email_input.text(), master_key
         )
 
@@ -82,8 +81,8 @@ class SetupWindow(QWidget):
             "Registration successfull!",
             "Please confirm your email to finish the registration",
         ]:
-            self.window_login.key_input.setText(self.key_input.text())
-            self.window_login.name_input.setText(self.username_input.text())
+            self.login_window.key_input.setText(self.key_input.text())
+            self.login_window.name_input.setText(self.username_input.text())
             self.close()
 
         self.messagebox = MessageBox(msg, self)
@@ -98,8 +97,8 @@ class SetupWindow(QWidget):
         """
 
         if choice == 1:
-            self.window_login.name_input.setText(self.username_input.text())
-            self.window_login.key_input.setText("")
+            self.login_window.name_input.setText(self.username_input.text())
+            self.login_window.key_input.setText("")
             self.close()
 
     def reset_entries(self) -> None:

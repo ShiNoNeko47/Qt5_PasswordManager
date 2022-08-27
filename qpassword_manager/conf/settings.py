@@ -20,8 +20,10 @@ class Settings(QWidget):
         config: configuration in json format
     """
 
-    def __init__(self) -> None:
+    def __init__(self, login_window) -> None:
         super().__init__()
+        self.login_window = login_window
+
         self.config = Config.config()
         self.setWindowTitle("Settings")
 
@@ -65,6 +67,7 @@ class Settings(QWidget):
         self.config["url"] = self.url_le.text()
         self.config["database_online"] = self.radiobutton_online.isChecked()
         Config.config_update(self.config)
+        self.login_window.load_config()
         self.close()
 
     def keyPressEvent(self, event) -> None:  # pylint: disable=invalid-name

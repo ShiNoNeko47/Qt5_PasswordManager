@@ -14,7 +14,6 @@ from PyQt5.Qt import Qt
 from PyQt5 import QtCore
 from cryptography.fernet import Fernet
 import pyperclip
-from qpassword_manager.database.database_handler import DatabaseHandler
 from qpassword_manager.password_table import PasswordTable
 from qpassword_manager.messagebox import MessageBox
 
@@ -33,6 +32,7 @@ class MainWindow(QWidget):
 
         self.fernet = None
         self.login_window = login_window
+        self.database_handler = login_window.database_handler
 
         self.setWindowTitle("Passwords")
         self.layout = QGridLayout()
@@ -121,10 +121,10 @@ class MainWindow(QWidget):
                 continue
 
             if change[0]:
-                DatabaseHandler.add_to_database(*change[1], self.auth)
+                self.database_handler.add_to_database(*change[1], self.auth)
                 continue
 
-            DatabaseHandler.remove_from_database(change[2], self.auth)
+            self.database_handler.remove_from_database(change[2], self.auth)
 
         self.table.fill_table()
         self.table.setCurrentCell(*current_cell)
@@ -241,7 +241,7 @@ class MainWindow(QWidget):
             self.changes.clear()
             self.close()
 
-    def check_inactivity(self):
+    def check_inactivity(self) -> None:
         """Logs out after 5 minutes of inactivity"""
 
         while True:
