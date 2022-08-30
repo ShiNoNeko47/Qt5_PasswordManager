@@ -2,12 +2,13 @@
 """Entry point"""
 
 import sys
+import time
 import os
 import getopt
 import logging
 from xdg import xdg_data_home
-from PyQt5.QtWidgets import QApplication
-from qpassword_manager.login_window import LoginWindow
+from PyQt5.QtWidgets import QApplication, QSplashScreen
+from PyQt5.QtGui import QPixmap
 
 
 def main() -> None:
@@ -31,10 +32,20 @@ def main() -> None:
 
     app = QApplication(["qpassword_manager"])
 
+    pixmap = QPixmap("images/splash.jpg")
+    splash = QSplashScreen(pixmap)
+    splash.show()
+
     os.chdir(os.path.join(xdg_data_home(), "qpassword_manager"))
 
+    time.sleep(.1)
+    app.processEvents()
+
+    from qpassword_manager.login_window import LoginWindow
     window = LoginWindow()
     window.show()
+
+    splash.finish(window)
 
     app.exec()
 
