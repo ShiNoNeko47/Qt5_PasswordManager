@@ -41,7 +41,7 @@ class Config:
                 encoding="utf8",
             ) as file:
                 config = """{
-                    \"url\": \"\"
+                    \"url\": \"\",
                     \"database_online\": false,
                     \"vim_mode\": true
                 }"""
