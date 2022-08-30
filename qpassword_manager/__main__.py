@@ -31,7 +31,11 @@ def main() -> None:
 
     app = QApplication(["qpassword_manager"])
 
-    os.chdir(os.path.join(xdg_data_home(), "qpassword_manager"))
+    directory = os.path.join(xdg_data_home(), "qpassword_manager")
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    os.chdir(directory)
 
     window = LoginWindow()
     window.show()
