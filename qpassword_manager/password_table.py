@@ -111,7 +111,8 @@ class PasswordTable(QTableWidget):
             entry_id = self.entry_ids[self.currentRow()]
             pyperclip.copy(
                 json.dumps(
-                    self.window.database_handler.get_entry(entry_id, self.window.auth)
+                    self.window.database_handler.get_entry(
+                        entry_id, self.window.auth)
                     if entry_id >= 0
                     else self.window.changes[-entry_id - 1][1]
                 )
@@ -133,7 +134,8 @@ class PasswordTable(QTableWidget):
                             break
 
                 else:
-                    self.window.add_to_changes([0, self.currentRow(), entry_id])
+                    self.window.add_to_changes(
+                        [0, self.currentRow(), entry_id])
 
                 self.entry_ids.pop(self.currentRow())
                 self.removeRow(self.currentRow())
@@ -176,7 +178,8 @@ class PasswordTable(QTableWidget):
         if self.rowCount():
             self.setCurrentCell(0, 0)
 
-        self.entry_ids = self.window.database_handler.get_entry_ids(self.window.auth)
+        self.entry_ids = self.window.database_handler.get_entry_ids(
+            self.window.auth)
 
     def search_next_prev(self, key, items) -> None:
         """

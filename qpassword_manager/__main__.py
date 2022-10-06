@@ -5,7 +5,7 @@ import sys
 import os
 import getopt
 import logging
-from xdg import xdg_data_home
+from xdg.BaseDirectory import xdg_data_home
 from PyQt5.QtWidgets import QApplication
 from qpassword_manager.login_window import LoginWindow
 
@@ -31,7 +31,7 @@ def main() -> None:
 
     app = QApplication(["qpassword_manager"])
 
-    directory = os.path.join(xdg_data_home(), "qpassword_manager")
+    directory = os.path.join(xdg_data_home, "qpassword_manager")
     if not os.path.exists(directory):
         os.makedirs(directory)
 
