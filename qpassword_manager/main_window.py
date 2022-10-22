@@ -202,6 +202,8 @@ class MainWindow(QWidget):
                     )
                     self.table.fill_row(
                         self.table.get_entry_input(self.fernet))
+                    self.table.data.append(
+                        self.table.get_entry_input(self.fernet))
                     self.table.removeRow(self.table.entry_row_index)
                     self.table.setFocus()
 

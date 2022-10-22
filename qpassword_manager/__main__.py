@@ -6,7 +6,7 @@ import time
 import os
 import getopt
 import logging
-from xdg import xdg_data_home
+from xdg.BaseDirectory import xdg_data_home
 from PyQt5.QtWidgets import QApplication, QSplashScreen
 from PyQt5.QtGui import QPixmap
 
@@ -36,12 +36,17 @@ def main() -> None:
     splash = QSplashScreen(pixmap)
     splash.show()
 
-    os.chdir(os.path.join(xdg_data_home(), "qpassword_manager"))
+    directory = os.path.join(xdg_data_home, "qpassword_manager")
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
-    time.sleep(.1)
+    os.chdir(directory)
+
+    time.sleep(0.1)
     app.processEvents()
 
     from qpassword_manager.login_window import LoginWindow
+
     window = LoginWindow()
     window.show()
 

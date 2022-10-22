@@ -4,7 +4,7 @@ import os
 import logging
 import base64
 import json
-from xdg import xdg_config_home
+from xdg.BaseDirectory import xdg_config_home
 from Crypto.Hash import SHA256
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLineEdit, QPushButton
 from PyQt5.Qt import Qt
@@ -71,7 +71,7 @@ class LoginWindow(QWidget):
         try:
             with open(
                 os.path.join(
-                    xdg_config_home(), "qpassword_manager", "autofill.json"
+                    xdg_config_home, "qpassword_manager", "autofill.json"
                 ),
                 "r",
                 encoding="utf8",
@@ -86,7 +86,7 @@ class LoginWindow(QWidget):
         except FileNotFoundError as error:
             with open(
                 os.path.join(
-                    xdg_config_home(), "qpassword_manager", "autofill.json"
+                    xdg_config_home, "qpassword_manager", "autofill.json"
                 ),
                 "w+",
                 encoding="utf8",
