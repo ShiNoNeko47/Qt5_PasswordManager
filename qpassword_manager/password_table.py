@@ -44,6 +44,7 @@ class PasswordTable(QTableWidget):
         self.entry_ids = []
         self.entry_row_index = 0
         self.entry_input = None
+        self.entry_input_mode = 0
         self.data = None
 
     def event(self, event) -> bool:
@@ -91,28 +92,36 @@ class PasswordTable(QTableWidget):
             self.window.cmd_input.setFocus()
 
         elif key in ["i", "I", "a", "A", "o", "O"]:
-            if not self.insert_mode()[0]:
-                self.entry_row_index = self.rowCount()
-                self.insertRow(self.entry_row_index)
+            self.add_row(self.rowCount())
+            self.entry_input_mode = 1
 
-                self.entry_input = [
-                    NewWebsiteInput(),
-                    QLineEdit(),
-                    NewPasswordInput(),
-                ]
+        elif key in ["c", "C"]:
+            row = self.currentRow()
+            current_entry = self.window.database_handler.get_entry(
+                self.entry_ids[row], self.window.auth
+            )
 
-                for i in range(3):
-                    self.setCellWidget(
-                        self.entry_row_index, i, self.entry_input[i]
-                    )
-            self.focus_entry_input()
+            if current_entry is not None:
+                self.removeRow(row)
+                self.add_row(row)
+
+                for i in range(2):
+                    self.entry_input[i].setText(current_entry[i])
+
+                self.entry_input[2].setText(
+                    self.window.fernet.decrypt(
+                        current_entry[2].encode()
+                    ).decode()
+                )
+                self.entry_input_mode = 2
 
         elif key in ["y", "Y"]:
             entry_id = self.entry_ids[self.currentRow()]
             pyperclip.copy(
                 json.dumps(
                     self.window.database_handler.get_entry(
-                        entry_id, self.window.auth)
+                        entry_id, self.window.auth
+                    )
                     if entry_id >= 0
                     else self.window.changes[-entry_id - 1][1]
                 )
@@ -134,23 +143,52 @@ class PasswordTable(QTableWidget):
                             break
 
                 else:
-                    self.window.add_to_changes(
-                        [0, self.currentRow(), entry_id])
+                    self.window.add_to_changes([0, self.currentRow(), entry_id])
 
                 self.entry_ids.pop(self.currentRow())
                 self.removeRow(self.currentRow())
 
+    def stop_change(self) -> None:
+        """Stops editting and resets values in current row to the ones in database"""
+
+        row_index = self.currentRow()
+        column_index = self.currentColumn()
+        self.removeRow(row_index)
+        row = self.window.database_handler.get_entry(
+            self.entry_ids[row_index], self.window.auth
+        )
+        self.fill_row(row, row_index)
+        self.setCurrentCell(row_index, column_index)
+
+    def add_row(self, row) -> None:
+        """Adds a row with input entries"""
+
+        if not self.insert_mode()[0]:
+            self.entry_row_index = row
+            self.insertRow(row)
+
+            self.entry_input = [
+                NewWebsiteInput(),
+                QLineEdit(),
+                NewPasswordInput(),
+            ]
+
+            for i in range(3):
+                self.setCellWidget(row, i, self.entry_input[i])
+        self.focus_entry_input()
+
     def fill_row(self, row, index=None) -> None:
         """Fills table row with values from the list passed to it"""
 
-        index = index or self.rowCount()
+        if index is None:
+            index = self.rowCount()
         self.insertRow(index)
         for j in range(2):
             self.setItem(index, j, (QTableWidgetItem(row[j])))
 
         row = "*" * len(self.window.fernet.decrypt(row[2].encode()))
         self.setItem(index, 2, (QTableWidgetItem(row)))
-        self.setCurrentCell(self.rowCount() - 1, self.currentColumn())
+        self.setCurrentCell(index, self.currentColumn())
 
     def fill_table(self) -> None:
         """Updates data in the table"""
@@ -179,7 +217,8 @@ class PasswordTable(QTableWidget):
             self.setCurrentCell(0, 0)
 
         self.entry_ids = self.window.database_handler.get_entry_ids(
-            self.window.auth)
+            self.window.auth
+        )
 
     def search_next_prev(self, key, items) -> None:
         """

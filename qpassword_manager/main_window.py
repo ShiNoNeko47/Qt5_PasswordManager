@@ -55,7 +55,7 @@ class MainWindow(QWidget):
 
         self.auth = (
             self.login_window.name_input.text(),
-            self.login_window.key_input_hashed.hexdigest()
+            self.login_window.key_input_hashed.hexdigest(),
         )
 
         self.set_key(self.login_window.get_key())
@@ -68,7 +68,8 @@ class MainWindow(QWidget):
 
         self.last_event_time = 0
         self.checking_inactivity = threading.Thread(
-            target=self.check_inactivity, daemon=True)
+            target=self.check_inactivity, daemon=True
+        )
         self.checking_inactivity.start()
 
     def set_key(self, key) -> None:
@@ -120,8 +121,14 @@ class MainWindow(QWidget):
             if change[0] == -1:
                 continue
 
-            if change[0]:
+            if change[0] == 1:
                 self.database_handler.add_to_database(*change[1], self.auth)
+                continue
+
+            if change[0] == 2:
+                self.database_handler.update_entry(
+                    change[2], *change[1], self.auth
+                )
                 continue
 
             self.database_handler.remove_from_database(change[2], self.auth)
@@ -135,8 +142,9 @@ class MainWindow(QWidget):
 
         if self.changes:
             with open("changes_" + self.auth[0], "wb+") as changes_file:
-                changes_file.write(self.fernet.encrypt(
-                    json.dumps(self.changes).encode()))
+                changes_file.write(
+                    self.fernet.encrypt(json.dumps(self.changes).encode())
+                )
 
             self.changes.clear()
 
@@ -146,7 +154,8 @@ class MainWindow(QWidget):
         if os.path.exists("changes_" + self.auth[0]):
             with open("changes_" + self.auth[0], "rb") as changes_file:
                 self.changes = json.loads(
-                    self.fernet.decrypt(changes_file.read()))
+                    self.fernet.decrypt(changes_file.read())
+                )
 
             os.remove("changes_" + self.auth[0])
 
@@ -177,7 +186,9 @@ class MainWindow(QWidget):
             self.changes.clear()
             self.close()
 
-    def keyPressEvent(self, event) -> None:  # pylint: disable=invalid-name
+    def keyPressEvent(  # pylint: disable=invalid-name, too-many-branches
+        self, event
+    ) -> None:
         """Copy selected item in table"""
 
         if event.key() == Qt.Key_Return:
@@ -189,23 +200,37 @@ class MainWindow(QWidget):
                 else:
                     pyperclip.copy(
                         self.fernet.decrypt(
-                            self.table.data[self.table.selectedIndexes()[0].row()][
-                                2
-                            ].encode()
+                            self.table.data[
+                                self.table.selectedIndexes()[0].row()
+                            ][2].encode()
                         ).decode()
                     )
 
             elif all(self.table.insert_mode()):
                 if self.table.check_entry_input():
                     self.add_to_changes(
-                        [1, self.table.get_entry_input(self.fernet)]
+                        [
+                            self.table.entry_input_mode,
+                            self.table.get_entry_input(self.fernet),
+                            self.table.entry_ids[self.table.currentRow()]
+                            if self.table.entry_input_mode == 2
+                            else 0,
+                        ]
                     )
                     self.table.fill_row(
-                        self.table.get_entry_input(self.fernet))
-                    self.table.data.append(
-                        self.table.get_entry_input(self.fernet))
+                        self.table.get_entry_input(self.fernet),
+                        self.table.currentRow() + 1,
+                    )
                     self.table.removeRow(self.table.entry_row_index)
                     self.table.setFocus()
+                    if self.table.entry_input_mode == 1:
+                        self.table.data.append(
+                            self.table.get_entry_input(self.fernet)
+                        )
+                    else:
+                        self.table.data[
+                            self.table.currentRow()
+                        ] = self.table.get_entry_input(self.fernet)
 
             else:
                 self.search_input.hide()
@@ -217,10 +242,13 @@ class MainWindow(QWidget):
             self.search_input.clear()
             self.cmd_input.hide()
             if all(self.table.insert_mode()):
-                self.table.setCurrentCell(
-                    self.table.entry_row_index - 1,
-                    self.table.currentColumn(),
-                )
+                if self.table.entry_input_mode == 1:
+                    self.table.setCurrentCell(
+                        self.table.entry_row_index - 1,
+                        self.table.currentColumn(),
+                    )
+                else:
+                    self.table.stop_change()
                 self.table.setFocus()
             if self.table.insert_mode()[0] and all(
                 entry.text() == "" for entry in self.table.entry_input

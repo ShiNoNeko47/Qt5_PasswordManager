@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 if __name__ == "__main__":
     setup(
         name="qpassword_manager",
-        version="0.10.0",
+        version="0.11.0",
         author="ShiNoNeko47",
         author_email="nikola.brezovec.32123@gmail.com",
         packages=find_packages(),
@@ -17,7 +17,7 @@ if __name__ == "__main__":
             "PyQt5",
             "requests",
             "pyxdg",
-            "pynput"
+            "pynput",
         ],
         entry_points={
             "gui_scripts": [

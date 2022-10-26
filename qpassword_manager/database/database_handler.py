@@ -155,6 +155,38 @@ class DatabaseHandler:
         return
 
     @check_server
+    def update_entry(  # pylint: disable=too-many-arguments
+        self, row_id, website, username, password, auth
+    ) -> None:
+        """Function for working with only one row in database"""
+
+        if self.config["database_online"]:
+            requests.post(
+                url=self.config["url"] + "/update_entry",
+                timeout=5,
+                json={
+                    "id": row_id,
+                    "website": website,
+                    "username": username,
+                    "password": password,
+                },
+                auth=auth,
+            )
+            return
+
+        conn = sqlite3.connect(auth[0] + ".db")
+        cursor = conn.cursor()
+        cursor.execute(
+            f"""update passwords
+                set website = \"{website}\", username = \"{username}\", password = \"{password}\"
+                where (id = {row_id})"""
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return
+
+    @check_server
     def register(self, username, email, master_key) -> str:
         """Function for adding a new user to database"""
 
