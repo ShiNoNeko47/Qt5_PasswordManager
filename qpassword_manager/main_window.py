@@ -234,6 +234,7 @@ class MainWindow(QWidget):
 
             else:
                 self.search_input.hide()
+                self.table.search_next_prev('n', self.search())
                 self.run_cmd()
                 self.cmd_input.hide()
 

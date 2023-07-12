@@ -128,10 +128,8 @@ class LoginWindow(QWidget):
         logging.debug(self.name_input.text())
         logging.debug(self.key_input_hashed.hexdigest())
         logging.debug(credentials_match)
-        if credentials_match:
-            return True
 
-        return False
+        return credentials_match
 
     def login(self) -> None:
         """opens MainWindow if check_key returns True"""
@@ -140,7 +138,8 @@ class LoginWindow(QWidget):
             self.w_main = MainWindow(self)
             self.w_main.show()
 
-            self.autofill()
+            self.key_input.setText("")
+            self.key_input.setFocus()
             self.hide()
 
     def new_user(self) -> None:
@@ -155,7 +154,7 @@ class LoginWindow(QWidget):
         password = self.key_input.text().encode()
         salt = b"sw\xea\x01\x9d\x109\x0eF\xef/\n\xb0mWK"
         kdf = PBKDF2HMAC(
-            algorithm=hashes.SHA256,
+            algorithm=hashes.SHA256(),
             length=32,
             salt=salt,
             iterations=10000,
