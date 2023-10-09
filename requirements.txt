@@ -4,4 +4,3 @@ pyperclip>=1.8.2
 PyQt5>=5.15.6
 requests>=2.31.0
 pyxdg>=0.28
-pynput>=1.7.6

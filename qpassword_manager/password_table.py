@@ -2,15 +2,17 @@
 
 import json
 import logging
-from pynput.keyboard import Key, Controller
+
 import pyperclip
 from PyQt5.QtCore import QEvent, Qt
+from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (
     QTableWidget,
     QLineEdit,
     QTableWidgetItem,
     QHeaderView,
     QAbstractItemView,
+    QApplication,
 )
 from qpassword_manager.entry_input import NewPasswordInput, NewWebsiteInput
 
@@ -29,14 +31,13 @@ class PasswordTable(QTableWidget):
         self.window = window
 
         self.keybinds = {
-            Qt.Key_H: [Key.left],
-            Qt.Key_J: [Key.down],
-            Qt.Key_K: [Key.up],
-            Qt.Key_L: [Key.right],
-            Qt.Key_0: [Key.home],
-            Qt.Key_Dollar: [Key.end],
+            Qt.Key_H: Qt.Key_Left,
+            Qt.Key_J: Qt.Key_Down,
+            Qt.Key_K: Qt.Key_Up,
+            Qt.Key_L: Qt.Key_Right,
+            Qt.Key_0: Qt.Key_Home,
+            Qt.Key_Dollar: Qt.Key_End,
         }
-        self.keyboard = Controller()
 
         self.current_index = 0
         self.setTabKeyNavigation(False)
@@ -51,15 +52,13 @@ class PasswordTable(QTableWidget):
         """Handles keys for navigation"""
 
         if event.type() == QEvent.KeyPress and event.key() in self.keybinds:
-            for keybind in self.keybinds[event.key()]:
-                self.keyboard.press(keybind)
-
-            return True
-
-        if event.type() == QEvent.KeyRelease and event.key() in self.keybinds:
-            for keybind in self.keybinds[event.key()]:
-                self.keyboard.release(keybind)
-
+            event = QKeyEvent(
+                QEvent.KeyPress,
+                self.keybinds[event.key()],
+                Qt.NoModifier,
+                "",
+            )
+            QApplication.sendEvent(self, event)
             return True
 
         return QTableWidget.event(self, event)
